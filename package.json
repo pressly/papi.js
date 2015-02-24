@@ -1,0 +1,19 @@
+{
+  "name": "papi",
+  "version": "0.1.0",
+  "description": "Javascript HTTP/REST client for the Pressly API",
+  "author": "Peter Kieltyka <peter@pressly.com>",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/pressly/papi.js.git"
+  },
+  "dependencies": {
+    "superagent": "0.21.0"
+  },
+  "devDependencies": {
+  },
+  "main": "./papi.js",
+  "engines": {
+    "node": ">= 0.10"
+  }
+}
