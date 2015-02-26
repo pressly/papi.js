@@ -8,10 +8,10 @@
     "url": "git://github.com/pressly/papi.js.git"
   },
   "dependencies": {
+    "q": "^1.2.0",
     "superagent": "0.21.0"
   },
-  "devDependencies": {
-  },
+  "devDependencies": {},
   "main": "./papi.js",
   "engines": {
     "node": ">= 0.10"

@@ -28,7 +28,6 @@
 var request = require("superagent");
 
 var Papi = {
-  // host: "http://localhost:5331",
   host: "https://beta-api.pressly.com",
   jwtToken: null,
 
@@ -37,17 +36,13 @@ var Papi = {
   },
 
   creds: function() {
-    request.get(this.host + "/creds?jwt="+this.jwtToken, function(err, res) {
-      if (err) throw err;
-      console.log(res.text);
-    });
+    return request.get(this.host + "/creds?jwt="+this.jwtToken)
   },
 
-  searchTwitter: function() {
-    request.get(this.host + "/twitter/search?q=golang&jwt="+this.jwtToken, function(err, res) {
-      if (err) throw err;
-      console.log(res.text);
-    });
+  searchTwitter: function(q) {
+    var q = q || 'golang';
+    console.log('PAPI: Performing Twitter Search for: ' + q);
+    return request.get(this.host + "/twitter/search?q=" + q + "&jwt="+this.jwtToken)
     // hrmm.. should use promises......? and return a prompse..
     // would be nicer.......
   }

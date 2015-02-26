@@ -1,4 +1,4 @@
-Reeler Webapp example using Browserify
+PAPI Webapp example
 ======================================
 
 # TODO:
