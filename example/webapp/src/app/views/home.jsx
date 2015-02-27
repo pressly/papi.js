@@ -1,5 +1,4 @@
 import React from 'react';
-import ItemList from '../components/itemList.jsx';
 
 var Home = React.createClass({
 

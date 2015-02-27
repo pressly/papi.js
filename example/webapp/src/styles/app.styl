@@ -12,7 +12,7 @@ html
 button
 input
 select
-textarea 
+textarea
   color: $black
 
 a
@@ -22,16 +22,16 @@ a:visited
 
 a:hover
   color: lighten($linkColor,10%)
-  
+
 body
   color: $black
   font-size: 1em
   line-height: 1.5
-  
+
 header
   background: $grey
   color:$black
-  
+
   nav
     float: left
     user-select: none
@@ -39,15 +39,28 @@ header
   .logo
     float: right
     padding: 20px 40px
-    
+
   .nav-item
     float:left
     padding: 20px 40px
     margin: 0
-    
+
     &.active
       background: #aaa
       color: #fff
-    
+
 .content
   padding: 2em 4em
+
+ul.results
+  list-style: none;
+  padding: 20px 0;
+  margin: 0;
+
+  > li
+    padding: 5px 10px;
+    border-bottom: 1px solid #ddd;
+
+    img.avatar
+      width: 20px;
+      height: 20px;

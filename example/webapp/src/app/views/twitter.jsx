@@ -1,5 +1,5 @@
 import React from 'react';
-import ItemList from '../components/itemList.jsx';
+import AssetList from '../components/assetList.jsx';
 
 var Twitter = React.createClass({
 
@@ -7,7 +7,7 @@ var Twitter = React.createClass({
     return (
       <div>
         <h1>PAPI Twitter Search</h1>
-        <ItemList />
+        <AssetList />
       </div>
     );
   }
