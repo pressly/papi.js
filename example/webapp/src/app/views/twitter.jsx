@@ -6,7 +6,7 @@ var Twitter = React.createClass({
   render() {
     return (
       <div>
-        <h1>PAPI Twitter Search</h1>
+        <h1>PAPI Provider Search</h1>
         <AssetList />
       </div>
     );

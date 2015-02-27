@@ -15,7 +15,7 @@ var request = require('superagent');
 // Tokens.
 var devJwtToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNTQzODA0ZmIzZDNkOWQzNGI3MDAwMDAxIn0.Pcv9tTmQZnQNByS4ZItJwCIcbJ8xH-mRMPyzd-z6kGM';
 var betaJwtToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNTRkZTYxNjM0MmJjMzk0NzNkZDdjYmY4In0.VrSrFkbY09DRQZa0W4uWa5VFqyXZH37jqXZ8sny1-WE';
-var alexJwtToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNTRkZTYxNjM0MmJjMzk0NzNkZDdjYzA0In0.WhNAHf4h79w1jtkLSPYqvANOcJGnCIGY6iu3X6KfFzY';
+var alexJwtToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNTRmMGRiNzMwOGFmYTEyYjUzNjIwNTg4In0.CvXGDKAJYZkoH3nnEirtlGlwRzErv1ANOJ-dVkUAnjo';
 
 
 /**
@@ -39,13 +39,13 @@ Provider.prototype.search = function(q) {
 
   if (userSearch) {
     return request
-      .get(Papi.host + '/' + this.provider + '/user')
+      .get(Papi.host + '/network/' + this.provider + '/user')
       .query({ username: q })
       .query({ jwt: Papi.jwtToken });
   }
 
   return request
-    .get(Papi.host + '/' + this.provider + '/search')
+    .get(Papi.host + '/network/' + this.provider + '/search')
     .query({ q: q })
     .query({ jwt: Papi.jwtToken });
 };
@@ -60,7 +60,7 @@ Provider.prototype.profile = function(cred) {
   if (!cred) throw new Error('Credentials were not specified');
 
   return request
-    .get(Papi.host + '/' + this.provider + '/profile/' + cred[0].id)
+    .get(Papi.host + '/network/' + this.provider + '/profile/' + cred[0].id)
     .query({ jwt: Papi.jwtToken });
 };
 
@@ -74,7 +74,7 @@ Provider.prototype.feed = function(cred) {
   if (!cred) throw new Error('Credentials were not specified');
 
   return request
-    .get(Papi.host + '/' + this.provider + '/profile')
+    .get(Papi.host + '/network/' + this.provider + '/profile')
     .query({ username: username })
     .query({ jwt: Papi.jwtToken });
 };
@@ -89,7 +89,7 @@ Provider.prototype.posts = function(cred) {
   if (!cred) throw new Error('Credentials were not specified');
 
   return request
-    .get(Papi.host + '/' + this.provider + '/user')
+    .get(Papi.host + '/network/' + this.provider + '/user')
     .query({ username: username })
     .query({ jwt: Papi.jwtToken });
 };
@@ -105,7 +105,7 @@ Provider.prototype.post = function(cred) {
   if (!cred) throw new Error('Credentials were not specified');
 
   return request
-    .get(Papi.host + '/' + this.provider + '/user')
+    .get(Papi.host + '/network/' + this.provider + '/user')
     .query({ username: username })
     .query({ jwt: Papi.jwtToken });
 };

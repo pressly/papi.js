@@ -9,7 +9,9 @@ var assetList = React.createClass({
       assets : [],
       query: '',
       loading : false,
-      error : false
+      error : false,
+      provider: 'twitter',
+      providers: [ 'twitter', 'gplus', 'youtube' ]
     }
   },
 
@@ -32,15 +34,27 @@ var assetList = React.createClass({
     this.setState({ query: input });
   },
 
+  providerSelected: function(e) {
+    this.setState({ provider: e.target.value });
+  },
+
   handleSubmit: function(e) {
     e.preventDefault();
     this.state.assets = [];
-    assetActions.loadAssets(this.state.query);
+    assetActions.loadAssets(this.state.provider, this.state.query);
   },
 
   render: function() {
     var loading = this.state.loading ? <div>Loading...</div> : '';
     var assets = this.state.assets;
+    var providers = this.state.providers;
+    var self = this;
+
+    var providerList = providers.map(function(provider, index) {
+      return (
+        <input key={ provider + index } onChange={ self.providerSelected } type="radio" name="provider" value={ provider } checked={ self.state.provider == provider }>{ provider }</input>
+      );
+    });
 
     // Regular search (multiple results)
     if (assets.length) {
@@ -58,7 +72,9 @@ var assetList = React.createClass({
     return (
       <div>
         <form className="searchForm" onSubmit={this.handleSubmit}>
-          <input onChange={this.onInputChange} value={this.state.query} />
+          { providerList }
+          <br />
+          <input onChange={this.onInputChange} type="text" value={this.state.query} />
           <button>Search</button>
         </form>
 

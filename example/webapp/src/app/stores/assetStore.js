@@ -12,11 +12,11 @@ var assetStore = Reflux.createStore({
     this.listenTo(assetActions.loadAssetsSuccess, this.loadAssetsSuccess);
   },
 
-  loadAssets: function(q) {
+  loadAssets: function(provider, q) {
     this.trigger({ loading: true });
 
     // PAPI search
-    Papi.search('twitter', q).end(function(res) {
+    Papi.search(provider, q).end(function(res) {
       assetActions.loadAssetsSuccess(res.body);
       console.log('PAPI - Results:', res.body);
     });
