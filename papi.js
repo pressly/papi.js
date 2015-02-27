@@ -133,17 +133,13 @@ var Papi = {
   },
 
   search: function(provider, q) {
-    var P = new Provider(provider);
-
     console.log('PAPI - Performing {' + provider + '} Search for: ' + q);
-    return P.search(q);
+    return new Provider(provider).search(q);
   },
 
   profile: function(provider) {
-    var P = new Provider(provider);
-
     console.log('PAPI - Showing {' + provider + '} Profile creds');
-    return P.profile(Papi.credentials[provider]);
+    return new Provider(provider).profile(Papi.credentials[provider]);
   }
 };
 

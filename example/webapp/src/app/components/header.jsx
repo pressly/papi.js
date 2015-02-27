@@ -11,7 +11,7 @@ var Header = React.createClass({
         <nav className="clearfix">
           <Link to="home" className="nav-item">Home</Link>
           <Link to="info" className="nav-item">Info</Link>
-          <Link to="twitter" className="nav-item">PAPI Twitter Search</Link>
+          <Link to="twitter" className="nav-item">Search</Link>
         </nav>
       </header>
     );

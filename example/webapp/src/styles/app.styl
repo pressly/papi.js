@@ -38,11 +38,11 @@ header
 
   .logo
     float: right
-    padding: 20px 40px
+    padding: 15px 30px
 
   .nav-item
     float:left
-    padding: 20px 40px
+    padding: 15px 30px
     margin: 0
 
     &.active
@@ -60,7 +60,20 @@ ul.results
   > li
     padding: 5px 10px;
     border-bottom: 1px solid #ddd;
+    line-height: 30px;
 
     img.avatar
-      width: 20px;
-      height: 20px;
+      width: 30px;
+      height: 30px;
+
+    a
+      color: #aaa;
+      &:hover
+        color: #000;
+
+.searchForm
+  input
+    height: 25px;
+    margin-right: 10px;
+  button
+    padding: 4px 20px;

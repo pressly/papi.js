@@ -26,11 +26,15 @@ var assetList = React.createClass({
   },
 
   onInputChange: function(e) {
-    this.setState({ query: e.target.value });
+    var input = e.target.value;
+    if (!input.length) this.state.assets = [];
+
+    this.setState({ query: input });
   },
 
   handleSubmit: function(e) {
     e.preventDefault();
+    this.state.assets = [];
     assetActions.loadAssets(this.state.query);
   },
 
@@ -41,17 +45,19 @@ var assetList = React.createClass({
     // Regular search (multiple results)
     if (assets.length) {
       assets = this.state.assets.map(function(asset, index) {
-        return <li key={ asset.id }><img className="avatar" src={ asset.author.avatar_url } /> - { asset.author.name } - { asset.source.url }</li>
+        return <li key={ asset.id }><img className="avatar" src={ asset.author.avatar_url } /> - { asset.author.name } - <a href={ asset.source.url } target="_blank">{ asset.source.url }</a></li>
       });
 
     // @username search (single result)
     } else {
-      assets = <li key={ assets.uid }><img src={ assets.avatar_url } /> { assets.name }</li>
+      if (assets.uid) {
+        assets = <li key={ assets.uid }><img className="avatar" src={ assets.avatar_url } /> { assets.name }</li>
+      }
     }
 
     return (
       <div>
-        <form onSubmit={this.handleSubmit}>
+        <form className="searchForm" onSubmit={this.handleSubmit}>
           <input onChange={this.onInputChange} value={this.state.query} />
           <button>Search</button>
         </form>
