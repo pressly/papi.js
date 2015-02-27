@@ -1,56 +1,154 @@
 /**
   * Papi JS client
   * ================
-  * 
-  * GET /creds
-  *  
-  * GET /:provider/search?q=X
-  * GET /:provider/user?username=X
-  *  
-  * GET /:provider/profile/:cred
-  * GET /:provider/feed/:cred
-  * GET /:provider/posts/:cred
-  *  
-  * GET /:provider/post/:cred?body=X
-  * POST /:provider/post/:cred {..obj..}
-  * 
-  * Also:
-  * - Authorization header with JWT token
-  * 
   **/
 
 // The first version, just write it plan javascript..
 // no fancy es6, just stick to the basics
 
-// make sure to set window.superagent ... 
+// make sure to set window.superagent ...
 // ie. when using with angular.......
 
-var request = require("superagent");
+// Dependencies.
+var request = require('superagent');
 
+// Tokens.
+var devJwtToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNTQzODA0ZmIzZDNkOWQzNGI3MDAwMDAxIn0.Pcv9tTmQZnQNByS4ZItJwCIcbJ8xH-mRMPyzd-z6kGM';
+var betaJwtToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNTRkZTYxNjM0MmJjMzk0NzNkZDdjYmY4In0.VrSrFkbY09DRQZa0W4uWa5VFqyXZH37jqXZ8sny1-WE';
+var alexJwtToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNTRkZTYxNjM0MmJjMzk0NzNkZDdjYzA0In0.WhNAHf4h79w1jtkLSPYqvANOcJGnCIGY6iu3X6KfFzY';
+
+
+/**
+ * Search Provider
+ *
+ * Main wrapper for PAPI Search.
+ */
+function Provider(provider) {
+  this.provider = provider;
+};
+
+/**
+ * Search:
+ *    GET /:provider/search?q=X
+ *
+ * @param {String} q - Search query
+ */
+Provider.prototype.search = function(q) {
+  var userSearch = (q[0] == '@') ? true : false;
+  if (!q) q = 'golang';
+
+  if (userSearch) {
+    return request
+      .get(Papi.host + '/' + this.provider + '/user')
+      .query({ username: q })
+      .query({ jwt: Papi.jwtToken });
+  }
+
+  return request
+    .get(Papi.host + '/' + this.provider + '/search')
+    .query({ q: q })
+    .query({ jwt: Papi.jwtToken });
+};
+
+/**
+ * Profile:
+ *    GET /:provider/profile/:cred
+ *
+ * @param {Object} cred - Papi credential
+ */
+Provider.prototype.profile = function(cred) {
+  if (!cred) throw new Error('Credentials were not specified');
+
+  return request
+    .get(Papi.host + '/' + this.provider + '/profile/' + cred[0].id)
+    .query({ jwt: Papi.jwtToken });
+};
+
+/**
+ * Feed:
+ *    GET /:provider/feed/:cred
+ *
+ * @param {Object} cred - Papi credential
+ */
+Provider.prototype.feed = function(cred) {
+  if (!cred) throw new Error('Credentials were not specified');
+
+  return request
+    .get(Papi.host + '/' + this.provider + '/profile')
+    .query({ username: username })
+    .query({ jwt: Papi.jwtToken });
+};
+
+/**
+ * Posts:
+ *    GET /:provider/posts/:cred
+ *
+ * @param {Object} cred - Papi credential
+ */
+Provider.prototype.posts = function(cred) {
+  if (!cred) throw new Error('Credentials were not specified');
+
+  return request
+    .get(Papi.host + '/' + this.provider + '/user')
+    .query({ username: username })
+    .query({ jwt: Papi.jwtToken });
+};
+
+/**
+ * Post:
+ *    GET /:provider/post/:cred?body=X
+ *    POST /:provider/post/:cred {..obj..}
+ *
+ * @param {Object} cred - Papi credential
+ */
+Provider.prototype.post = function(cred) {
+  if (!cred) throw new Error('Credentials were not specified');
+
+  return request
+    .get(Papi.host + '/' + this.provider + '/user')
+    .query({ username: username })
+    .query({ jwt: Papi.jwtToken });
+};
+
+
+/**
+ * PAPI
+ *
+ * Pressly JS API.
+ */
 var Papi = {
-  host: "https://beta-api.pressly.com",
+  host: 'https://beta-api.pressly.com',
   jwtToken: null,
+  credentials: null,
 
   auth: function(jwtToken) {
     this.jwtToken = jwtToken;
   },
 
   creds: function() {
-    return request.get(this.host + "/creds?jwt="+this.jwtToken)
+    request.get(this.host + '/creds?jwt=' + this.jwtToken).end(function(res) {
+      Papi.credentials = res.body;
+      console.log('CREDS:', res.body);
+    });
   },
 
-  searchTwitter: function(q) {
-    var q = q || 'golang';
-    console.log('PAPI: Performing Twitter Search for: ' + q);
-    return request.get(this.host + "/twitter/search?q=" + q + "&jwt="+this.jwtToken)
-    // hrmm.. should use promises......? and return a prompse..
-    // would be nicer.......
+  search: function(provider, q) {
+    var P = new Provider(provider);
+
+    console.log('PAPI - Performing {' + provider + '} Search for: ' + q);
+    return P.search(q);
+  },
+
+  profile: function(provider) {
+    var P = new Provider(provider);
+
+    console.log('PAPI - Showing {' + provider + '} Profile creds');
+    return P.profile(Papi.credentials[provider]);
   }
-}
+};
 
-var devJwtToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNTQzODA0ZmIzZDNkOWQzNGI3MDAwMDAxIn0.Pcv9tTmQZnQNByS4ZItJwCIcbJ8xH-mRMPyzd-z6kGM';
-var betaJwtToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNTRkZTYxNjM0MmJjMzk0NzNkZDdjYmY4In0.VrSrFkbY09DRQZa0W4uWa5VFqyXZH37jqXZ8sny1-WE';
+Papi.auth(alexJwtToken);
+Papi.creds();
 
-Papi.auth(betaJwtToken);
-
+window.Papi = Papi;
 module.exports = Papi;
