@@ -10,7 +10,8 @@
 // ie. when using with angular.......
 
 // Dependencies.
-var request = require('superagent');
+var request = require('superagent')
+  , _       = require('underscore');
 
 // Tokens.
 var devJwtToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNTQzODA0ZmIzZDNkOWQzNGI3MDAwMDAxIn0.Pcv9tTmQZnQNByS4ZItJwCIcbJ8xH-mRMPyzd-z6kGM';
@@ -132,6 +133,19 @@ var Papi = {
     });
   },
 
+  loadHubs: function() {
+    return request
+      .get(this.host + '/hubs')
+      .query({ jwt: this.jwtToken });
+  },
+
+  loadAssets: function(hubId) {
+    return request
+      .get(this.host + '/hubs/' + hubId + '/stream')
+      .query({ limit: 8 })
+      .query({ jwt: Papi.jwtToken });
+  },
+
   search: function(provider, q) {
     console.log('PAPI - Performing {' + provider + '} Search for: ' + q);
     return new Provider(provider).search(q);
@@ -140,6 +154,24 @@ var Papi = {
   profile: function(provider) {
     console.log('PAPI - Showing {' + provider + '} Profile creds');
     return new Provider(provider).profile(Papi.credentials[provider]);
+  },
+
+  imgry: function(url, width, height, op, fp, box) {
+    var params = {
+      url: url,
+      size: (width || '') + 'x' + (height || ''),
+      op: (op || 'balance')
+    };
+
+    if (fp)  { params.fp = _.toArray(fp).join(',') }
+    if (box) { params.box = _.toArray(box).join(',') }
+
+    // convert params into url hash
+    imgryUrl = '//imgry.pressly.com/xx2/fetch?' + _(_(_(params).pairs()).map(function (e) {
+      return _(e).join('=')
+    })).join('&');
+
+    return imgryUrl;
   }
 };
 

@@ -9,7 +9,8 @@
   },
   "dependencies": {
     "q": "^1.2.0",
-    "superagent": "0.21.0"
+    "superagent": "0.21.0",
+    "underscore": "^1.8.2"
   },
   "devDependencies": {},
   "main": "./papi.js",
