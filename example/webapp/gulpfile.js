@@ -14,7 +14,7 @@ var isProduction  = environment === 'production';
 var webpackConfig = require('./webpack.config.js')[environment];
 
 // https://github.com/ai/autoprefixer
-var autoprefixerBrowsers = [                 
+var autoprefixerBrowsers = [
   'ie >= 9',
   'ie_mob >= 10',
   'ff >= 30',
@@ -50,7 +50,7 @@ gulp.task('styles',function(cb) {
       compress: isProduction, // only compress if we are in production
       'include css' : true    // include 'normal' css into app.css
     }))
-    .pipe($.autoprefixer({browsers: autoprefixerBrowsers})) 
+    .pipe($.autoprefixer({browsers: autoprefixerBrowsers}))
     .pipe(gulp.dest(dist + 'css/'))
     .pipe($.size({ title : 'css' }))
     .pipe($.connect.reload());
@@ -74,6 +74,14 @@ gulp.task('images', function(cb) {
     .pipe(gulp.dest(dist + 'img/'));
 });
 
+// copy vendor
+gulp.task('vendor', function(cb) {
+  return gulp.src(src + 'vendor/**/*')
+    .pipe($.size({ title : 'vendor' }))
+    .pipe(gulp.dest(dist + 'vendor/'));
+});
+
+
 // watch styl, html and js file changes
 gulp.task('watch', function() {
   gulp.watch(src + 'styles/*.styl', ['styles']);
@@ -93,5 +101,5 @@ gulp.task('default', ['build', 'serve', 'watch']);
 
 // waits until clean is finished then builds the project
 gulp.task('build', ['clean'], function(){
-  gulp.start(['images', 'html','scripts','styles']);
+  gulp.start(['images', 'html', 'scripts', 'styles', 'vendor']);
 });

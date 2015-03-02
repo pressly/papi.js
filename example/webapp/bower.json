@@ -12,5 +12,6 @@
     "tests"
   ],
   "dependencies": {
+    "owl.carousel": "*"
   }
 }
