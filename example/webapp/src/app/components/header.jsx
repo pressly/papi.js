@@ -12,6 +12,7 @@ var Header = React.createClass({
           <Link to="home" className="nav-item">Home</Link>
           <Link to="info" className="nav-item">Info</Link>
           <Link to="twitter" className="nav-item">Search</Link>
+          <Link to="embed" className="nav-item">Embed</Link>
         </nav>
       </header>
     );

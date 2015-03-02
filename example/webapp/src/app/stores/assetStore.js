@@ -18,7 +18,6 @@ var assetStore = Reflux.createStore({
     // PAPI search
     Papi.search(provider, q).end(function(res) {
       assetActions.loadAssetsSuccess(res.body);
-      console.log('PAPI - Results:', res.body);
     });
   },
 

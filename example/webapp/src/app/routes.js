@@ -5,6 +5,7 @@ import App from './views/app.jsx';
 import Home from './views/home.jsx';
 import Info from './views/info.jsx';
 import Twitter from './views/twitter.jsx';
+import Embed from './views/embed.jsx';
 import NotFound from './views/notFound.jsx';
 
 var routes = (
@@ -12,6 +13,7 @@ var routes = (
     <Route name="info" handler={ Info } />
     <Route name="home" handler={ Home } />
     <Route name="twitter" handler={ Twitter } />
+    <Route name="embed" handler={ Embed } />
     <DefaultRoute handler={ Home } />
     <NotFoundRoute handler={ NotFound } />
   </Route>
