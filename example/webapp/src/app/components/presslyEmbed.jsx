@@ -46,21 +46,19 @@ var PresslyEmbed = React.createClass({
         return (
           <li key={ item.id }>
             <div className="asset-contents">
-              <a href={ item.source.url } className="image" target="_blank">
-                <div className="background-image" style={ bgStyle } />
-              </a>
+              <div className="image" style={ bgStyle } />
               <div className="content">
                 <div className="byline">{ item.author.name ? item.author.name + ' - ' : '' }{ moment }</div>
-                <h1 className="title"><a href={ item.source.url } target="_blank">{ item.title }</a></h1>
+                <h1 className="title"><a href={ item.source.url } target="_blank" dangerouslySetInnerHTML={{ __html: item.title }}></a></h1>
               </div>
             </div>
+            <a href={ item.source.url } className="link" target="_blank"></a>
           </li>
         );
       });
     }
 
     return (
-      { loading },
       <ul className="embed-results owl-carousel">{ assets }</ul>
     );
   }

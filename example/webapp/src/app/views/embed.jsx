@@ -6,7 +6,7 @@ var Embed = React.createClass({
   render() {
     return (
       <div>
-        <h1>Pressly Embed</h1>
+        <h1>Embed</h1>
         <PresslyEmbed />
       </div>
     );

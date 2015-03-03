@@ -14,6 +14,8 @@ input
 select
 textarea
   color: $black
+h1
+  padding: 0 10px;
 
 a
 a:visited
@@ -81,7 +83,8 @@ ul.results
 .embed-results
   margin: 0;
   padding: 0;
-  list-style:none;
+  list-style: none;
+  position: relative;
 
   li
     width: 100%;
@@ -93,10 +96,49 @@ ul.results
         padding: 0;
 
         .byline
-          padding:10px 0 5px 0;
+          font-size: 14px;
+          padding: 4px 0 0px 0;
 
         .title
-          font-size:18px
+          font-size: 16px
           line-height: 20px;
-          padding:0;
-          margin:0;
+          padding: 0;
+          margin: 0;
+
+    .link
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      z-index: 10;
+
+  &:hover
+    .owl-prev, .owl-next
+      opacity: 1;
+      transform: translateX(0);
+
+.owl-controls
+  .owl-nav
+    div
+      color: #fff;
+      opacity: 0.2;
+      padding: 10px 12px;
+      background: #000;
+      transition: transform 0.3s ease, opacity 0.3s ease;
+
+  .owl-prev, .owl-next
+    position: absolute;
+    top: 50%;
+    margin-top: -50px;
+
+    &:hover
+      background: #0694ff;
+
+  .owl-prev
+    left: 0;
+    transform: translateX(-100%);
+
+  .owl-next
+    right: 0;
+    transform: translateX(100%);
