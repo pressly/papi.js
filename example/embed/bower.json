@@ -1,0 +1,17 @@
+{
+  "name": "papi-example",
+  "version": "0.0.0",
+  "description": "Pressly API Example",
+  "main": "index.html",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "vendor",
+    "src/vendor",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "owl.carousel": "*"
+  }
+}
