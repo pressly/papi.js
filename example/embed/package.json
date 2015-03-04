@@ -26,8 +26,9 @@
     "webpack": "^1.5.3"
   },
   "dependencies": {
+    "moment": "^2.9.0",
+    "papi": "../..",
     "react": "^0.12.2",
-    "reflux": "^0.2.5",
-    "papi": "../.."
+    "reflux": "^0.2.5"
   }
 }
