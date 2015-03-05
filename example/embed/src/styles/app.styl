@@ -1,5 +1,6 @@
 @import 'normalize'
 @import 'helper'
+@import 'carousel'
 
 /* variables */
 $lightgrey = #999
@@ -75,27 +76,3 @@ body
         opacity: 1;
         transform: translateX(0);
 
-.owl-controls
-  .owl-nav
-    div
-      color: #fff;
-      opacity: 0.2;
-      padding: 10px 12px;
-      background: #000;
-      transition: transform 0.3s ease, opacity 0.3s ease;
-
-  .owl-prev, .owl-next
-    position: absolute;
-    top: 50%;
-    margin-top: -60px;
-
-    &:hover
-      background: #0694ff;
-
-  .owl-prev
-    left: 0;
-    transform: translateX(-100%);
-
-  .owl-next
-    right: 0;
-    transform: translateX(100%);

@@ -1,4 +1,5 @@
 var gulp  = require('gulp');
+var concat= require('gulp-concat');
 var path  = require('path');
 var del   = require('del');
 var $     = require('gulp-load-plugins')();
@@ -76,11 +77,25 @@ gulp.task('images', function(cb) {
 
 // copy vendor
 gulp.task('vendor', function(cb) {
-  return gulp.src(src + 'vendor/**/*')
+  return gulp.src([
+      src + 'vendor/jquery/dist/jquery.min.js',
+      src + 'vendor/owl.carousel/dist/owl.carousel.min.js',
+    ])
+    .pipe(concat('vendor.js'))
     .pipe($.size({ title : 'vendor' }))
     .pipe(gulp.dest(dist + 'vendor/'));
 });
 
+// unify all js into one file
+gulp.task('unify', function(cb) {
+  return gulp.src([
+      src + 'js/app.js',
+      src + 'vendor/vendor.js'
+    ])
+    .pipe(concat('unify.js'))
+    .pipe($.size({ title : 'unify' }))
+    .pipe(gulp.dest(dist + 'js/'));
+});
 
 // watch styl, html and js file changes
 gulp.task('watch', function() {

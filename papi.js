@@ -15,7 +15,7 @@ var request = require('superagent')
 
 // Tokens.
 var devJwtToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNTQzODA0ZmIzZDNkOWQzNGI3MDAwMDAxIn0.Pcv9tTmQZnQNByS4ZItJwCIcbJ8xH-mRMPyzd-z6kGM';
-var betaJwtToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNTRkZTYxNjM0MmJjMzk0NzNkZDdjYmY4In0.VrSrFkbY09DRQZa0W4uWa5VFqyXZH37jqXZ8sny1-WE';
+var betaJwtToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNTRmMGRiNzMwOGFmYTEyYjUzNjIwNTkwIn0.3dtaAt-WIyqi5LPT4EiHGFLiU2TDD6-_sWpwZwkqcHI';
 var alexJwtToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNTRmMGRiNzMwOGFmYTEyYjUzNjIwNTg4In0.CvXGDKAJYZkoH3nnEirtlGlwRzErv1ANOJ-dVkUAnjo';
 
 
@@ -123,7 +123,7 @@ var Papi = {
   credentials: null,
 
   auth: function(jwtToken) {
-    this.jwtToken = jwtToken;
+    this.jwtToken = jwtToken || alexJwtToken;
   },
 
   creds: function() {
@@ -175,8 +175,4 @@ var Papi = {
   }
 };
 
-Papi.auth(alexJwtToken);
-Papi.creds();
-
-window.Papi = Papi;
 module.exports = Papi;
