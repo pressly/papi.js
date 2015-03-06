@@ -1,12 +1,13 @@
 import React from 'react';
+import EmbedExample from '../components/embedExample.jsx';
 
 var Home = React.createClass({
 
   render() {
     return (
-      <div>
-        <h1>Home</h1>
-        PAPI Webapp Example
+      <div className="container">
+        <h1>Embed Example:</h1>
+        <EmbedExample />
       </div>
     );
   }

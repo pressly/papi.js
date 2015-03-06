@@ -13,7 +13,6 @@ var routes = (
     <Route name="info" handler={ Info } />
     <Route name="home" handler={ Home } />
     <Route name="twitter" handler={ Twitter } />
-    <Route name="embed" handler={ Embed } />
     <DefaultRoute handler={ Home } />
     <NotFoundRoute handler={ NotFound } />
   </Route>
