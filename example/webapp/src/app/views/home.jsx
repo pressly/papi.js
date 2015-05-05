@@ -6,7 +6,7 @@ var Home = React.createClass({
   render() {
     return (
       <div className="container">
-        <h1>Embed Example:</h1>
+        <h1>Embed:</h1>
         <EmbedExample />
       </div>
     );

@@ -6,6 +6,7 @@ var EmbedExample = React.createClass({
     return {
       query: 'http://av.local:4444/',
       src: '',
+      theme: 'light',
     }
   },
 
@@ -23,6 +24,12 @@ var EmbedExample = React.createClass({
 
   onInputChange: function(e) {
     var input = e.target.value;
+
+    if (input.indexOf('dark') > 0) {
+      this.setState({ theme: 'dark' });
+    } else {
+      this.setState({ theme: 'light' });
+    }
 
     this.setState({ query: input });
   },
@@ -46,13 +53,17 @@ var EmbedExample = React.createClass({
         marginBottom: 10
       };
 
+    var dark = { background: '#000' };
+    var light = { background: '#fff' };
+
     return (
       <div>
         <form className="embedForm" onSubmit={this.handleSubmit}>
-          <input style={ inputStyle } onChange={this.onInputChange} type="text" value={this.state.query} />
+          <input style={ inputStyle } onChange={this.onInputChange} type="text" value={ this.state.query } />
         </form>
-
-        <iframe width="100%" height="400" scrolling="no" frameBorder="no" src={this.state.src}></iframe>
+        <div className="iframe-container" style={ this.state.theme == 'dark' ? dark : light }>
+          <iframe width="100%" height="450" scrolling="no" frameBorder="no" src={ this.state.src }></iframe>
+        </div>
       </div>
     );
   }

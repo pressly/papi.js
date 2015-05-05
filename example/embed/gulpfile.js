@@ -5,7 +5,7 @@ var del   = require('del');
 var $     = require('gulp-load-plugins')();
 
 // config
-var port = $.util.env.port || 3333;
+var port = $.util.env.port || 4444;
 var src = 'src/';
 var dist = 'dist/';
 

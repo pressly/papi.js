@@ -10,8 +10,9 @@ function PresslyEmbed(options) {
   this.defaults = {
     items: 5,
     width: 250,
-    height: 200,
+    height: 210,
     ewidth: 0,
+    theme: 'light',
   };
 
   this.settings = $.extend(this.defaults, options);
@@ -39,6 +40,7 @@ PresslyEmbed.prototype.init = function() {
     nav: true,
     navText: [ '<', '>' ],
     margin: 10,
+    stagePadding: 10,
     autoplay: true,
     lazyLoad: true,
     autoplaySpeed: 500,
@@ -50,6 +52,7 @@ PresslyEmbed.prototype.init = function() {
 
   // re-fit assets into container
   self.updateAssets();
+  self.updateTheme();
 
   // handle window resize
   $(window).on('resize', debounce(function(e) {
@@ -71,6 +74,26 @@ PresslyEmbed.prototype.updateContainer = function() {
       $(this.container).css('width', this.settings.ewidth);
     }
   }
+};
+
+/**
+ * Switch themes.
+ */
+PresslyEmbed.prototype.updateTheme = function() {
+  var self = this;
+
+  // links
+  $('.pressly-embed a', $(this.container)).css('color', self.settings.theme == 'dark' ? '#fff' : '#000');
+
+  // navigation
+  $('.owl-prev, .owl-next', $(this.container)).css({
+    'color': self.settings.theme == 'dark' ? '#000' : '#fff',
+    'background': self.settings.theme == 'dark' ? '#fff' : '#000',
+  }).on('mouseover', function() {
+    $(this).css({ 'background': '#0694ff' });
+  }).on('mouseout', function() {
+    $(this).css({ 'background': self.settings.theme == 'dark' ? '#fff' : '#000' });
+  });
 };
 
 /**
