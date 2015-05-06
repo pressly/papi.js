@@ -6,6 +6,10 @@
   "scripts": {
     "dev": "gulp"
   },
+  "repository": {
+    "type": "git",
+    "url": "http://github.com/pressly/papi.js.git"
+  },
   "license": "MIT",
   "devDependencies": {
     "babel-core": "^5.0.0",
