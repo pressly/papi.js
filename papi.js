@@ -48,13 +48,13 @@ SearchProvider.prototype.search = function(q) {
     return request
       .get(Papi.host + '/network/' + this.network + '/user')
       .query({ username: q })
-      .query({ jwt: Papi.jwtToken });
+      .query({ jwt: Papi.auth.jwt });
   }
 
   return request
     .get(Papi.host + '/network/' + this.network + '/search')
     .query({ q: q })
-    .query({ jwt: Papi.jwtToken });
+    .query({ jwt: Papi.auth.jwt });
 };
 
 /**
@@ -68,24 +68,72 @@ SearchProvider.prototype.profile = function(cred) {
 
   return request
     .get(Papi.host + '/network/' + this.network + '/profile/' + cred[0].id)
-    .query({ jwt: Papi.jwtToken });
+    .query({ jwt: Papi.auth.jwt });
 };
 
 
 /**
  * Security
  */
-function Security() {
+function Security() { };
 
+/**
+ * Login:
+ *    POST /login
+ *
+ * @param {Object} creds - Login credentials
+ */
+Security.prototype.login = function(creds) {
+  if (!creds) throw new Error('PAPI Security: Unathorized Login - Missing Login Credentials')
+  if (!creds.email) throw new Error('PAPI Security: Unathorized Login - Missing Login Email')
+  if (!creds.password) throw new Error('PAPI Security: Unathorized Login - Missing Login Password')
+
+  return $q.promise(function(resolve, reject) {
+    request
+      .post(Papi.host + '/login')
+      .send({ email: creds.email, password: creds.password })
+      .end(function(err, res) {
+        if (res.status == 200) resolve(res.body);
+      });
+  });
 };
 
-Security.prototype.login = function(email, password) {
-  if (!email) throw new Error('PAPI Security: Unathorized Login - Missing Email')
-  if (!password) throw new Error('PAPI Security: Unathorized Login - Missing Password')
+/**
+ * Logout:
+ *    GET /login
+ *
+ * @param {String} jwt - Jwt token
+ */
+Security.prototype.logout = function(jwt) {
+  if (!jwt) throw new Error('PAPI Security: Unathorized')
 
-  return request
-    .post(Papi.host + '/login')
-    .send({ email: email, password: password })
+  return $q.promise(function(resolve, reject) {
+    request
+      .get(Papi.host + '/auth/logout')
+      .query({ jwt: jwt })
+      .end(function(err, res) {
+        if (res.status == 200) resolve(res.body);
+      });
+  });
+};
+
+/**
+ * Session:
+ *    GET /auth/session
+ *
+ * @param {String} jwt - Jwt token
+ */
+Security.prototype.session = function(jwt) {
+  if (!jwt) throw new Error('PAPI Security: Unathorized')
+
+  return $q.promise(function(resolve, reject) {
+    request
+      .get(Papi.host + '/auth/session')
+      .query({ jwt: jwt })
+      .end(function(err, res) {
+        if (res.status == 200) resolve(res.body);
+      });
+  });
 };
 
 
@@ -99,37 +147,10 @@ Security.prototype.login = function(email, password) {
  */
 var Papi = {
   host: 'https://beta-api.pressly.com',
-  jwtToken: null,
   credentials: null,
-  currentUser: null,
-
-  auth: function(jwtToken) {
-    this.jwtToken = jwtToken || alexJwtToken;
-  },
-
-  login: function(creds) {
-    var self = this;
-
-    return $q.promise(function(resolve, reject) {
-      try {
-        var security = new Security();
-
-        security.login(creds.email, creds.password).end(function(err, res) {
-          resolve(self.currentUser = res.body)
-        });
-      } catch (e) {
-        console.error(e.message)
-        reject();
-      }
-    });
-  },
-
-  isAuthenticated: function() {
-    return !!this.currentUser;
-  },
 
   creds: function() {
-    request.get(this.host + '/creds?jwt=' + this.jwtToken).end(function(res) {
+    request.get(this.host + '/creds?jwt=' + this.auth.jwt).end(function(res) {
       Papi.credentials = res.body;
       console.log('CREDS:', res.body);
     });
@@ -138,14 +159,14 @@ var Papi = {
   loadHubs: function() {
     return request
       .get(this.host + '/hubs')
-      .query({ jwt: this.jwtToken });
+      .query({ jwt: this.auth.jwt });
   },
 
   loadAssets: function(hubId) {
     return request
       .get(this.host + '/hubs/' + hubId + '/stream')
       .query({ limit: 8 })
-      .query({ jwt: Papi.jwtToken });
+      .query({ jwt: this.auth.jwt });
   },
 
   search: function(network, q) {
@@ -184,8 +205,87 @@ var Papi = {
   }
 };
 
+Papi.auth = {
+  jwt: null,
+  security: new Security(),
+  currentUser: null,
+
+  setJwt: function(jwt) {
+    this.jwt = jwt || alexJwtToken;
+  },
+
+  login: function(creds) {
+    var self = this;
+
+    return $q.promise(function(resolve, reject) {
+      try {
+        self.security.login(creds).then(function(user) {
+          if (!user.jwt) reject('missing jwt')
+          resolve(self.setCurrentUser(user));
+        });
+      } catch (e) {
+        console.error(e.message);
+      }
+    });
+  },
+
+  logout: function() {
+    var self = this;
+
+    return $q.promise(function(resolve, reject) {
+      try {
+        self.security.logout(self.jwt).then(function(res) {
+          self.jwt = null
+          self.currentUser = null
+          resolve(res)
+        });
+      } catch (e) {
+        console.error(e.message);
+      }
+    });
+  },
+
+  setCurrentUser: function(currentUser) {
+    this.jwt = currentUser.jwt;
+    return this.currentUser = currentUser;
+  },
+
+  requestCurrentUser: function() {
+    var self = this;
+
+    if (this.isAuthenticated()) {
+      return $q.when(this.currentUser)
+    } else {
+      return $q.promise(function(resolve, reject) {
+        try {
+          self.security.session(self.jwt).then(function(currentUser) {
+            resolve(self.setCurrentUser(currentUser));
+          });
+        } catch (e) {
+          console.error(e.message);
+        }
+      })
+    }
+  },
+
+  isAuthenticated: function() {
+    return !!this.currentUser;
+  },
+};
+
 module.exports = Papi;
 
-Papi.login({ email: 'alex.vitiuk@pressly.com', password: 'betame' }).then(function(res) {
+Papi.auth.login({ email: 'alex.vitiuk@pressly.com', password: 'betame' }).then(function(res) {
   console.log('LOGIN SUCCESS', res);
+
+  Papi.auth.requestCurrentUser().then(function(res) {
+    console.log('REQUEST CURR USERS SUCCESS', res)
+  });
+
+  /* LOGOUT
+  Papi.auth.logout().then(function(res) {
+    console.log('LOGOUT SUCCESS', res);
+  });
+  */
 });
+
