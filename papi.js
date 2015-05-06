@@ -11,7 +11,8 @@
 
 // Dependencies.
 var request = require('superagent')
-  , _       = require('underscore');
+  , _       = require('underscore')
+  , $q      = require('q');
 
 // Tokens.
 var devJwtToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNTQzODA0ZmIzZDNkOWQzNGI3MDAwMDAxIn0.Pcv9tTmQZnQNByS4ZItJwCIcbJ8xH-mRMPyzd-z6kGM';
@@ -24,92 +25,71 @@ var alexJwtToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNTRmMGR
  *
  * Main wrapper for PAPI Search.
  */
-function Provider(provider) {
-  this.provider = provider;
+function SearchProvider(network) {
+  if (!network) throw new Error('PAPI: network is not defined')
+
+  this.network = network;
 };
 
 /**
  * Search:
- *    GET /:provider/search?q=X
+ *    GET /network/:network/search?q=X
+ *    GET /network/:network/user?username=X
  *
  * @param {String} q - Search query
  */
-Provider.prototype.search = function(q) {
-  var userSearch = (q[0] == '@') ? true : false;
-  if (!q) q = 'golang';
+SearchProvider.prototype.search = function(q) {
+  if (!q) throw new Error('PAPI: Search Query is not defined')
+  if (!Security.isSecurityenticated()) throw new Error('PAPI: unauthorized')
+
+  var userSearch = (q[0] == '@')
 
   if (userSearch) {
     return request
-      .get(Papi.host + '/network/' + this.provider + '/user')
+      .get(Papi.host + '/network/' + this.network + '/user')
       .query({ username: q })
       .query({ jwt: Papi.jwtToken });
   }
 
   return request
-    .get(Papi.host + '/network/' + this.provider + '/search')
+    .get(Papi.host + '/network/' + this.network + '/search')
     .query({ q: q })
     .query({ jwt: Papi.jwtToken });
 };
 
 /**
  * Profile:
- *    GET /:provider/profile/:cred
+ *    GET /:network/profile/:cred
  *
  * @param {Object} cred - Papi credential
  */
-Provider.prototype.profile = function(cred) {
-  if (!cred) throw new Error('Credentials were not specified');
+SearchProvider.prototype.profile = function(cred) {
+  if (!cred) throw new Error('PAPI: Credentials were not specified');
 
   return request
-    .get(Papi.host + '/network/' + this.provider + '/profile/' + cred[0].id)
+    .get(Papi.host + '/network/' + this.network + '/profile/' + cred[0].id)
     .query({ jwt: Papi.jwtToken });
 };
+
 
 /**
- * Feed:
- *    GET /:provider/feed/:cred
- *
- * @param {Object} cred - Papi credential
+ * Security
  */
-Provider.prototype.feed = function(cred) {
-  if (!cred) throw new Error('Credentials were not specified');
+function Security() {
 
-  return request
-    .get(Papi.host + '/network/' + this.provider + '/profile')
-    .query({ username: username })
-    .query({ jwt: Papi.jwtToken });
 };
 
-/**
- * Posts:
- *    GET /:provider/posts/:cred
- *
- * @param {Object} cred - Papi credential
- */
-Provider.prototype.posts = function(cred) {
-  if (!cred) throw new Error('Credentials were not specified');
+Security.prototype.login = function(email, password) {
+  if (!email) throw new Error('PAPI Security: Unathorized Login - Missing Email')
+  if (!password) throw new Error('PAPI Security: Unathorized Login - Missing Password')
 
   return request
-    .get(Papi.host + '/network/' + this.provider + '/user')
-    .query({ username: username })
-    .query({ jwt: Papi.jwtToken });
+    .post(Papi.host + '/login')
+    .send({ email: email, password: password })
 };
 
-/**
- * Post:
- *    GET /:provider/post/:cred?body=X
- *    POST /:provider/post/:cred {..obj..}
- *
- * @param {Object} cred - Papi credential
- */
-Provider.prototype.post = function(cred) {
-  if (!cred) throw new Error('Credentials were not specified');
 
-  return request
-    .get(Papi.host + '/network/' + this.provider + '/user')
-    .query({ username: username })
-    .query({ jwt: Papi.jwtToken });
-};
+
 
 
 /**
@@ -121,9 +101,31 @@ var Papi = {
   host: 'https://beta-api.pressly.com',
   jwtToken: null,
   credentials: null,
+  currentUser: null,
 
   auth: function(jwtToken) {
     this.jwtToken = jwtToken || alexJwtToken;
+  },
+
+  login: function(creds) {
+    var self = this;
+
+    return $q.promise(function(resolve, reject) {
+      try {
+        var security = new Security();
+
+        security.login(creds.email, creds.password).end(function(err, res) {
+          resolve(self.currentUser = res.body)
+        });
+      } catch (e) {
+        console.error(e.message)
+        reject();
+      }
+    });
+  },
+
+  isAuthenticated: function() {
+    return !!this.currentUser;
   },
 
   creds: function() {
@@ -146,14 +148,21 @@ var Papi = {
       .query({ jwt: Papi.jwtToken });
   },
 
-  search: function(provider, q) {
-    console.log('PAPI - Performing {' + provider + '} Search for: ' + q);
-    return new Provider(provider).search(q);
+  search: function(network, q) {
+    var res = null
+
+    try {
+      res = new SearchProvider(network).search(q)
+    } catch (e) {
+      console.error(e.message);
+    }
+
+    return res;
   },
 
-  profile: function(provider) {
-    console.log('PAPI - Showing {' + provider + '} Profile creds');
-    return new Provider(provider).profile(Papi.credentials[provider]);
+  profile: function(network) {
+    console.log('PAPI - Showing {' + network + '} Profile creds');
+    return new SearchProvider(network).profile(Papi.credentials[network]);
   },
 
   imgry: function(url, width, height, op, fp, box) {
@@ -176,3 +185,7 @@ var Papi = {
 };
 
 module.exports = Papi;
+
+Papi.login({ email: 'alex.vitiuk@pressly.com', password: 'betame' }).then(function(res) {
+  console.log('LOGIN SUCCESS', res);
+});
