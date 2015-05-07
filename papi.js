@@ -3,9 +3,6 @@
   * ================
   **/
 
-// The first version, just write it plan javascript..
-// no fancy es6, just stick to the basics
-
 // make sure to set window.superagent ...
 // ie. when using with angular.......
 
@@ -141,6 +138,7 @@ Security.prototype = {
     });
   }
 };
+
 
 /**
  * Resource.
