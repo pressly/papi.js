@@ -13,3 +13,6 @@ rebuild: clean build
 
 test: install
 	@npm run test
+
+test-watch: install
+	@npm run test-watch
