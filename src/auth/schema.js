@@ -1,7 +1,20 @@
 'use strict';
 
-const AuthPayload = {
-  {
+const authSchemaRequest = {
+  type: Object,
+  content: {
+    email: {
+      type: String,
+      required: true
+    },
+    password: {
+      type: String,
+      required: true
+    }
+  }
+};
+
+const authSchemaResponse = {
     type: Object,
     content: {
       account_id: {
@@ -53,8 +66,9 @@ const AuthPayload = {
         }
       }
     }
-}
+};
 
 export {
-  AuthPayload
+  authSchemaRequest,
+  authSchemaResponse
 }

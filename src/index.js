@@ -1,7 +1,11 @@
 'use strict';
 
-import Auth from './auth';
+import AuthApi from './auth';
 
-export {
-  Auth
+function papi(domain) {
+  return {
+    auth: new AuthApi(domain)
+  };
 }
+
+export default papi;

@@ -10,3 +10,6 @@ build: install
 	  npm run build)
 
 rebuild: clean build
+
+test: install
+	@npm run test
