@@ -4,8 +4,8 @@ var gulp       = require('gulp')
   , source     = require('vinyl-source-stream')
   , babelify   = require('babelify');
 
-gulp.task('browserify', function () {
-  return browserify({ entries: './src/papi.es6' })
+gulp.task('build', function () {
+  return browserify({ entries: './src/index.js' })
     .transform(babelify)
     .bundle()
     .pipe(source('bundle.js'))
@@ -22,7 +22,7 @@ gulp.task('connect', function() {
 });
 
 gulp.task('watch', function () {
-  gulp.watch('src/*.es6', { debounceDelay: 2000 }, ['browserify']);
+  gulp.watch('src/**/*.js', { debounceDelay: 2000 }, ['build']);
 });
 
 gulp.task('default', ['connect', 'watch']);

@@ -1,7 +1,7 @@
 module.exports = function(config) {
   config.set({
-    basePath: './',
-    frameworks: ['browserify', 'jasmine'],
+    basePath: '../',
+    frameworks: ['browserify', 'mocha'],
 
     files: [ 'test/**/*.js' ],
     exclude: [ ],
