@@ -4,13 +4,18 @@
   "description": "Pressly API Wrapper",
   "main": "dist/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "./node_modules/webpack/bin/webpack.js --progress --colors",
+    "test": "node_modules/.bin/mocha --harmony --recursive",
+    "test-watch": "node_modules/.bin/mocha -w --harmony"
   },
   "repository": {
     "type": "git",
     "url": "https://github.com/pressly/papi.js.git"
   },
-  "author": ["Alexander Vitiuk", "Ali Najafizadeh"],
+  "author": [
+    "Alexander Vitiuk",
+    "Ali Najafizadeh"
+  ],
   "license": "BSD",
   "bugs": {
     "url": "https://github.com/pressly/papi.js/issues"
@@ -19,10 +24,10 @@
   "devDependencies": {
     "babel-core": "^5.1.13",
     "babel-loader": "^5.0.0",
+    "mocha": "^2.2.4",
+    "should": "^6.0.1",
+    "simple-json-validator": "^1.0.1",
     "superagent": "^1.2.0",
     "webpack": "^1.8.10"
-  },
-  "scripts": {
-    "build": "./node_modules/webpack/bin/webpack.js --progress --colors"
   }
 }
