@@ -12,10 +12,6 @@
     "type": "git",
     "url": "https://github.com/pressly/papi.js.git"
   },
-  "author": [
-    "Alexander Vitiuk",
-    "Ali Najafizadeh"
-  ],
   "license": "BSD",
   "bugs": {
     "url": "https://github.com/pressly/papi.js/issues"
