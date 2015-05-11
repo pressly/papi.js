@@ -1,18 +1,18 @@
 clean:
-  @rm -rf build
-  @rm -rf node_modules
+	@rm -rf build
+	@rm -rf node_modules
 
 install:
-  @npm install
+	@npm install
 
 build: install
-  @(export NODE_ENV=production && \
-    npm run build)
+	@(export NODE_ENV=production && \
+		npm run build)
 
 rebuild: clean build
 
 test: install
-  @npm run test
+	@npm run test
 
 test-watch: install
-  @npm run test-watch
+	@npm run test-watch
