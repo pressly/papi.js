@@ -26,11 +26,11 @@ class AuthApi {
         .post(`${this.domain}/login`, payload)
         .set('Content-Type', 'application/json')
         .send(payload)
-        .end((err, response) => {
+        .end((err, res) => {
           if (err) {
             reject(err);
           } else {
-            resolve(response.body);
+            resolve(res);
           }
         });
     });
