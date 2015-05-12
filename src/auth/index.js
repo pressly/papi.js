@@ -7,7 +7,7 @@ import jsonValidator from 'simple-json-validator';
 //payload
 import { authSchemaRequest, authSchemaResponse } from './schema.js';
 
-class AuthApi {
+class Auth {
   constructor(domain) {
     this.domain = domain;
     this.jwt = null;
@@ -92,4 +92,4 @@ class AuthApi {
   }
 }
 
-export default AuthApi;
+export default Auth;

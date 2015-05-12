@@ -1,8 +1,8 @@
 'use strict';
 
-import papi from '../../src';
+import Papi from '../../src';
 
-const api = papi('https://beta-api.pressly.com');
+const api = Papi('https://beta-api.pressly.com');
 
 describe('Testing Users API - $all', function () {
   it('should return all users', function (done) {
