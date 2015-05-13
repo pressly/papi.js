@@ -1,15 +1,12 @@
 'use strict';
 
-import papi from '../../src';
+import Papi from '../../src';
 
-const api = papi('https://beta-api.pressly.com');
+const api = new Papi();
 
 describe('Testing Auth API - Login', function () {
   it('should return 401', function (done) {
-    api.auth.login({
-      email: 'test',
-      password: 'test'
-    }).then(() => {
+    api.auth.login('test', 'test').then(() => {
       throw new Error('login was successfull');
     }).catch((err) => {
       if (err.status == 401) {
@@ -21,10 +18,7 @@ describe('Testing Auth API - Login', function () {
   });
 
   it('should return 200', function (done) {
-    api.auth.login({
-      email: 'alex.vitiuk@pressly.com',
-      password: 'betame'
-    }).then((res) => {
+    api.auth.login('alex.vitiuk@pressly.com', 'betame').then((res) => {
       if (res.status == 200) {
         done()
       } else {
@@ -36,17 +30,14 @@ describe('Testing Auth API - Login', function () {
   });
 
   it('should set jwt', function (done) {
-    api.auth.login({
-      email: 'alex.vitiuk@pressly.com',
-      password: 'betame'
-    }).then((res) => {
+    api.auth.login('alex.vitiuk@pressly.com', 'betame').then((res) => {
       if (res.status != 200) {
         throw new Error('login unsuccessful');
       }
 
-      if (!api.auth.jwt) {
+      if (!api.session.jwt) {
         throw new Error('jwt was not set');
-      } else if (api.auth.jwt != res.body.jwt) {
+      } else if (api.session.jwt != res.body.jwt) {
         throw new Error('wrong jwt set');
       }
 
@@ -56,11 +47,9 @@ describe('Testing Auth API - Login', function () {
     });
   });
 
+  /* TODO: REMOVE - not setting currentUser in api.session anymore
   it('should set currentUser', function (done) {
-    api.auth.login({
-      email: 'alex.vitiuk@pressly.com',
-      password: 'betame'
-    }).then((res) => {
+    api.auth.login('alex.vitiuk@pressly.com', 'betame').then((res) => {
       if (res.status != 200) {
         throw new Error('login unsuccessful');
       }
@@ -76,6 +65,7 @@ describe('Testing Auth API - Login', function () {
       done(err);
     });
   });
+  */
 });
 
 describe('Testing Auth API - Logout', function () {
@@ -119,10 +109,7 @@ describe('Testing Auth API - Session', function () {
   });
 
   it('should return currentUser', function (done) {
-    api.auth.login({
-      email: 'alex.vitiuk@pressly.com',
-      password: 'betame'
-    }).then((currentUser) => {
+    api.auth.login('alex.vitiuk@pressly.com', 'betame').then((currentUser) => {
       api.auth.session().then((res) => {
         if (res.body.id != currentUser.body.id) {
           throw new Error('Logged in user response doesnt match session response');

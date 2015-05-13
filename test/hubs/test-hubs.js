@@ -1,16 +1,12 @@
 'use strict';
 
-import papi from '../../src';
+import Papi from '../../src';
 
-const api = papi('https://beta-api.pressly.com');
+const api = new Papi('https://beta-api.pressly.com');
 
 describe('Testing Hubs API - $all', function () {
   it('should return all hubs', function (done) {
-    api.auth.login({
-      email: 'alex.vitiuk@pressly.com', password: 'betame'
-    }).then(() => {
-      api.hubs.setJwt(api.auth.jwt);
-
+    api.auth.login('alex.vitiuk@pressly.com', 'betame').then(() => {
       api.hubs.$all().then((res) => {
         if (res.status != 200) {
           throw new Error('Something went wrong');

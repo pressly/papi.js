@@ -1,15 +1,13 @@
 'use strict';
 
-//vendor
 import _ from 'underscore';
 import request from 'superagent';
 import jsonValidator from 'simple-json-validator';
 
 class Resource {
-  constructor(domain, route) {
-    this.jwt = null;
+  constructor(session, route) {
+    this.session = session;
     this.route = route;
-    this.domain = domain;
     this.params = null;
     this.reRouteParams = /:[^\/:]+/gi;
   }
@@ -22,7 +20,7 @@ class Resource {
         request
           .get(`${this.buildRoute()}`)
           .set('Content-Type', 'application/json')
-          .set('Authorization', `Bearer ${ this.jwt }`)
+          .set('Authorization', `Bearer ${ this.session.jwt }`)
           .end((err, res) => {
             if (err) {
               return reject(err);
@@ -44,7 +42,7 @@ class Resource {
         request
           .get(`${this.buildRoute()}`)
           .set('Content-Type', 'application/json')
-          .set('Authorization', `Bearer ${ this.jwt }`)
+          .set('Authorization', `Bearer ${ this.session.jwt }`)
           .send(this.params)
           .end((err, res) => {
             if (err) {
@@ -68,7 +66,7 @@ class Resource {
         request
           .put(`${this.buildRoute()}`)
           .set('Content-Type', 'application/json')
-          .set('Authorization', `Bearer ${ this.jwt }`)
+          .set('Authorization', `Bearer ${ this.session.jwt }`)
           .send(resource)
           .end((err, res) => {
             if (err) {
@@ -81,10 +79,6 @@ class Resource {
         return reject(err);
       }
     });
-  }
-
-  setJwt(jwt) {
-    this.jwt = jwt;
   }
 
   buildRoute() {
@@ -105,7 +99,7 @@ class Resource {
     });
 
     // concat segments
-    finalRoute = `${this.domain}${routeSegments.join('')}`;
+    finalRoute = `${this.session.domain}${routeSegments.join('')}`;
 
     // strip last char if forward slash
     if (finalRoute.substr(-1) === '/')

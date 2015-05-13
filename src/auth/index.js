@@ -1,26 +1,23 @@
 'use strict';
 
-//vendor
 import request from 'superagent';
 import jsonValidator from 'simple-json-validator';
-
-//payload
 import { authSchemaRequest, authSchemaResponse } from './schema.js';
 
 class Auth {
-  constructor(domain) {
-    this.domain = domain;
-    this.jwt = null;
-    this.currentUser = null;
+  constructor(session) {
+    this.apiSession = session;
   }
 
-  login(payload) {
+  login(email, password) {
     return new Promise((resolve, reject) => {
       try {
+        var payload = { email: email, password: password };
+
         jsonValidator(payload, authSchemaRequest);
 
         request
-          .post(`${this.domain}/login`, payload)
+          .post(`${this.apiSession.domain}/login`)
           .set('Content-Type', 'application/json')
           .send(payload)
           .end((err, res) => {
@@ -28,7 +25,10 @@ class Auth {
               return reject(err);
             } else {
               if (res.status == 200) {
-                this.setCurrentUser(res.body);
+                if (!res.body.jwt)
+                  throw new Error('Invalid user response - missing jwt');
+
+                this.apiSession.jwt = res.body.jwt;
               }
               resolve(res);
             }
@@ -42,17 +42,16 @@ class Auth {
   logout() {
     return new Promise((resolve, reject) => {
       request
-        .get(`${this.domain}/auth/logout`)
+        .get(`${this.apiSession.domain}/auth/logout`)
         .set('Content-Type', 'application/json')
-        .query({ jwt: this.jwt })
+        .set('Authorization', `Bearer ${this.apiSession.jwt}`)
         .end((err, res) => {
           if (err) {
             return reject(err);
           }
 
           if (res.status == 200) {
-            this.jwt = null;
-            this.currentUser = null;
+            this.apiSession.jwt = null;
           }
 
           resolve(res);
@@ -64,17 +63,12 @@ class Auth {
     return new Promise((resolve, reject) => {
       try {
         request
-          .get(`${this.domain}/auth/session`)
+          .get(`${this.apiSession.domain}/auth/session`)
           .set('Content-Type', 'application/json')
-          .query({ jwt: this.jwt })
+          .set('Authorization', `Bearer ${this.apiSession.jwt}`)
           .end((err, res) => {
             if (err) {
               return reject(err);
-            }
-
-            // update currentUser on success
-            if (res.status == 200) {
-              this.currentUser = res.body;
             }
 
             resolve(res);
@@ -83,12 +77,6 @@ class Auth {
         return reject(err);
       }
     });
-  }
-
-  setCurrentUser(user) {
-    if (!user.jwt) throw new Error('Invalid user response - missing jwt');
-    this.jwt = user.jwt;
-    this.currentUser = user;
   }
 }
 

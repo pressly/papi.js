@@ -2,15 +2,11 @@
 
 import Papi from '../../src';
 
-const api = Papi('https://beta-api.pressly.com');
+const api = new Papi('https://beta-api.pressly.com');
 
 describe('Testing Users API - $all', function () {
   it('should return all users', function (done) {
-    api.auth.login({
-      email: 'alex.vitiuk@pressly.com', password: 'betame'
-    }).then(() => {
-      api.users.setJwt(api.auth.jwt);
-
+    api.auth.login('alex.vitiuk@pressly.com', 'betame').then(() => {
       api.users.$all().then((res) => {
         if (res.status != 200) {
           throw new Error('Something went wrong');
