@@ -14,5 +14,8 @@ rebuild: clean build
 test: install
 	@npm run test
 
+test-server: install
+	@NOCK_OFF=true npm run test
+
 test-watch: install
 	@npm run test-watch
