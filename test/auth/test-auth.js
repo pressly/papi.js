@@ -1,8 +1,33 @@
 'use strict';
 
+import nock from 'nock';
 import Papi from '../../src';
 
 const api = new Papi();
+
+// mock requests
+nock(api.session.domain)
+  .post('/login', {
+    email: 'test',
+    password: 'test',
+  }).reply(401)
+  .post('/login', {
+    email: 'alex.vitiuk@pressly.com',
+    password: 'betame',
+  }).times(3).reply(200, {
+    jwt: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNTRmMGRiNzMwOGFmYTEyYjUzNjIwNTg4In0.CvXGDKAJYZkoH3nnEirtlGlwRzErv1ANOJ-dVkUAnjo#_login_post'
+  });
+
+// mock authorization requests
+nock(api.session.domain, { reqheaders: { 'Authorization': `Bearer ${api.session.jwt}` } })
+  .get('/auth/logout').reply(200)
+  .get('/auth/session').times(2).reply(function() {
+    if (api.session.jwt) {
+      return [200, { status: 200, body: { } }];
+    }
+
+    return [401, { status: 401, body: { } }];
+  });
 
 describe('Testing Auth API - Login', function () {
   it('should return 401', function (done) {
@@ -46,26 +71,6 @@ describe('Testing Auth API - Login', function () {
       done(err)
     });
   });
-
-  /* TODO: REMOVE - not setting currentUser in api.session anymore
-  it('should set currentUser', function (done) {
-    api.auth.login('alex.vitiuk@pressly.com', 'betame').then((res) => {
-      if (res.status != 200) {
-        throw new Error('login unsuccessful');
-      }
-
-      if (!api.auth.currentUser) {
-        throw new Error('currentUser was not set');
-      } else if (api.auth.currentUser.id != res.body.id) {
-        throw new Error('wrong jwt set');
-      }
-
-      done()
-    }).catch((err) => {
-      done(err);
-    });
-  });
-  */
 });
 
 describe('Testing Auth API - Logout', function () {
@@ -81,15 +86,8 @@ describe('Testing Auth API - Logout', function () {
   });
 
   it('should clear jwt', function (done) {
-    if (api.auth.jwt) {
+    if (api.session.jwt) {
       throw new Error('logout didnt clear jwt');
-    }
-    done()
-  });
-
-  it('should clear currentUser', function (done) {
-    if (api.auth.currentUser) {
-      throw new Error('logout didnt clear currentUser');
     }
     done()
   });
@@ -116,6 +114,8 @@ describe('Testing Auth API - Session', function () {
         }
 
         done();
+      }).catch((err) => {
+        done(err);
       });
     }).catch((err) => {
       done(err);

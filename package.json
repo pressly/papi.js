@@ -31,6 +31,7 @@
     "karma-chrome-launcher": "~0.1.8",
     "karma-mocha": "^0.1.10",
     "mocha": "^2.2.4",
+    "nock": "^2.0.1",
     "should": "^6.0.1",
     "simple-json-validator": "^1.0.1",
     "superagent": "1.2.0",
