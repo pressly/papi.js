@@ -7,15 +7,9 @@ const api = new Papi();
 
 // mock requests
 nock(api.session.domain)
-  .post('/login', {
-    email: 'test',
-    password: 'test',
-  }).reply(401)
-  .post('/login', {
-    email: 'alex.vitiuk@pressly.com',
-    password: 'betame',
-  }).times(3).reply(200, {
-    jwt: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNTRmMGRiNzMwOGFmYTEyYjUzNjIwNTg4In0.CvXGDKAJYZkoH3nnEirtlGlwRzErv1ANOJ-dVkUAnjo#_login_post'
+  .post('/login', { email: 'test', password: 'test', }).reply(401)
+  .post('/login', { email: 'alex.vitiuk@pressly.com', password: 'betame', }).times(3).reply(200, {
+    jwt: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNTRmMGRiNzMwOGFmYTEyYjUzNjIwNTg4In0.CvXGDKAJYZkoH3nnEirtlGlwRzErv1ANOJ-dVkUAnjo'
   });
 
 // mock authorization requests
@@ -23,12 +17,18 @@ nock(api.session.domain, { reqheaders: { 'Authorization': `Bearer ${api.session.
   .get('/auth/logout').reply(200)
   .get('/auth/session').times(2).reply(function() {
     if (api.session.jwt) {
-      return [200, { status: 200, body: { } }];
+      return [200, { status: 200, body: {} }];
     }
 
-    return [401, { status: 401, body: { } }];
+    return [401, { status: 401, body: {} }];
   });
 
+// clear outstanding mocks
+after(function() {
+  nock.cleanAll();
+});
+
+// tests
 describe('Testing Auth API - Login', function () {
   it('should return 401', function (done) {
     api.auth.login('test', 'test').then(() => {
