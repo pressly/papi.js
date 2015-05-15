@@ -1,19 +1,14 @@
 'use strict';
 
+import Papi from '../../src';
+import { mockHub } from '../mocks';
 import nock from 'nock';
 import should from 'should';
-import Papi from '../../src';
 
 const api = new Papi('https://beta-api.pressly.com');
 
-// mock requests
-const mockHub = {
-  id: '5540ed5d468bb00001000042',
-  uid: 'hacktheplanet',
-  name: 'HackThePlanel',
-  account_id: 'peter'
-};
 
+// interceptors
 nock(api.session.domain)
   .post('/login', {
     email: 'alex.vitiuk@pressly.com',
