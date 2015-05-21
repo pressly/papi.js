@@ -4,30 +4,35 @@ import _ from 'lodash';
 
 import * as models from './models';
 
-/* Utility tools */
-var deepClone = function(obj) {
+
+/** Utility tools *************************************************************/
+
+function deepClone(obj) {
   return JSON.parse(JSON.stringify(obj));
-};
+}
 
-var singularize = function(string) {
+function singularize(string) {
   return string.replace(/s$/, '');
-};
+}
 
-var capitalize = function(string) {
+function capitalize(string) {
   return string.charAt(0).toUpperCase() + string.slice(1);
-};
+}
 
-var decapitalize = function(string) {
+function decapitalize(string) {
   return string.charAt(0).toLowerCase() + string.slice(1);
-};
+}
 
-var pluralize = function(string) {
+function pluralize(string) {
   return string + 's';
-};
+}
 
-var classify = function(string) {
+function classify(string) {
   return singularize(_.map(string.split("_"), function(s) { return capitalize(s); }).join(''));
-};
+}
+
+
+/** Api Helpers ***************************************************************/
 
 var buildRoute = function(resource) {
   var current = resource;
@@ -65,11 +70,6 @@ var buildKey = function(resource, name) {
   }
 
   return segments.join('.');
-}
-
-export function getNameFromKey(key) {
-  var parts = key.split('.');
-  return parts[parts.length - 1];
 }
 
 export function applyResourceHelpers(klass) {
@@ -130,6 +130,9 @@ export function applyResourceHelpers(klass) {
 
   _.extend(klass, pointer({}));
 };
+
+
+/** Resource class ************************************************************/
 
 var extendPromise = function(parentPromise, parentResource, promises) {
   promises = (promises || [parentPromise]);
@@ -245,8 +248,6 @@ export default class Resource {
 
     var promise = this.api.$request('get', path).then(function(res) {
       var model = resource.hydrateModel(res.body);
-
-      console.log(model);
 
       return model;
     });

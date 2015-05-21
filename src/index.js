@@ -4,7 +4,7 @@ require('babel/register');
 
 import _ from 'lodash';
 import request from 'superagent';
-import {Resource, applyResourceHelpers} from './resource-new';
+import Resource, { applyResourceHelpers } from './resource-new';
 
 import Auth from './auth';
 import Hubs from './hubs';

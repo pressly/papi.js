@@ -1,15 +1,14 @@
 'use strict';
 
 import Papi from '../../src';
-import * as mock from '../mocks';
+import * as mock from './mocks';
 import nock from 'nock';
 import should from 'should';
+import * as models from '../../src/models';
 
-//const api = new Papi('http://beta.pressly.com', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNTRmMGRiNzMwOGFmYTEyYjUzNjIwNTg4In0.CvXGDKAJYZkoH3nnEirtlGlwRzErv1ANOJ-dVkUAnjo#_login_post');
 const api = new Papi('http://beta.pressly.com');
 
-
-// interceptors
+// Interceptors
 nock(api.session.domain)
   .post('/login', {
     email: 'alex.vitiuk@pressly.com',
@@ -19,26 +18,68 @@ nock(api.session.domain)
   });
 
 nock(api.session.domain, { reqheaders: { 'Authorization': `Bearer ${api.session.jwt}` } })
+  // Hub Resource Requests
   .get('/hubs').reply(200, mock.hubs)
-  .get(`/hubs/${mock.hubs[0].id}`).reply(200, mock.hubs[0]);
 
-// tests
-describe('Testing !!!NEW API', function () {
-  it('should return all hubs', function (done) {
+  .get(`/hubs/${mock.hubs[0].id}`).reply(200, mock.hubs[0])
+
+
+  // App Resource Requests
+  .get(`/hubs/${mock.hubs[0].id}/apps`).reply(200, mock.apps)
+
+  .get(`/hubs/${mock.hubs[0].id}/apps/${mock.apps[0].id}`).reply(200, mock.apps[0])
+
+  .get(`/hubs/${mock.hubs[0].id}`).reply(200, mock.hubs[0])
+  .get(`/hubs/${mock.hubs[0].id}/apps`).reply(200, mock.apps)
+
+  .get(`/hubs/${mock.hubs[0].id}`).reply(200, mock.hubs[0])
+  .get(`/hubs/${mock.hubs[0].id}/apps`).reply(200, mock.apps)
+
+
+  // Style Resource Requests
+  .get(`/hubs/${mock.hubs[0].id}/apps/${mock.apps[0].id}/styles`).reply(200, mock.styles)
+
+  .get(`/hubs/${mock.hubs[0].id}/apps/${mock.apps[0].id}/styles/${mock.styles[0].id}`).reply(200, mock.styles[0])
+
+  .get(`/hubs`).reply(200, mock.hubs)
+  .get(`/hubs/${mock.hubs[0].id}/apps`).reply(200, mock.apps)
+  .get(`/hubs/${mock.hubs[0].id}/apps/${mock.apps[0].id}/styles`).reply(200, mock.styles)
+
+  .get(`/hubs/${mock.hubs[0].id}`).reply(200, mock.hubs[0])
+  .get(`/hubs/${mock.hubs[0].id}/apps/${mock.apps[0].id}`).reply(200, mock.apps[0])
+  .get(`/hubs/${mock.hubs[0].id}/apps/${mock.apps[0].id}/styles`).reply(200, mock.styles)
+;
+
+
+describe('Hubs Resource', function () {
+  it("$all should return an array", function (done) {
     api.$query('hubs').$all().then((res) => {
       res.should.not.be.empty;
+      res[0].should.instanceOf(models.Hub);
+
       done();
     }).catch((err) => {
       done(err);
     });
   });
 
-  it('should return one hub', function (done) {
+  it('$find should return one item', function (done) {
     api.$query('hubs').$find(mock.hubs[0].id).then((res) => {
-      res.id.should.be.exactly(mock.hubs[0].id);
-      res.uid.should.not.be.empty;
-      res.name.should.not.be.empty;
-      res.account_id.should.not.be.empty;
+      res.should.instanceOf(models.Hub);
+      res.id.should.equal(mock.hubs[0].id);
+
+      done();
+    }).catch((err) => {
+      done(err);
+    });
+  });
+});
+
+describe('Apps Resource', function() {
+  it('$all should return an array', function(done) {
+    api.$query('hubs.apps').$all({hubId: mock.hubs[0].id}).then((res) => {
+      res.should.not.be.empty;
+      res[0].should.instanceOf(models.App);
 
       done();
     }).catch((err) => {
@@ -46,107 +87,109 @@ describe('Testing !!!NEW API', function () {
     });
   });
 
+  it('$find should return one item', function(done) {
+    api.$query('hubs.apps').$find({hubId: mock.hubs[0].id, id: mock.apps[0].id}).then((res) => {
+      res.should.instanceOf(models.App);
+      res.id.should.equal(mock.apps[0].id);
 
-  // describe('hubs.$all', function(test) {
-  //   api.$query('hubs').$all().then(function(res) {
-  //     test(_.isArray(res) && res[0].constructor == models.Hub);
-  //   }).catch(function(err) {
-  //     test(false, err);
-  //   });
-  // });
-  //
-  // // Support $find on root level endpoint
-  // describe('hubs.$find', function(test) {
-  //   api.$query('hubs').$find('5527e3b0ec798feb57000044').then(function(res) {
-  //     test(_.isObject(res) && res.constructor == models.Hub);
-  //   }).catch(function(err) {
-  //     test(false, err)
-  //   });
-  // });
-  //
-  // // Support $all on child level endpoint
-  // describe('hubs.apps.$all', function(test) {
-  //   api.$query('hubs.apps').$all({hubId: '5527e3b0ec798feb57000044'}).then(function(res) {
-  //     test(_.isArray(res));
-  //   }).catch(function(err) {
-  //     test(false, err);
-  //   });
-  // });
-  //
-  // // Support $find on child level endpoint
-  // describe('hubs.apps.$find', function(test) {
-  //   api.$query('hubs.apps').$find({hubId: '5527e3b0ec798feb57000044', id: '5550ca65ec798fa92a00000c'}).then(function(res) {
-  //     test(_.isObject(res));
-  //   }).catch(function(err) {
-  //     test(false, err);
-  //   });
-  // });
-  //
-  // // Support $find on child level endpoint
-  // describe('hubs.apps.styles.$find', function(test) {
-  //   api.$query('hubs.apps.styles').$all({hubId: '5527e3b0ec798feb57000044', appId: '5550ca65ec798fa92a00000c'}).then(function(res) {
-  //     test(_.isArray(res) && res[0].constructor == models.Style);
-  //   }).catch(function(err) {
-  //     test(false, err);
-  //   });
-  // });
-  //
-  // // Supports inline fetches
-  // describe('hubs.$find then hubs.apps.$all', function(test) {
-  //   api.$query('hubs').$find('5527e3b0ec798feb57000044').then(function(hub) {
-  //     api.$query('hubs.apps').$all({hubId: hub.id}).then(function(apps) {
-  //       test(hub.constructor == models.Hub && apps[0].constructor == models.App);
-  //     });
-  //   }).catch(function(err) {
-  //     test(false, err);
-  //   });
-  // });
-  //
-  // // Support resource access from the result model
-  // describe('hubResultModel.apps.$all', function(test) {
-  //   api.$query('hubs').$find('5527e3b0ec798feb57000044').then(function(hub) {
-  //     hub.$query('apps').$all().then(function(apps) {
-  //       test(hub.constructor == models.Hub && apps[0].constructor == models.App);
-  //     }).catch(function(err) {
-  //       test(false, err);
-  //     });
-  //   }).catch(function(err) {
-  //     test(false, err);
-  //   });
-  // });
-  //
-  // // Support chainable $all on child resource association
-  // describe('hubs.$find.apps.$all', function(test) {
-  //   api.$query('hubs').$find('5527e3b0ec798feb57000044').$query('apps').$all().then(function(res) {
-  //     var hub = res[0];
-  //     var apps = res[1];
-  //     //console.log(hub, apps);
-  //     test(_.isObject(hub) && _.isArray(apps) && hub.constructor == models.Hub && apps[0].constructor == models.App);
-  //   }).catch(function(err) {
-  //     test(false, err);
-  //   });
-  // });
-  //
-  //
-  // // Support $find on child level endpoint
-  // describe('hubs.$find.apps.$find.styles.$all', function(test) {
-  //   var a = api.$query('hubs');
-  //   var b = a.$find('5527e3b0ec798feb57000044');
-  //   var c = b.$query('apps');
-  //   var d = c.$find('5550ca65ec798fa92a00000c');
-  //   var e = d.$query('styles');
-  //   var f = e.$all();
-  //
-  //   f.then(function(res) {
-  //     var hub = res[0];
-  //     var app = res[1];
-  //     var styles = res[2];
-  //     var style = styles[0];
-  //
-  //     test(_.isArray(res) && res.length == 3 && hub.constructor == models.Hub && app.constructor == models.App && style.constructor == models.Style);
-  //   }).catch(function(err) {
-  //     test(false, err);
-  //   });
-  // });
+      done();
+    }).catch((err) => {
+      done(err);
+    });
+  });
 
+  it('should support access from the result model', function(done) {
+    api.$query('hubs').$find(mock.hubs[0].id).then(function(hub) {
+      hub.$query('apps').$all().then(function(apps) {
+        hub.should.instanceOf(models.Hub);
+        apps.should.not.be.empty;
+        apps[0].should.instanceOf(models.App);
+
+        done();
+      }).catch((err) => {
+        done(err);
+      });
+    });
+  });
+
+  it('should support chainable queries on find', function(done) {
+    api.$query('hubs').$find(mock.hubs[0].id).$query('apps').$all().then(function(res) {
+      var hub = res[0];
+      var apps = res[1];
+
+      hub.should.instanceOf(models.Hub);
+      apps.should.not.be.empty;
+      apps[0].should.instanceOf(models.App);
+
+      done();
+    }).catch((err) => {
+      done(err);
+    });
+  });
+});
+
+describe('Styles Resource', function() {
+  it('$all should return an array', function(done) {
+    api.$query('hubs.apps.styles').$all({hubId: mock.hubs[0].id, appId: mock.apps[0].id}).then((res) => {
+      res.should.not.be.empty;
+      res[0].should.instanceOf(models.Style);
+
+      done();
+    }).catch((err) => {
+      done(err);
+    });
+  });
+
+  it('$find should return one item', function(done) {
+    api.$query('hubs.apps.styles').$find({hubId: mock.hubs[0].id, appId: mock.apps[0].id, id: mock.styles[0].id}).then((res) => {
+      res.should.instanceOf(models.Style);
+      res.id.should.equal(mock.styles[0].id);
+
+      done();
+    }).catch((err) => {
+      done(err);
+    });
+  });
+
+  it('should fetch styles in an inline fashion', function(done) {
+    api.$query('hubs').$all().then(function(hubs) {
+      api.$query('hubs.apps').$all({hubId: hubs[0].id}).then(function(apps) {
+         api.$query('hubs.apps.styles').$all({hubId: hubs[0].id, appId: apps[0].id}).then((res) => {
+           res.should.not.be.empty;
+           res[0].should.instanceOf(models.Style);
+
+           done();
+         }).catch((err) => {
+           done(err);
+         });
+      });
+    });
+  });
+
+  it('should support chainable queries on $find', function(done) {
+    var a = api.$query('hubs');
+    var b = a.$find(mock.hubs[0].id);
+    var c = b.$query('apps');
+    var d = c.$find(mock.apps[0].id);
+    var e = d.$query('styles');
+    var f = e.$all();
+
+    f.then(function(res) {
+      var hub = res[0];
+      var app = res[1];
+      var styles = res[2];
+      var style = styles[0];
+
+      res.should.not.be.empty;
+      res.length.should.equal(3); // 3 promises resolved
+      hub.should.instanceOf(models.Hub);
+      app.should.instanceOf(models.App);
+      styles.should.not.be.empty;
+      style.should.instanceOf(models.Style);
+
+      done();
+    }).catch((err) => {
+      done(err);
+    });
+  })
 });
