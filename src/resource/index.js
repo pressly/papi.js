@@ -1,6 +1,6 @@
 'use strict';
 
-import _ from 'underscore';
+import _ from 'lodash';
 import request from 'superagent';
 import jsonValidator from 'simple-json-validator';
 

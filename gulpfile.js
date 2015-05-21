@@ -1,3 +1,5 @@
+require('babel/register');
+
 var gulp       = require('gulp')
   , connect    = require('gulp-connect')
   , browserify = require('browserify')
