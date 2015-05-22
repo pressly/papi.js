@@ -31,17 +31,17 @@ var api = new Papi();
 
 ## Querying
 
-** Querying a root resource **
+##### Querying a root resource
 ```javascript
 api.$query('hubs'); // returns a Hubs Resource for the  
 ```
 
-** Querying a child resource **
+##### Querying a child resource
 ```javascript
 api.$query('hubs.assets'); // returns an Assets Resource
 ```
 
-** Preparing a resource query **
+##### Preparing a resource query
 ```javascript
 api.$query('hubs.assets', {hubId: 123}); // returns an Assets Resource with set hub id
 ```
