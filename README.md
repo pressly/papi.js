@@ -31,31 +31,35 @@ var api = new Papi();
 
 ## Querying
 
+Before we can fetch data we need to set up the appropriate resource we wish to query.
+
 ##### Querying a root resource
 ```javascript
-api.$query('hubs'); // returns a Hubs Resource for the  
+var resource = api.$query('hubs'); // returns a Hubs Resource
 ```
 
 ##### Querying a child resource
 ```javascript
-api.$query('hubs.assets'); // returns an Assets Resource
+var resource = api.$query('hubs.assets'); // returns an Assets Resource
 ```
 
-##### Preparing a resource query
+##### Preparing a query with resource params
 ```javascript
-api.$query('hubs.assets', {hubId: 123}); // returns an Assets Resource with set hub id
+var resource = api.$query('hubs.assets', { hubId: 123 }); // returns an Assets Resource with set hub id
 ```
 
 ## Fetching Data
+
 Fetching data is done by the `$all` and `$find` methods on a Resource.
 
 ##### $all(`*params`)
 - **params** (optional) | Object ex. `{ hubId: 123 }`
+params will override anything set in the resource.
 
 Returns a `Promise` which resolves an Array of result models.
 
 ```javascript
-api.$query('hubs').$all().then(function(hubs) {
+resource.$all().then(function(hubs) {
   ...
 });
 ```
@@ -63,11 +67,37 @@ api.$query('hubs').$all().then(function(hubs) {
 ##### $find(`id` or `params`)
 - **id** (optional) | Integer | ex `123`
 - **params** (optional) | Object ex. `{ hubId: 123, id: 1 }`
+params will override anything set in the resource.
 
 returns a `Promise` which resolves a result model.
 
 ```javascript
-api.$query('hubs').find(123).then(function(hub) {
+resource.find(123).then(function(hub) {
   ...
+});
+```
+
+##### Result models can also `$query` child resources to get associated data
+
+Result models are extended with the query resource that generated it so you can
+access `$query` to generate child resources.
+
+```javascript
+api.$query('hubs').$find(123).then(function(hub) {
+  hub.$query('apps').$all().then(function(apps) {
+    ..
+  });
+});
+```
+
+Notice that when you chain queries you specify the child name `hubs` rather than the full resource key `hubs.apps`.
+
+This is equivalent to:
+
+```javascript
+api.$query('hubs').$find(123).then(function(hub) {
+  api.$query('hubs.apps', { hubId: hub.id }).$all().then(function(apps) {
+    ..
+  });
 });
 ```
