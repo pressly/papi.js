@@ -236,7 +236,7 @@ export default class Resource {
   $find(params) {
     var self = this;
 
-    if (!_.isObject(params)) {
+    if (params && !_.isObject(params)) {
       params = { id: params };
     }
 

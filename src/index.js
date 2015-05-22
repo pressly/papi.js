@@ -22,12 +22,22 @@ export default class Papi {
     this.users = new Users(this.session);
   }
 
-  $query(key, parentResource) {
+  /*
+    $query(key);
+    $query(key, params);
+    $query(name, parentResource);
+    $query(name, params, parentResource);
+  */
+  $query() {
+    var key = arguments[0];
+
     if (typeof key == 'undefined') {
       throw new Error("Papi::$query: key is undefined");
     }
 
     var name = _.last(key.split('.'));
+    var params = (_.isObject(arguments[1]) && !(arguments[1] instanceof Resource)) ? arguments[1] : undefined;
+    var parentResource = arguments[2] || (!params && arguments[1]) || undefined;
 
     if (parentResource) {
       if (parentResource.children.indexOf(name) == -1) {
@@ -37,7 +47,7 @@ export default class Papi {
       key = parentResource.key + '.' + name;
     }
 
-    return new Resource(this, key, parentResource);
+    return new Resource(this, key, parentResource).includeParams(params);
   }
 
   $request(method, route, data) {

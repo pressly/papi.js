@@ -26,15 +26,20 @@ nock(api.session.domain, { reqheaders: { 'Authorization': `Bearer ${api.session.
   // $find
   .get(`/hubs/${mock.hubs[0].id}`).reply(200, mock.hubs[0])
 
+  // $query with prepared params then $find()
+  .get(`/hubs/${mock.hubs[0].id}`).reply(200, mock.hubs[0])
+
 
   /** App Resource Requests ***************************************************/
 
   // $all
   .get(`/hubs/${mock.hubs[0].id}/apps`).reply(200, mock.apps)
 
-
   // $find
   .get(`/hubs/${mock.hubs[0].id}/apps/${mock.apps[0].id}`).reply(200, mock.apps[0])
+
+  // $query with prepared params then $all()
+  .get(`/hubs/${mock.hubs[0].id}/apps`).reply(200, mock.apps)
 
   // $all from a result model
   .get(`/hubs/${mock.hubs[0].id}`).reply(200, mock.hubs[0])
@@ -91,6 +96,17 @@ describe('Hubs Resource', function () {
       done(err);
     });
   });
+
+  it('$query with prepared params then $find should return one item', function (done) {
+    api.$query('hubs', { id: mock.hubs[0].id }).$find().then((res) => {
+      res.should.instanceOf(models.Hub);
+      res.id.should.equal(mock.hubs[0].id);
+
+      done();
+    }).catch((err) => {
+      done(err);
+    });
+  });
 });
 
 describe('Apps Resource', function() {
@@ -109,6 +125,18 @@ describe('Apps Resource', function() {
     api.$query('hubs.apps').$find({hubId: mock.hubs[0].id, id: mock.apps[0].id}).then((res) => {
       res.should.instanceOf(models.App);
       res.id.should.equal(mock.apps[0].id);
+
+      done();
+    }).catch((err) => {
+      done(err);
+    });
+  });
+
+  it('$query with prepared params then $all should return an array', function(done) {
+    api.$query('hubs.apps', { hubId: mock.hubs[0].id }).$all().then((res) => {
+      res.should.not.be.empty;
+      res[0].should.instanceOf(models.App);
+      res[0].id.should.equal(mock.apps[0].id);
 
       done();
     }).catch((err) => {
