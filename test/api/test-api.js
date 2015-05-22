@@ -18,33 +18,51 @@ nock(api.session.domain)
   });
 
 nock(api.session.domain, { reqheaders: { 'Authorization': `Bearer ${api.session.jwt}` } })
-  // Hub Resource Requests
+  /** Hub Resource Requests ***************************************************/
+
+  // $all
   .get('/hubs').reply(200, mock.hubs)
 
+  // $find
   .get(`/hubs/${mock.hubs[0].id}`).reply(200, mock.hubs[0])
 
 
-  // App Resource Requests
+  /** App Resource Requests ***************************************************/
+
+  // $all
   .get(`/hubs/${mock.hubs[0].id}/apps`).reply(200, mock.apps)
 
+
+  // $find
   .get(`/hubs/${mock.hubs[0].id}/apps/${mock.apps[0].id}`).reply(200, mock.apps[0])
 
+  // $all from a result model
   .get(`/hubs/${mock.hubs[0].id}`).reply(200, mock.hubs[0])
   .get(`/hubs/${mock.hubs[0].id}/apps`).reply(200, mock.apps)
 
+  // chainable $find and $all
   .get(`/hubs/${mock.hubs[0].id}`).reply(200, mock.hubs[0])
   .get(`/hubs/${mock.hubs[0].id}/apps`).reply(200, mock.apps)
 
+  // chainable $find and $find
+  .get(`/hubs/${mock.hubs[0].id}`).reply(200, mock.hubs[0])
+  .get(`/hubs/${mock.hubs[0].id}/apps/${mock.apps[0].id}`).reply(200, mock.apps[0])
 
-  // Style Resource Requests
+
+  /** Style Resource Requests *************************************************/
+
+  // $all
   .get(`/hubs/${mock.hubs[0].id}/apps/${mock.apps[0].id}/styles`).reply(200, mock.styles)
 
+  // $find
   .get(`/hubs/${mock.hubs[0].id}/apps/${mock.apps[0].id}/styles/${mock.styles[0].id}`).reply(200, mock.styles[0])
 
+  // promises resolved in an inline fashion
   .get(`/hubs`).reply(200, mock.hubs)
   .get(`/hubs/${mock.hubs[0].id}/apps`).reply(200, mock.apps)
   .get(`/hubs/${mock.hubs[0].id}/apps/${mock.apps[0].id}/styles`).reply(200, mock.styles)
 
+  // chainable query on find
   .get(`/hubs/${mock.hubs[0].id}`).reply(200, mock.hubs[0])
   .get(`/hubs/${mock.hubs[0].id}/apps/${mock.apps[0].id}`).reply(200, mock.apps[0])
   .get(`/hubs/${mock.hubs[0].id}/apps/${mock.apps[0].id}/styles`).reply(200, mock.styles)
@@ -112,7 +130,7 @@ describe('Apps Resource', function() {
     });
   });
 
-  it('should support chainable queries on find', function(done) {
+  it('should support chainable queries $find and then $all', function(done) {
     api.$query('hubs').$find(mock.hubs[0].id).$query('apps').$all().then(function(res) {
       var hub = res[0];
       var apps = res[1];
@@ -120,6 +138,20 @@ describe('Apps Resource', function() {
       hub.should.instanceOf(models.Hub);
       apps.should.not.be.empty;
       apps[0].should.instanceOf(models.App);
+
+      done();
+    }).catch((err) => {
+      done(err);
+    });
+  });
+
+  it('should support chainable queries on $find and then $find', function(done) {
+    api.$query('hubs').$find(mock.hubs[0].id).$query('apps').$find(mock.apps[0].id).then(function(res) {
+      var hub = res[0];
+      var app = res[1];
+
+      hub.should.be.instanceOf(models.Hub);
+      app.should.be.instanceOf(models.App);
 
       done();
     }).catch((err) => {

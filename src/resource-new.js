@@ -155,7 +155,7 @@ var extendPromise = function(parentPromise, parentResource, promises) {
         $find: function(id) {
           childResource.includeParams({id: id});
           var promise = childResource._find(id);
-          var finalPromiseChain = Promise.all([promises.concat(promise)]);
+          var finalPromiseChain = Promise.all(promises.concat(promise));
 
           promises.push(promise);
 
