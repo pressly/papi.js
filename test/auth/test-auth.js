@@ -1,7 +1,7 @@
 'use strict';
 
 import Papi from '../../src';
-import { mockAuth } from '../mocks';
+import * as mock from './mocks';
 import nock from 'nock';
 import should from 'should';
 
@@ -9,17 +9,17 @@ const api = new Papi();
 
 // interceptors
 nock(api.session.domain)
-  .post('/login', { email: 'test', password: 'test', }).reply(401)
-  .post('/login', { email: mockAuth.email, password: mockAuth.password }).times(3).reply(200, mockAuth);
+  .post('/auth/login', { email: 'incorrect-email', password: 'incorrect-password', }).reply(401)
+  .post('/auth/login', { email: mock.session.email, password: mock.session.password }).times(3).reply(200, mock.session);
 
 nock(api.session.domain, { reqheaders: { 'Authorization': `Bearer ${api.session.jwt}` } })
   .get('/auth/logout').reply(200)
   .get('/auth/session').times(2).reply(function() {
     if (api.session.jwt) {
-      return [200, mockAuth];
+      return [200, mock.session];
     }
 
-    return [401, mockAuth];
+    return [401, null];
   });
 
 // clear outstanding interceptors
@@ -27,10 +27,9 @@ after(function() {
   nock.cleanAll();
 });
 
-// tests
 describe('Testing Auth API - Login', function () {
-  it('should return 401', function (done) {
-    api.auth.login('test', 'test').then(() => {
+  it('should return 401 when given incorrect email or password', function (done) {
+    api.auth.login('incorrect-email', 'incorrect-password').then(() => {
       throw new Error('login was successfull');
     }).catch((err) => {
       if (err.status == 401) {
@@ -41,16 +40,16 @@ describe('Testing Auth API - Login', function () {
     });
   });
 
-  it('should return 200', function (done) {
+  it('should return 200 with proper email and password', function (done) {
     api.auth.login('alex.vitiuk@pressly.com', 'betame').then((res) => {
       if (res.status != 200) {
         throw new Error('login unsuccessful');
       }
 
-      res.body.id.should.be.exactly(mockAuth.id);
-      res.body.jwt.should.be.exactly(mockAuth.jwt);
-      res.body.email.should.be.exactly(mockAuth.email);
-      res.body.username.should.be.exactly(mockAuth.username);
+      res.body.id.should.be.exactly(mock.session.id);
+      res.body.jwt.should.be.exactly(mock.session.jwt);
+      res.body.email.should.be.exactly(mock.session.email);
+      res.body.username.should.be.exactly(mock.session.username);
       res.body.account_id.should.not.be.empty;
 
       done();

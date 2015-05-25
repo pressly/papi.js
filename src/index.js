@@ -4,22 +4,38 @@ require('babel/register');
 
 import _ from 'lodash';
 import request from 'superagent';
-import Resource, { applyResourceHelpers } from './resource-new';
 
-import Auth from './auth';
-import Hubs from './hubs';
-import Users from './users';
+import Resource, { applyResourcing } from './resource';
 
 export default class Papi {
   constructor(domain = 'https://beta-api.pressly.com', jwt = null) {
-    // XXX temporary injecting default jwt
-    jwt = (jwt || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNTUyN2RlNjU3YjVmODg2NDllM2Q1M2ZiIn0.d8o8SXSQhgH6fYfdagLcGJNIL_ccjBjNkJHqh3hx_Tk');
-
     this.session = { domain: domain, jwt: jwt };
 
-    this.auth  = new Auth(this.session);
-    this.hubs  = new Hubs(this.session);
-    this.users = new Users(this.session);
+    this.auth = {
+      login: (email, password) => {
+        return this.$request('post', '/auth/login', { email, password }).then((res) => {
+          if (!res.body.jwt) {
+            return Promise.reject(new Error('Papi:Auth: Invalid session response - missing jwt'));
+          }
+
+          this.session.jwt = res.body.jwt;
+
+          return res;
+        });
+      },
+
+      logout: () => {
+        return this.$request('get', '/auth/logout').then((res) => {
+          this.session.jwt = undefined;
+
+          return res;
+        });
+      },
+
+      session: () => {
+        return this.$request('get', '/auth/session');
+      }
+    }
   }
 
   /*
@@ -74,7 +90,9 @@ export default class Papi {
   }
 }
 
-applyResourceHelpers(Papi);
+applyResourcing(Papi);
+
+//Resource.init(Papi);
 
 Papi
   .resource('auth')

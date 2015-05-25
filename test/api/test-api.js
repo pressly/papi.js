@@ -73,7 +73,6 @@ nock(api.session.domain, { reqheaders: { 'Authorization': `Bearer ${api.session.
   .get(`/hubs/${mock.hubs[0].id}/apps/${mock.apps[0].id}/styles`).reply(200, mock.styles)
 ;
 
-
 describe('Hubs Resource', function () {
   it("$all should return an array", function (done) {
     api.$resource('hubs').$all().then((res) => {

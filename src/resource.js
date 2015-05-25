@@ -72,7 +72,7 @@ var buildKey = function(resource, name) {
   return segments.join('.');
 }
 
-export function applyResourceHelpers(klass) {
+export function applyResourcing(klass) {
   klass.resourceDefinitions = {};
 
   var pointer = function (bucket, parentPointer) {
@@ -176,7 +176,6 @@ export default class Resource {
       throw new Error("Resource: Must supply a proper definition");
     }
 
-    var self = this;
     this.api = api;
 
     this.name = def.name;
@@ -193,8 +192,8 @@ export default class Resource {
     if (parentResource) {
       var parentParams = {};
 
-      _.each(parentResource.route.params, function(value, paramName) {
-        if (parentResource.key != self.key && paramName == 'id') {
+      _.each(parentResource.route.params, (value, paramName) => {
+        if (parentResource.key != this.key && paramName == 'id') {
           paramName = singularize(parentResource.name) + 'Id';
         }
 
@@ -234,8 +233,6 @@ export default class Resource {
   }
 
   $find(params) {
-    var self = this;
-
     if (params && !_.isObject(params)) {
       params = { id: params };
     }
@@ -256,8 +253,6 @@ export default class Resource {
   }
 
   $all(params) {
-    var self = this;
-
     // Create a new resource for this step of the chain with included parameters
     var resource = new Resource(this.api, this.key, this).includeParams(params);
     var path = resource.buildRoute(true);
@@ -285,8 +280,6 @@ export default class Resource {
   }
 
   hydrateModel(data) {
-    var self = this;
-
     // Create a new resource for the model based on the current resource and maintain the parent relationship
     var resource = new Resource(this.api, this.key, this);
     var model = new resource.model(data);
