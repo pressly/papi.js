@@ -29,6 +29,34 @@ PAPI.js (Pressly API)
 var api = new Papi();
 ```
 
+## Authentication
+
+All authentication is handled under the Papi.auth module.
+
+##### auth.login(`email`, `password`)
+
+```javascript
+api.auth.login(email, password).then(function(session) {
+  // Returns logged in session
+});
+```
+
+##### auth.logout()
+
+```javascript
+api.auth.logout(email, password).then(function() {
+  // User is successfully logged out
+});
+```
+
+##### auth.session()
+
+```javascript
+api.auth.session().then(function(session) {
+  // Returns current session if already logged in
+});
+```
+
 ## Resources
 
 Before we can fetch data we need to set up the appropriate resource we wish to query.
