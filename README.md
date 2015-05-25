@@ -35,17 +35,17 @@ Before we can fetch data we need to set up the appropriate resource we wish to q
 
 ##### Querying a root resource
 ```javascript
-var resource = api.$query('hubs'); // returns a Hubs Resource
+var resource = api.$resource('hubs'); // returns a Hubs Resource
 ```
 
 ##### Querying a child resource
 ```javascript
-var resource = api.$query('hubs.assets'); // returns an Assets Resource
+var resource = api.$resource('hubs.assets'); // returns an Assets Resource
 ```
 
 ##### Preparing a query with resource params
 ```javascript
-var resource = api.$query('hubs.assets', { hubId: 123 }); // returns an Assets Resource with set hub id
+var resource = api.$resource('hubs.assets', { hubId: 123 }); // returns an Assets Resource with set hub id
 ```
 
 ## Fetching Data
@@ -77,14 +77,14 @@ resource.find(123).then(function(hub) {
 });
 ```
 
-##### Result models can also `$query` child resources to get associated data
+##### Result models can also `$resource` child resources to get associated data
 
 Result models are extended with the query resource that generated it so you can
-access `$query` to generate child resources.
+access `$resource` to generate child resources.
 
 ```javascript
-api.$query('hubs').$find(123).then(function(hub) {
-  hub.$query('apps').$all().then(function(apps) {
+api.$resource('hubs').$find(123).then(function(hub) {
+  hub.$resource('apps').$all().then(function(apps) {
     ..
   });
 });
@@ -95,8 +95,8 @@ Notice that when you chain queries you specify the child name `hubs` rather than
 This is equivalent to:
 
 ```javascript
-api.$query('hubs').$find(123).then(function(hub) {
-  api.$query('hubs.apps', { hubId: hub.id }).$all().then(function(apps) {
+api.$resource('hubs').$find(123).then(function(hub) {
+  api.$resource('hubs.apps', { hubId: hub.id }).$all().then(function(apps) {
     ..
   });
 });
