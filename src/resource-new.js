@@ -138,10 +138,10 @@ var extendPromise = function(parentPromise, parentResource, promises) {
   promises = (promises || [parentPromise]);
 
   return _.extend(parentPromise, {
-    $query: function(name) {
+    $resource: function(name) {
       var key = parentResource.key + '.' + name;
 
-      var childResource = parentResource.api.$query(key, parentResource);
+      var childResource = parentResource.api.$resource(key, parentResource);
 
       childResource._all = childResource.$all;
       childResource._find = childResource.$find;
@@ -205,7 +205,7 @@ export default class Resource {
     }
 
     this.parent = function() {
-      return parentResource || (def.parent && this.api.$query(def.parent.key)) || null;
+      return parentResource || (def.parent && this.api.$resource(def.parent.key)) || null;
     };
   }
 
@@ -301,8 +301,8 @@ export default class Resource {
     model.$resource = resource;
 
     var methods = {
-      $query: function(name) {
-        return resource.api.$query(name, resource);
+      $resource: function(name) {
+        return resource.api.$resource(name, resource);
       }
     };
 

@@ -23,16 +23,16 @@ export default class Papi {
   }
 
   /*
-    $query(key);
-    $query(key, params);
-    $query(name, parentResource);
-    $query(name, params, parentResource);
+    $resource(key);
+    $resource(key, params);
+    $resource(name, parentResource);
+    $resource(name, params, parentResource);
   */
-  $query() {
+  $resource() {
     var key = arguments[0];
 
     if (typeof key == 'undefined') {
-      throw new Error("Papi::$query: key is undefined");
+      throw new Error("Papi::$resource: key is undefined");
     }
 
     var name = _.last(key.split('.'));
@@ -41,7 +41,7 @@ export default class Papi {
 
     if (parentResource) {
       if (parentResource.children.indexOf(name) == -1) {
-        throw new Error("Papi::$query: key not found in parent resource.");
+        throw new Error("Papi::$resource: key not found in parent resource.");
       }
 
       key = parentResource.key + '.' + name;
