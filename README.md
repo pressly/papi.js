@@ -46,7 +46,7 @@ var resource = api.$resource('hubs.assets'); // returns an Assets Resource
 ```
 
 ##### Preparing a resource with params
-In cases where we are creating a nested resource we will need to specify the ids of the parent this can be done in the `$all` or `$find` methods when you query the data or you can prepare the resource with the required properties when you create it.
+In cases where we are creating a nested resource we will need to specify the ids of the parents. This can be done at the time you request data from the resource via the `$all` or `$find` methods *or* you can prepare the resource with default params when you create it.
 
 **Note** The param names for parent ids take the form `{singular parent name }Id` ie. hubs -> hubId
 
