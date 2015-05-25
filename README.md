@@ -29,28 +29,42 @@ PAPI.js (Pressly API)
 var api = new Papi();
 ```
 
-## Querying
+## Resources
 
 Before we can fetch data we need to set up the appropriate resource we wish to query.
 
-##### Querying a root resource
+##### Creating a resource
 ```javascript
 var resource = api.$resource('hubs'); // returns a Hubs Resource
 ```
 
-##### Querying a child resource
+##### Creating a nested resource
+When directly specifying nested resources we use the format `parent.child` starting from the root.
+
 ```javascript
 var resource = api.$resource('hubs.assets'); // returns an Assets Resource
 ```
 
-##### Preparing a query with resource params
+##### Preparing a resource with params
+In cases where we are creating a nested resource we will need to specify the ids of the parent this can be done in the `$all` or `$find` methods when you query the data or you can prepare the resource with the required properties when you create it.
+
+**Note** The param names for parent ids take the form `{singular parent name }Id` ie. hubs -> hubId
+
 ```javascript
 var resource = api.$resource('hubs.assets', { hubId: 123 }); // returns an Assets Resource with set hub id
 ```
 
-## Fetching Data
+Now this resource will be setup to return assets from hub '123'.
 
-Fetching data is done by the `$all` and `$find` methods on a Resource.
+Here is an example of preparing a resource that is nested 3 deep. The styles resource.
+
+```javascript
+var resource = api.$resource('hubs.apps.styles', { hubId: 123, appId: 456 }); // returns a Styles Resource with set hub and app id
+```
+
+## Requests
+
+Requesting data is done by the `$all` and `$find` methods on a Resource.
 
 ##### $all(`*params`)
 - **params** (optional) | Object ex. `{ hubId: 123 }`
@@ -72,14 +86,14 @@ params will override anything set in the resource.
 returns a `Promise` which resolves a result model.
 
 ```javascript
-resource.find(123).then(function(hub) {
+resource.$find(123).then(function(hub) {
   ...
 });
 ```
 
-##### Result models can also `$resource` child resources to get associated data
+##### Models can also `$resource` child resources to get associated data
 
-Result models are extended with the query resource that generated it so you can
+Result models are extended with the resource that generated it so you can
 access `$resource` to generate child resources.
 
 ```javascript
