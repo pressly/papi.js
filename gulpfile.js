@@ -11,12 +11,12 @@ gulp.task('build:es6', function() {
     .pipe(gulp.dest('build'));
 });
 
-gulp.task('build:bundle', ['build:es6'], function () {
-  return browserify({ entries: './build/index.js' })
+gulp.task('build', ['build:es6'], function () {
+  return browserify({ entries: './build/index.js', standalone: 'Papi' })
     //.transform(babelify)
     .bundle()
-    .pipe(source('bundle.js'))
-    .pipe(gulp.dest('./build/'))
+    .pipe(source('papi.js'))
+    .pipe(gulp.dest('dist'))
     .pipe(connect.reload());
 });
 
