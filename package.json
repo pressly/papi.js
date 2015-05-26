@@ -5,7 +5,7 @@
   "author": "Peter Kieltyka <peter@pressly.com>",
   "main": "./build/index.js",
   "scripts": {
-    "postinstall": "gulp build:bundle",
+    "postinstall": "node_modules/gulp/bin/gulp.js build:bundle",
     "build": "gulp build:bundle",
     "test": "node_modules/.bin/mocha --compilers js:babel/register --recursive",
     "test-watch": "node_modules/.bin/mocha -w --compilers js:babel/register"
