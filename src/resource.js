@@ -187,6 +187,7 @@ export default class Resource {
     this.depth = parentResource ? parentResource.depth + 1 : 1;
 
     this.route = deepClone(def.route);
+    this.route.queryParams = {};
 
     // Prepare route params, extends the route params from the parentResource
     if (parentResource) {
@@ -232,8 +233,14 @@ export default class Resource {
     return this;
   }
 
+  $query(params) {
+    _.extend(this.route.queryParams, params);
+
+    return this;
+  }
+
   $limit(rpp) {
-    this.rpp = rpp;
+    this.$query({limit: rpp});
 
     return this;
   }
@@ -265,13 +272,7 @@ export default class Resource {
 
     //console.log("$all:", path);
 
-    var queryParams = {};
-
-    if (this.rpp) {
-      queryParams.limit = this.rpp;
-    }
-
-    return this.api.$request('get', path, { query: queryParams }).then(function(res) {
+    return this.api.$request('get', path, { query: this.route.queryParams }).then(function(res) {
       var collection = _.map(res.body, function(item) { return resource.hydrateModel(item); });
       collection.$resource = resource;
 
