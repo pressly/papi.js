@@ -2,6 +2,7 @@
 
 import _ from 'lodash';
 import request from 'superagent';
+import Promise from 'bluebird';
 
 import Resource, { applyResourcing } from './resource';
 
