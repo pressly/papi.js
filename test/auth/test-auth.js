@@ -8,19 +8,19 @@ import should from 'should';
 const api = new Papi();
 
 // interceptors
-nock(api.session.domain)
-  .post('/login', { email: 'incorrect-email', password: 'incorrect-password', }).reply(401)
-  .post('/login', { email: mock.session.email, password: mock.session.password }).times(3).reply(200, mock.session);
+nock(api.domain)
+.post('/login', { email: 'incorrect-email', password: 'incorrect-password', }).reply(401)
+.post('/login', { email: mock.session.email, password: mock.session.password }).times(3).reply(200, mock.session);
 
-nock(api.session.domain, { reqheaders: { 'Authorization': `Bearer ${api.session.jwt}` } })
-  .get('/auth/logout').reply(200)
-  .get('/auth/session').times(2).reply(function() {
-    if (api.session.jwt) {
-      return [200, mock.session];
-    }
+nock(api.domain)
+.get('/auth/logout').reply(200)
+.get('/auth/session').times(2).reply(function() {
+  if (api.auth.session) {
+    return [200, mock.session];
+  }
 
-    return [401, null];
-  });
+  return [401, null];
+})
 
 // clear outstanding interceptors
 after(function() {
@@ -64,9 +64,9 @@ describe('Testing Auth API - Login', function () {
         throw new Error('login unsuccessful');
       }
 
-      if (!api.session.jwt) {
+      if (!api.auth.session.jwt) {
         throw new Error('jwt was not set');
-      } else if (api.session.jwt != res.body.jwt) {
+      } else if (api.auth.session.jwt != res.body.jwt) {
         throw new Error('wrong jwt set');
       }
 
@@ -89,8 +89,8 @@ describe('Testing Auth API - Logout', function () {
     });
   });
 
-  it('should clear jwt', function (done) {
-    if (api.session.jwt) {
+  it('should clear session', function (done) {
+    if (api.auth.session) {
       throw new Error('logout didnt clear jwt');
     }
     done()
@@ -99,7 +99,7 @@ describe('Testing Auth API - Logout', function () {
 
 describe('Testing Auth API - Session', function () {
   it('should return 401 unauthorized', function (done) {
-    api.auth.session().then((res) => {
+    api.auth.get().then((res) => {
       throw new Error('auth success without being logged in');
     }).catch((err) => {
       if (err.status == 401) {
@@ -112,7 +112,7 @@ describe('Testing Auth API - Session', function () {
 
   it('should return currentUser', function (done) {
     api.auth.login('alex.vitiuk@pressly.com', 'betame').then((currentUser) => {
-      api.auth.session().then((res) => {
+      api.auth.get().then((res) => {
         if (res.body.id != currentUser.body.id) {
           throw new Error('Logged in user response doesnt match session response');
         }

@@ -8,16 +8,11 @@ import * as models from '../../src/models';
 
 const api = new Papi('http://beta.pressly.com');
 
-// Interceptors
-nock(api.session.domain)
-  .post('/login', {
-    email: 'alex.vitiuk@pressly.com',
-    password: 'betame',
-  }).times(1).reply(200, {
-    jwt: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNTRmMGRiNzMwOGFmYTEyYjUzNjIwNTg4In0.CvXGDKAJYZkoH3nnEirtlGlwRzErv1ANOJ-dVkUAnjo#_login_post'
-  });
+api.auth.set({jwt: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNTRmMGRiNzMwOGFmYTEyYjUzNjIwNTg4In0.CvXGDKAJYZkoH3nnEirtlGlwRzErv1ANOJ-dVkUAnjo#_login_post'});
 
-nock(api.session.domain, { reqheaders: { 'Authorization': `Bearer ${api.session.jwt}` } })
+nock(api.domain)
+  .matchHeader('authorization', function() { return `Bearer ${api.auth.session.jwt}`; })
+
   /** Hub Resource Requests ***************************************************/
 
   // $all

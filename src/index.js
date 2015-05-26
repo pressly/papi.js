@@ -7,16 +7,40 @@ import Resource, { applyResourcing } from './resource';
 
 export default class Papi {
   constructor(domain = 'https://beta-api.pressly.com', jwt = null) {
-    this.session = { domain: domain, jwt: jwt };
+    this.domain = domain;
 
     this.auth = {
+      session: null,
+
+      get: () => {
+        return this.$request('get', '/auth/session').then((res) => {
+          this.auth.set(res.body);
+
+          return res;
+        });
+      },
+
+      set: (session) => {
+        if (!session.jwt) {
+          throw new Error('Papi:Auth: Invalid session response - missing jwt')
+        }
+
+        this.auth.session = session;
+
+        return this.auth.session;
+      },
+
+      isLoggedIn: () => {
+        return !!this.auth.session && !this.auth.isExpired();
+      },
+
+      isExpired: () => {
+        return false;
+      },
+
       login: (email, password) => {
         return this.$request('post', '/login', { data: { email, password } }).then((res) => {
-          if (!res.body.jwt) {
-            return Promise.reject(new Error('Papi:Auth: Invalid session response - missing jwt'));
-          }
-
-          this.session.jwt = res.body.jwt;
+          this.auth.set(res.body);
 
           return res;
         });
@@ -24,14 +48,10 @@ export default class Papi {
 
       logout: () => {
         return this.$request('get', '/auth/logout').then((res) => {
-          this.session.jwt = undefined;
+          this.auth.session = null;
 
           return res;
         });
-      },
-
-      session: () => {
-        return this.$request('get', '/auth/session');
       }
     }
   }
@@ -66,17 +86,26 @@ export default class Papi {
 
   $request(method, route, options = {}) {
     return new Promise((resolve, reject) => {
-      var req = request[method](this.session.domain + route);
+      var req = request[method](this.domain + route);
       req.set('Content-Type', 'application/json');
 
-      if (this.session.jwt) {
-        req.set('Authorization', 'Bearer ' + this.session.jwt)
+
+      // Allow sending cookies from origin
+      if (typeof req.withCredentials == 'function') {
+        req.withCredentials();
       }
 
+      // Send Authorization header when we have a JSON Web Token set in the session
+      if (this.auth.session && this.auth.session.jwt) {
+        req.set('Authorization', 'Bearer ' + this.auth.session.jwt)
+      }
+
+      // Query params to be added to the url
       if (options.query) {
         req.query(options.query);
       }
 
+      // Data to send (with get requests these are converted into query params)
       if (options.data) {
         req.send(options.data);
       }
