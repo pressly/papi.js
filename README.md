@@ -25,6 +25,10 @@ PAPI.js (Pressly API)
 
 ## Connection
 
+##### Papi::constructor(`*host`, `*jwt`)
+- **host** (optional) | String | defaults to 'https://beta-api.pressly.com'
+- **jwt*** (optional) | String | a JSON Web Token
+
 ```javascript
 var api = new Papi();
 ```
@@ -34,6 +38,10 @@ var api = new Papi();
 All authentication is handled under the Papi.auth module.
 
 ##### auth.login(`email`, `password`)
+- **email** (required) | String
+- **password*** (required) | String
+
+Returns Promise which resolves session response.
 
 ```javascript
 api.auth.login(email, password).then(function(session) {
@@ -43,23 +51,44 @@ api.auth.login(email, password).then(function(session) {
 
 ##### auth.logout()
 
+Returns promise for successful logout.
+
 ```javascript
 api.auth.logout(email, password).then(function() {
   // User is successfully logged out
 });
 ```
 
-##### auth.session()
+##### auth.get()
+
+Returns promise which resolves the current session.
+
+This will attempt to pass an authentication cookie if one exists to retreive the logged in session.
 
 ```javascript
-api.auth.session().then(function(session) {
+api.auth.get().then(function(session) {
   // Returns current session if already logged in
 });
+```
+
+##### auth.set(`session`)
+- **session** (required) | Object | a stored session object.
+
+You may wish to store the `api.auth.session` object on the client and restore it at a later time.
+
+```javascript
+api.auth.set(session);
 ```
 
 ## Resources
 
 Before we can fetch data we need to set up the appropriate resource we wish to query.
+
+##### $resource(`key`, `*params`)
+- **key** (required) | String | Key of the resource eg. 'hubs.assets'
+- **params** (optional) | Object | eg. {hubId: 123}
+
+Returns a prepared Resource.
 
 ##### Creating a resource
 ```javascript
@@ -95,7 +124,7 @@ var resource = api.$resource('hubs.apps.styles', { hubId: 123, appId: 456 }); //
 Requesting data is done by the `$all` and `$find` methods on a Resource.
 
 ##### $all(`*params`)
-- **params** (optional) | Object ex. `{ hubId: 123 }`
+- **params** (optional) | Object | ex. `{ hubId: 123 }`
 params will override anything set in the resource.
 
 Returns a `Promise` which resolves an Array of result models.
@@ -108,7 +137,7 @@ resource.$all().then(function(hubs) {
 
 ##### $find(`id` or `params`)
 - **id** (optional) | Integer | ex `123`
-- **params** (optional) | Object ex. `{ hubId: 123, id: 1 }`
+- **params** (optional) | Object | ex. `{ hubId: 123, id: 1 }`
 params will override anything set in the resource.
 
 returns a `Promise` which resolves a result model.
