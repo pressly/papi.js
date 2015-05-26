@@ -13,7 +13,7 @@ export default class Papi {
 
     this.auth = {
       login: (email, password) => {
-        return this.$request('post', '/auth/login', { email, password }).then((res) => {
+        return this.$request('post', '/login', { email, password }).then((res) => {
           if (!res.body.jwt) {
             return Promise.reject(new Error('Papi:Auth: Invalid session response - missing jwt'));
           }

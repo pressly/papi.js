@@ -1,11 +1,12 @@
 {
   "name": "papi",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Javascript HTTP/REST client for the Pressly API",
   "author": "Peter Kieltyka <peter@pressly.com>",
-  "main": "./papi.js",
+  "main": "./build/index.js",
   "scripts": {
-    "build": "gulp build",
+    "postinstall": "gulp build:bundle",
+    "build": "gulp build:bundle",
     "test": "node_modules/.bin/mocha --compilers js:babel/register --recursive",
     "test-watch": "node_modules/.bin/mocha -w --compilers js:babel/register"
   },

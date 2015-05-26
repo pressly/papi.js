@@ -9,8 +9,8 @@ const api = new Papi();
 
 // interceptors
 nock(api.session.domain)
-  .post('/auth/login', { email: 'incorrect-email', password: 'incorrect-password', }).reply(401)
-  .post('/auth/login', { email: mock.session.email, password: mock.session.password }).times(3).reply(200, mock.session);
+  .post('/login', { email: 'incorrect-email', password: 'incorrect-password', }).reply(401)
+  .post('/login', { email: mock.session.email, password: mock.session.password }).times(3).reply(200, mock.session);
 
 nock(api.session.domain, { reqheaders: { 'Authorization': `Bearer ${api.session.jwt}` } })
   .get('/auth/logout').reply(200)
