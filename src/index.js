@@ -11,7 +11,7 @@ export default class Papi {
 
     this.auth = {
       login: (email, password) => {
-        return this.$request('post', '/login', { email, password }).then((res) => {
+        return this.$request('post', '/login', { data: { email, password } }).then((res) => {
           if (!res.body.jwt) {
             return Promise.reject(new Error('Papi:Auth: Invalid session response - missing jwt'));
           }
@@ -64,7 +64,7 @@ export default class Papi {
     return new Resource(this, key, parentResource).includeParams(params);
   }
 
-  $request(method, route, data) {
+  $request(method, route, options = {}) {
     return new Promise((resolve, reject) => {
       var req = request[method](this.session.domain + route);
       req.set('Content-Type', 'application/json');
@@ -73,8 +73,12 @@ export default class Papi {
         req.set('Authorization', 'Bearer ' + this.session.jwt)
       }
 
-      if (data) {
-        req.send(data);
+      if (options.query) {
+        req.query(options.query);
+      }
+
+      if (options.data) {
+        req.send(options.data);
       }
 
       req.end((err, res) => {

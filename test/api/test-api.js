@@ -29,6 +29,8 @@ nock(api.session.domain, { reqheaders: { 'Authorization': `Bearer ${api.session.
   // $resource with prepared params then $find()
   .get(`/hubs/${mock.hubs[0].id}`).reply(200, mock.hubs[0])
 
+  // $all and $limit
+  .get('/hubs?limit=3').reply(200, mock.hubs.slice(0, 3))
 
   /** App Resource Requests ***************************************************/
 
@@ -100,6 +102,17 @@ describe('Hubs Resource', function () {
     api.$resource('hubs', { id: mock.hubs[0].id }).$find().then((res) => {
       res.should.instanceOf(models.Hub);
       res.id.should.equal(mock.hubs[0].id);
+
+      done();
+    }).catch((err) => {
+      done(err);
+    });
+  });
+
+  it('$all with $limit should return the correct number of results', function (done) {
+    api.$resource('hubs').$limit(3).$all().then((res) => {
+      res.length.should.equal(3);
+      res[0].should.instanceOf(models.Hub);
 
       done();
     }).catch((err) => {

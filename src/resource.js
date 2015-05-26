@@ -232,6 +232,12 @@ export default class Resource {
     return this;
   }
 
+  $limit(rpp) {
+    this.rpp = rpp;
+
+    return this;
+  }
+
   $find(params) {
     if (params && !_.isObject(params)) {
       params = { id: params };
@@ -259,7 +265,13 @@ export default class Resource {
 
     //console.log("$all:", path);
 
-    return this.api.$request('get', path).then(function(res) {
+    var queryParams = {};
+
+    if (this.rpp) {
+      queryParams.limit = this.rpp;
+    }
+
+    return this.api.$request('get', path, { query: queryParams }).then(function(res) {
       var collection = _.map(res.body, function(item) { return resource.hydrateModel(item); });
       collection.$resource = resource;
 
