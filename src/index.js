@@ -1,7 +1,5 @@
 'use strict';
 
-require('babel/register');
-
 import _ from 'lodash';
 import request from 'superagent';
 

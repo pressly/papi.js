@@ -17,6 +17,7 @@
   "license": "BSD",
   "homepage": "https://github.com/pressly/papi.js",
   "dependencies": {
+    "babel-runtime": "^5.4.7",
     "bluebird": "^2.9.25",
     "lodash": "^3.9.1",
     "superagent": "1.2.0"
