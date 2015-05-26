@@ -5,6 +5,8 @@ var gulp       = require('gulp')
   , babelify   = require('babelify')
   , babel      = require('gulp-babel');
 
+
+
 gulp.task('build:es6', function() {
   return gulp.src('src/**/*.js')
     .pipe(babel({optional: ['runtime']}))
@@ -16,8 +18,13 @@ gulp.task('build', ['build:es6'], function () {
     //.transform(babelify)
     .bundle()
     .pipe(source('papi.js'))
-    .pipe(gulp.dest('dist'))
+    .pipe(gulp.dest('build'))
     .pipe(connect.reload());
+});
+
+gulp.task('dist', ['build'], function() {
+  return gulp.src('build/**/*')
+  .pipe(gulp.dest('dist'));
 });
 
 gulp.task('connect', function() {
