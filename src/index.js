@@ -21,7 +21,7 @@ export default class Papi {
 
       set: (session) => {
         if (!session.jwt) {
-          throw new Error('Papi:Auth: Invalid session response - missing jwt')
+          throw new Error('Papi:Auth: Invalid session response - missing jwt');
         }
 
         this.auth.session = session;
