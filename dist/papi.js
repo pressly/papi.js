@@ -45,9 +45,7 @@ var Papi = (function () {
 
       get: function get() {
         return _this.$request('get', '/auth/session').then(function (res) {
-          _this.auth.set(res.body);
-
-          return res;
+          return _this.auth.set(res.body);
         });
       },
 
@@ -66,14 +64,14 @@ var Papi = (function () {
       },
 
       isExpired: function isExpired() {
+        // XXX this should be using a jwt lib to figure out if the token has expired
+        // XXX We do not currently include an expiry param in our tokens so just return false.
         return false;
       },
 
       login: function login(email, password) {
         return _this.$request('post', '/login', { data: { email: email, password: password } }).then(function (res) {
-          _this.auth.set(res.body);
-
-          return res;
+          return _this.auth.set(res.body);
         });
       },
 
