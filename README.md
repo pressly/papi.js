@@ -3,6 +3,29 @@ PAPI.js (Pressly API)
 
 *** Read this first! ***
 
+## Install
+
+You can install through npm and require in your project with commonJS require.
+
+##### npm
+```
+npm install papi
+```
+
+```javascript
+var Papi = require('papi');
+```
+
+##### Download Release
+
+Releases can be downloaded here https://github.com/pressly/papi.js/releases you can then script include /dist/papi.js in your project
+
+```html
+<script type="text/javascript" src="papi.js"></script>
+```
+
+This will expose the `Papi` class globally.
+
 ## API Schema
 
 * accounts
