@@ -36,15 +36,31 @@ function classify(string) {
 
 var buildRoute = function(resource) {
   var current = resource;
+  var segments = [];
 
-  var segments = ['/' + current.name + '/:' + (current.options.paramName || 'id')];
+  var path;
 
-  while (current && (current = current.parent)) {
-    var param = current.options.paramName ? singularize(current.name) + capitalize(current.options.paramName) : singularize(current.name) + 'Id';
-    segments.unshift('/' + current.name + '/:' + param);
+  if (current.options.route) {
+    path = current.options.route;
+  } else {
+
+    while (current) {
+      var paramName = current.options.routeSegment ? parseRouteParams(current.options.routeSegment)[0] : current.options.paramName || 'id';
+
+      if (current !== resource) {
+        paramName = singularize(current.name) + capitalize(paramName);
+      }
+
+      var routeSegment = current.options.routeSegment ? current.options.routeSegment.replace(/\/:[^\/]+$/, `/:${paramName}`) : `/${current.name}/:${paramName}`;
+
+      segments.unshift(routeSegment);
+
+      current = current.parent;
+    }
+
+    path = segments.join('');
   }
 
-  var path = segments.join('');
   var params = {};
   _.each(parseRouteParams(path), function(paramName) {
     params[paramName] = null;

@@ -68,6 +68,10 @@ nock(api.domain)
   .get(`/hubs/${mock.hubs[0].id}`).reply(200, mock.hubs[0])
   .get(`/hubs/${mock.hubs[0].id}/apps/${mock.apps[0].id}`).reply(200, mock.apps[0])
   .get(`/hubs/${mock.hubs[0].id}/apps/${mock.apps[0].id}/styles`).reply(200, mock.styles)
+
+  /** Stream Assets Requests **************************************************/
+  // $all
+  .get(`/hubs/${mock.hubs[0].id}/stream`).reply(200)
 ;
 
 describe('Hubs Resource', function () {
@@ -259,4 +263,14 @@ describe('Styles Resource', function() {
       done(err);
     });
   })
+});
+
+describe('Stream Assets Resource', function() {
+  it('should allow assets with custom routeSegment', function(done) {
+    api.$resource('hubs.assets', {hubId: mock.hubs[0].id}).$all().then((res) => {
+      done();
+    }).catch((err) => {
+      done(err);
+    });
+  });
 });

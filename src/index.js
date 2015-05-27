@@ -154,7 +154,10 @@ Papi
 
     .resource('tags')
 
-    .resource('assets').open()
+    .resource('assets', { routeSegment: '/stream/:id' }).open()
+      .resource('likes')
+      .resource('comments')
+
       .put('feature')
       .put('unfeature')
 
