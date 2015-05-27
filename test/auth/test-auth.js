@@ -42,15 +42,11 @@ describe('Testing Auth API - Login', function () {
 
   it('should return 200 with proper email and password', function (done) {
     api.auth.login('alex.vitiuk@pressly.com', 'betame').then((res) => {
-      if (res.status != 200) {
-        throw new Error('login unsuccessful');
-      }
-
-      res.body.id.should.be.exactly(mock.session.id);
-      res.body.jwt.should.be.exactly(mock.session.jwt);
-      res.body.email.should.be.exactly(mock.session.email);
-      res.body.username.should.be.exactly(mock.session.username);
-      res.body.account_id.should.not.be.empty;
+      res.id.should.be.exactly(mock.session.id);
+      res.jwt.should.be.exactly(mock.session.jwt);
+      res.email.should.be.exactly(mock.session.email);
+      res.username.should.be.exactly(mock.session.username);
+      res.account_id.should.not.be.empty;
 
       done();
     }).catch((err) => {
@@ -60,14 +56,8 @@ describe('Testing Auth API - Login', function () {
 
   it('should set jwt', function (done) {
     api.auth.login('alex.vitiuk@pressly.com', 'betame').then((res) => {
-      if (res.status != 200) {
-        throw new Error('login unsuccessful');
-      }
-
       if (!api.auth.session.jwt) {
         throw new Error('jwt was not set');
-      } else if (api.auth.session.jwt != res.body.jwt) {
-        throw new Error('wrong jwt set');
       }
 
       done()
@@ -111,9 +101,9 @@ describe('Testing Auth API - Session', function () {
   });
 
   it('should return currentUser', function (done) {
-    api.auth.login('alex.vitiuk@pressly.com', 'betame').then((currentUser) => {
+    api.auth.login('alex.vitiuk@pressly.com', 'betame').then((session) => {
       api.auth.get().then((res) => {
-        if (res.body.id != currentUser.body.id) {
+        if (res.id != session.id) {
           throw new Error('Logged in user response doesnt match session response');
         }
 

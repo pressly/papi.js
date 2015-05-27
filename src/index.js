@@ -15,9 +15,7 @@ export default class Papi {
 
       get: () => {
         return this.$request('get', '/auth/session').then((res) => {
-          this.auth.set(res.body);
-
-          return res;
+          return this.auth.set(res.body);
         });
       },
 
@@ -36,14 +34,14 @@ export default class Papi {
       },
 
       isExpired: () => {
+        // XXX this should be using a jwt lib to figure out if the token has expired
+        // XXX We do not currently include an expiry param in our tokens so just return false.
         return false;
       },
 
       login: (email, password) => {
         return this.$request('post', '/login', { data: { email, password } }).then((res) => {
-          this.auth.set(res.body);
-
-          return res;
+          return this.auth.set(res.body);
         });
       },
 
