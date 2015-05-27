@@ -684,6 +684,8 @@ module.exports = exports['default'];
 
 var _inherits = require('babel-runtime/helpers/inherits')['default'];
 
+var _createClass = require('babel-runtime/helpers/create-class')['default'];
+
 var _classCallCheck = require('babel-runtime/helpers/class-call-check')['default'];
 
 var _Object$defineProperty = require('babel-runtime/core-js/object/define-property')['default'];
@@ -709,12 +711,19 @@ var User = (function (_Model) {
 
   _inherits(User, _Model);
 
+  _createClass(User, [{
+    key: 'hasAccess',
+    value: function hasAccess() {
+      return this.access.status === 0;
+    }
+  }]);
+
   return User;
 })(_model2['default']);
 
 exports['default'] = User;
 module.exports = exports['default'];
-},{"../model":2,"babel-runtime/core-js/object/define-property":19,"babel-runtime/helpers/class-call-check":21,"babel-runtime/helpers/inherits":23,"babel-runtime/helpers/interop-require-default":24}],17:[function(require,module,exports){
+},{"../model":2,"babel-runtime/core-js/object/define-property":19,"babel-runtime/helpers/class-call-check":21,"babel-runtime/helpers/create-class":22,"babel-runtime/helpers/inherits":23,"babel-runtime/helpers/interop-require-default":24}],17:[function(require,module,exports){
 'use strict';
 
 var _createClass = require('babel-runtime/helpers/create-class')['default'];
