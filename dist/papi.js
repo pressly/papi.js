@@ -164,9 +164,7 @@ exports['default'] = Papi;
 
 (0, _resource.applyResourcing)(Papi);
 
-//Resource.init(Papi);
-
-Papi.resource('auth').resource('accounts').open().resource('users').resource('hubs').close().resource('hubs').open().post('upgrade').get('search', { on: 'collection' }).resource('apps').open().resource('styles').close().resource('feeds').open().resource('assets').close().resource('invites').resource('recommendations').resource('users').resource('collections').resource('tags').resource('assets').open().put('feature').put('unfeature').put('hide').put('unhide').put('lock').put('unlock').close().resource('drafts').close().resource('code_revisions').open().resource('hubs').close();
+Papi.resource('auth').resource('accounts').open().resource('users').resource('hubs').close().resource('hubs').open().post('upgrade').get('search', { on: 'collection' }).resource('apps').open().resource('styles').close().resource('feeds').open().resource('assets').close().resource('invites').resource('recommendations').resource('users').resource('collections').resource('tags').resource('assets', { routeSegment: '/stream/:id' }).open().resource('likes').resource('comments').put('feature').put('unfeature').put('hide').put('unhide').put('lock').put('unlock').close().resource('drafts').close().resource('code_revisions').open().resource('hubs').close();
 module.exports = exports['default'];
 },{"./resource":17,"babel-runtime/core-js/object/define-property":19,"babel-runtime/helpers/class-call-check":21,"babel-runtime/helpers/create-class":22,"babel-runtime/helpers/interop-require-default":24,"bluebird":58,"lodash":60,"superagent":61}],2:[function(require,module,exports){
 'use strict';
@@ -829,15 +827,31 @@ function classify(string) {
 
 var buildRoute = function buildRoute(resource) {
   var current = resource;
+  var segments = [];
 
-  var segments = ['/' + current.name + '/:' + (current.options.paramName || 'id')];
+  var path;
 
-  while (current && (current = current.parent)) {
-    var param = current.options.paramName ? singularize(current.name) + capitalize(current.options.paramName) : singularize(current.name) + 'Id';
-    segments.unshift('/' + current.name + '/:' + param);
+  if (current.options.route) {
+    path = current.options.route;
+  } else {
+
+    while (current) {
+      var paramName = current.options.routeSegment ? parseRouteParams(current.options.routeSegment)[0] : current.options.paramName || 'id';
+
+      if (current !== resource) {
+        paramName = singularize(current.name) + capitalize(paramName);
+      }
+
+      var routeSegment = current.options.routeSegment ? current.options.routeSegment.replace(/\/:[^\/]+$/, '/:' + paramName) : '/' + current.name + '/:' + paramName;
+
+      segments.unshift(routeSegment);
+
+      current = current.parent;
+    }
+
+    path = segments.join('');
   }
 
-  var path = segments.join('');
   var params = {};
   _lodash2['default'].each(parseRouteParams(path), function (paramName) {
     params[paramName] = null;

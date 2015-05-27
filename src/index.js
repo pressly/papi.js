@@ -122,8 +122,6 @@ export default class Papi {
 
 applyResourcing(Papi);
 
-//Resource.init(Papi);
-
 Papi
   .resource('auth')
 

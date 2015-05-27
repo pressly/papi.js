@@ -163,7 +163,5 @@ exports['default'] = Papi;
 
 (0, _resource.applyResourcing)(Papi);
 
-//Resource.init(Papi);
-
-Papi.resource('auth').resource('accounts').open().resource('users').resource('hubs').close().resource('hubs').open().post('upgrade').get('search', { on: 'collection' }).resource('apps').open().resource('styles').close().resource('feeds').open().resource('assets').close().resource('invites').resource('recommendations').resource('users').resource('collections').resource('tags').resource('assets').open().put('feature').put('unfeature').put('hide').put('unhide').put('lock').put('unlock').close().resource('drafts').close().resource('code_revisions').open().resource('hubs').close();
+Papi.resource('auth').resource('accounts').open().resource('users').resource('hubs').close().resource('hubs').open().post('upgrade').get('search', { on: 'collection' }).resource('apps').open().resource('styles').close().resource('feeds').open().resource('assets').close().resource('invites').resource('recommendations').resource('users').resource('collections').resource('tags').resource('assets', { routeSegment: '/stream/:id' }).open().resource('likes').resource('comments').put('feature').put('unfeature').put('hide').put('unhide').put('lock').put('unlock').close().resource('drafts').close().resource('code_revisions').open().resource('hubs').close();
 module.exports = exports['default'];
