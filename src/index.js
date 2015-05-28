@@ -88,7 +88,6 @@ export default class Papi {
       var req = request[method](this.domain + route);
       req.set('Content-Type', 'application/json');
 
-
       // Allow sending cookies from origin
       if (typeof req.withCredentials == 'function') {
         req.withCredentials();

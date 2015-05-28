@@ -31,7 +31,6 @@ function classify(string) {
   return singularize(_.map(string.split("_"), function(s) { return capitalize(s); }).join(''));
 }
 
-
 /** Api Helpers ***************************************************************/
 
 var buildRoute = function(resource) {
@@ -184,6 +183,21 @@ var extendPromise = function(parentPromise, parentResource, promises) {
   });
 };
 
+var parseHTTPLinks = function(linksString) {
+  var links = {};
+
+  if (linksString && !_.isEmpty(linksString)) {
+    _.each(linksString.split(','), function(link) {
+      var [href, rel] = link.split(';');
+      href = href.replace(/<(.*)>/, '$1').trim();
+      rel = rel.replace(/rel="(.*)"/, '$1').trim();
+      links[rel] = href;
+    });
+  }
+
+  return links;
+};
+
 export default class Resource {
   constructor(api, key, parentResource) {
     var def = api.constructor.resourceDefinitions[key];
@@ -284,32 +298,19 @@ export default class Resource {
     var resource = new Resource(this.api, this.key, this).includeParams(params);
     var path = resource.buildRoute(true);
 
-    return this.api.$request('get', path, { query: this.route.queryParams }).then(function(res) {
-      var collection = _.map(res.body, function(item) { return resource.hydrateModel(item); });
+    return this.api.$request('get', path, { query: this.route.queryParams }).then((res) => {
+      resource.setResponse(res);
 
-      // Set a reference to the resource on the model
-      collection.$resource = function(name) {
-        if (_.isEmpty(name)) {
-          return resource;
-        } else {
-          return resource.api.$resource(name, resource);
-        }
-      };
+      var collection = resource.hydrateCollection(res.body);
 
       return collection;
     });
   }
 
-  save() {
-
-  }
-
-  update() {
-
-  }
-
-  delete() {
-
+  setResponse(res) {
+    this.status = res.status;
+    this.headers = res.headers;
+    this.links = parseHTTPLinks(res.headers.link);
   }
 
   hydrateModel(data) {
@@ -333,5 +334,36 @@ export default class Resource {
     };
 
     return model;
+  }
+
+  hydrateCollection(data) {
+    var collection = _.map(data, (item) => { return this.hydrateModel(item); });
+
+    _.extend(collection, {
+      $resource: () => {
+        return this;
+      },
+
+      next: (options = {}) => {
+        if (this.links.next) {
+          return this.api.$request('get', this.links.next).then((res) => {
+            var models = _.map(res.body, (item) => { return this.hydrateModel(item); });
+            if (options.append || options.prepend) {
+              var method = options.append ? 'push' : 'unshift';
+
+              _.each(models, (item) => {
+                collection[method](item);
+              });
+
+              return collection;
+            } else {
+              return [];
+            }
+          });
+        }
+      }
+    });
+
+    return collection;
   }
 }
