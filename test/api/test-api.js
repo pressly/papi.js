@@ -82,7 +82,7 @@ describe('Hubs Resource', function () {
     api.$resource('hubs').all().then((res) => {
       res.should.not.be.empty;
       res[0].should.instanceOf(models.Hub);
-      should.exist(res.next);
+      should.exist(res.nextPage);
 
       done();
     }).catch((err) => {

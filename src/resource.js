@@ -344,7 +344,7 @@ export default class Resource {
         return this;
       },
 
-      next: (options = {}) => {
+      nextPage: (options = {}) => {
         if (this.links.next) {
           return this.api.$request('get', this.links.next).then((res) => {
             var models = _.map(res.body, (item) => { return this.hydrateModel(item); });
@@ -361,6 +361,10 @@ export default class Resource {
             }
           });
         }
+      },
+
+      hasPage: (name) => {
+        return !!this.links[name];
       }
     });
 

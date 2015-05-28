@@ -4,6 +4,8 @@ var _createClass = require('babel-runtime/helpers/create-class')['default'];
 
 var _classCallCheck = require('babel-runtime/helpers/class-call-check')['default'];
 
+var _slicedToArray = require('babel-runtime/helpers/sliced-to-array')['default'];
+
 var _Object$defineProperty = require('babel-runtime/core-js/object/define-property')['default'];
 
 var _Promise = require('babel-runtime/core-js/promise')['default'];
@@ -207,6 +209,27 @@ var extendPromise = function extendPromise(parentPromise, parentResource, promis
   });
 };
 
+var parseHTTPLinks = function parseHTTPLinks(linksString) {
+  var links = {};
+
+  if (linksString && !_lodash2['default'].isEmpty(linksString)) {
+    _lodash2['default'].each(linksString.split(','), function (link) {
+      var _link$split = link.split(';');
+
+      var _link$split2 = _slicedToArray(_link$split, 2);
+
+      var href = _link$split2[0];
+      var rel = _link$split2[1];
+
+      href = href.replace(/<(.*)>/, '$1').trim();
+      rel = rel.replace(/rel="(.*)"/, '$1').trim();
+      links[rel] = href;
+    });
+  }
+
+  return links;
+};
+
 var Resource = (function () {
   function Resource(api, key, parentResource) {
     var _this = this;
@@ -323,23 +346,20 @@ var Resource = (function () {
       var path = resource.buildRoute(true);
 
       return this.api.$request('get', path, { query: this.route.queryParams }).then(function (res) {
-        var collection = _lodash2['default'].map(res.body, function (item) {
-          return resource.hydrateModel(item);
-        });
-        collection.$resource = resource;
+        resource.setResponse(res);
+
+        var collection = resource.hydrateCollection(res.body);
 
         return collection;
       });
     }
   }, {
-    key: 'save',
-    value: function save() {}
-  }, {
-    key: 'update',
-    value: function update() {}
-  }, {
-    key: 'delete',
-    value: function _delete() {}
+    key: 'setResponse',
+    value: function setResponse(res) {
+      this.status = res.status;
+      this.headers = res.headers;
+      this.links = parseHTTPLinks(res.headers.link);
+    }
   }, {
     key: 'hydrateModel',
     value: function hydrateModel(data) {
@@ -363,6 +383,50 @@ var Resource = (function () {
       };
 
       return model;
+    }
+  }, {
+    key: 'hydrateCollection',
+    value: function hydrateCollection(data) {
+      var _this3 = this;
+
+      var collection = _lodash2['default'].map(data, function (item) {
+        return _this3.hydrateModel(item);
+      });
+
+      _lodash2['default'].extend(collection, {
+        $resource: function $resource() {
+          return _this3;
+        },
+
+        nextPage: function nextPage() {
+          var options = arguments[0] === undefined ? {} : arguments[0];
+
+          if (_this3.links.next) {
+            return _this3.api.$request('get', _this3.links.next).then(function (res) {
+              var models = _lodash2['default'].map(res.body, function (item) {
+                return _this3.hydrateModel(item);
+              });
+              if (options.append || options.prepend) {
+                var method = options.append ? 'push' : 'unshift';
+
+                _lodash2['default'].each(models, function (item) {
+                  collection[method](item);
+                });
+
+                return collection;
+              } else {
+                return [];
+              }
+            });
+          }
+        },
+
+        hasPage: function hasPage(name) {
+          return !!_this3.links[name];
+        }
+      });
+
+      return collection;
     }
   }]);
 
