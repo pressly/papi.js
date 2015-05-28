@@ -149,19 +149,25 @@ You can additionally set modifiers on the resource like limiting the number of r
 ##### limit(`rpp`)
 - **rpp** (required) | Integer | Requests per page, Number or results to return for `all` and custom actions
 
-Returns the resource so you can chain modifiers.
+Returns the resource.
 
 ```javascript
 resource.limit(15);
 ```
 
 ##### query(`params`)
-- **params** (required) | Object | Query params that will be set on the request ie. {q:1, b: 2} -> ..?q=1&b=2
+- **params** (required) | Object | Query params that will be set on the request ie. `{q:1, b: 2}` -> `?q=1&b=2`
 
-Returns the resource so you can chain modifiers.
+Returns the resource.
 
 ```javascript
 resource.query({q: 1, b: 2});
+```
+
+Because modifiers return the current resource you can chain them like so:
+
+```javascript
+resource.limit(15).query({q: 1, b: 2});
 ```
 
 ## Requests
