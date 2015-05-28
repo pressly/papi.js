@@ -28,6 +28,16 @@ Releases can be downloaded here https://github.com/pressly/papi.js/releases you 
 
 This will expose the `Papi` class globally.
 
+## API Docs
+
+1. Login to https://beta.pressly.com
+2. View docs at: https://beta-api.pressly.com/docs
+
+## Getting a JWT
+
+1. Login to https://beta.pressly.com
+2. Visit https://beta-api.pressly.com/auth/session and copy the `jwt` string
+
 ## API Schema
 
 * accounts
