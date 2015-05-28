@@ -347,16 +347,19 @@ export default class Resource {
       nextPage: (options = {}) => {
         if (this.links.next) {
           return this.api.$request('get', this.links.next).then((res) => {
-            var models = _.map(res.body, (item) => { return this.hydrateModel(item); });
             if (options.append || options.prepend) {
+              this.setResponse(res);
+              
               var method = options.append ? 'push' : 'unshift';
 
-              _.each(models, (item) => {
-                collection[method](item);
+              _.each(res.body, (item) => {
+                collection[method](this.hydrateModel(item));
               });
 
               return collection;
             } else {
+              // XXX Not implemented yet.
+              // Should create a new resource and hydrate
               return [];
             }
           });

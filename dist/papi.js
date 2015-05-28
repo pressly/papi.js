@@ -1173,18 +1173,19 @@ var Resource = (function () {
 
           if (_this3.links.next) {
             return _this3.api.$request('get', _this3.links.next).then(function (res) {
-              var models = _lodash2['default'].map(res.body, function (item) {
-                return _this3.hydrateModel(item);
-              });
               if (options.append || options.prepend) {
+                _this3.setResponse(res);
+
                 var method = options.append ? 'push' : 'unshift';
 
-                _lodash2['default'].each(models, function (item) {
-                  collection[method](item);
+                _lodash2['default'].each(res.body, function (item) {
+                  collection[method](_this3.hydrateModel(item));
                 });
 
                 return collection;
               } else {
+                // XXX Not implemented yet.
+                // Should create a new resource and hydrate
                 return [];
               }
             });

@@ -235,7 +235,3 @@ api.$resource('hubs').find(123).then(function(hub) {
   });
 });
 ```
-
-## Models
-
-...
