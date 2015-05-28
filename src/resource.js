@@ -286,7 +286,15 @@ export default class Resource {
 
     return this.api.$request('get', path, { query: this.route.queryParams }).then(function(res) {
       var collection = _.map(res.body, function(item) { return resource.hydrateModel(item); });
-      collection.$resource = resource;
+
+      // Set a reference to the resource on the model
+      collection.$resource = function(name) {
+        if (_.isEmpty(name)) {
+          return resource;
+        } else {
+          return resource.api.$resource(name, resource);
+        }
+      };
 
       return collection;
     });

@@ -1,7 +1,9 @@
 PAPI.js (Pressly API)
 ==
 
-*** Read this first! ***
+Papi.js offers a Promise based abstraction for accessing the Pressly API.
+
+
 
 ## Install
 
@@ -109,7 +111,7 @@ Before we can fetch data we need to set up the appropriate resource we wish to q
 
 ##### $resource(`key`, `*params`)
 - **key** (required) | String | Key of the resource eg. 'hubs.assets'
-- **params** (optional) | Object | eg. {hubId: 123}
+- **params** (optional) | Object | eg. `{ hubId: 123 }`
 
 Returns a prepared Resource.
 
@@ -156,18 +158,18 @@ resource.limit(15);
 ```
 
 ##### query(`params`)
-- **params** (required) | Object | Query params that will be set on the request ie. `{q:1, b: 2}` -> `?q=1&b=2`
+- **params** (required) | Object | Query params that will be set on the request ie. `{ q: 1, b: 2 }` -> `?q=1&b=2`
 
 Returns the resource.
 
 ```javascript
-resource.query({q: 1, b: 2});
+resource.query({ q: 1, b: 2 });
 ```
 
 Because modifiers return the current resource you can chain them like so:
 
 ```javascript
-resource.limit(15).query({q: 1, b: 2});
+resource.limit(15).query({ q: 1, b: 2 });
 ```
 
 ## Requests
@@ -223,3 +225,7 @@ api.$resource('hubs').find(123).then(function(hub) {
   });
 });
 ```
+
+## Models
+
+...
