@@ -117,13 +117,14 @@ var Papi = (function () {
     }
   }, {
     key: '$request',
-    value: function $request(method, route) {
+    value: function $request(method, path) {
       var _this2 = this;
 
       var options = arguments[2] === undefined ? {} : arguments[2];
 
       return new _bluebird2['default'](function (resolve, reject) {
-        var req = _superagent2['default'][method](_this2.domain + route);
+        var url = /^(https?:)?\/\//.test(path) ? path : _this2.domain + path;
+        var req = _superagent2['default'][method](url);
         req.set('Content-Type', 'application/json');
 
         // Allow sending cookies from origin
@@ -1171,7 +1172,7 @@ var Resource = (function () {
           var options = arguments[0] === undefined ? {} : arguments[0];
 
           if (_this3.links.next) {
-            return _this3.api.$request('get', _this3.links.next.replace(_this3.api.domain, '')).then(function (res) {
+            return _this3.api.$request('get', _this3.links.next).then(function (res) {
               var models = _lodash2['default'].map(res.body, function (item) {
                 return _this3.hydrateModel(item);
               });

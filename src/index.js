@@ -83,9 +83,10 @@ export default class Papi {
     return new Resource(this, key, parentResource).includeParams(params);
   }
 
-  $request(method, route, options = {}) {
+  $request(method, path, options = {}) {
     return new Promise((resolve, reject) => {
-      var req = request[method](this.domain + route);
+      var url = /^(https?:)?\/\//.test(path) ? path : this.domain + path;
+      var req = request[method](url);
       req.set('Content-Type', 'application/json');
 
       // Allow sending cookies from origin
