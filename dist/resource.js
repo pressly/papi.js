@@ -402,7 +402,7 @@ var Resource = (function () {
           var options = arguments[0] === undefined ? {} : arguments[0];
 
           if (_this3.links.next) {
-            return _this3.api.$request('get', _this3.links.next).then(function (res) {
+            return _this3.api.$request('get', _this3.links.next.replace(_this3.api.domain, '')).then(function (res) {
               var models = _lodash2['default'].map(res.body, function (item) {
                 return _this3.hydrateModel(item);
               });

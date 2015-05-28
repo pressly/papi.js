@@ -346,7 +346,7 @@ export default class Resource {
 
       nextPage: (options = {}) => {
         if (this.links.next) {
-          return this.api.$request('get', this.links.next).then((res) => {
+          return this.api.$request('get', this.links.next.replace(this.api.domain, '')).then((res) => {
             var models = _.map(res.body, (item) => { return this.hydrateModel(item); });
             if (options.append || options.prepend) {
               var method = options.append ? 'push' : 'unshift';
