@@ -159,16 +159,16 @@ var extendPromise = function(parentPromise, parentResource, promises) {
 
       var childResource = parentResource.api.$resource(key, parentResource);
 
-      childResource._all = childResource.$all;
-      childResource._find = childResource.$find;
+      childResource._all = childResource.all;
+      childResource._find = childResource.find;
 
       var result = _.extend(childResource, {
-        $all: function() {
+        all: function() {
           var promise = childResource._all();
           return Promise.all(promises.concat(promise));
         },
 
-        $find: function(id) {
+        find: function(id) {
           childResource.includeParams({id: id});
           var promise = childResource._find(id);
           var finalPromiseChain = Promise.all(promises.concat(promise));
@@ -249,19 +249,19 @@ export default class Resource {
     return this;
   }
 
-  $query(params) {
+  query(params) {
     _.extend(this.route.queryParams, params);
 
     return this;
   }
 
-  $limit(rpp) {
-    this.$query({limit: rpp});
+  limit(rpp) {
+    this.query({limit: rpp});
 
     return this;
   }
 
-  $find(params) {
+  find(params) {
     if (params && !_.isObject(params)) {
       params = { id: params };
     }
@@ -269,8 +269,6 @@ export default class Resource {
     // Create a new resource for this step of the chain with included parameters
     var resource = new Resource(this.api, this.key, this).includeParams(params);
     var path = resource.buildRoute(true);
-
-    //console.log("$find:", path);
 
     var promise = this.api.$request('get', path).then(function(res) {
       var model = resource.hydrateModel(res.body);
@@ -281,12 +279,10 @@ export default class Resource {
     return extendPromise(promise, resource);
   }
 
-  $all(params) {
+  all(params) {
     // Create a new resource for this step of the chain with included parameters
     var resource = new Resource(this.api, this.key, this).includeParams(params);
     var path = resource.buildRoute(true);
-
-    //console.log("$all:", path);
 
     return this.api.$request('get', path, { query: this.route.queryParams }).then(function(res) {
       var collection = _.map(res.body, function(item) { return resource.hydrateModel(item); });
@@ -296,15 +292,15 @@ export default class Resource {
     });
   }
 
-  $save() {
+  save() {
 
   }
 
-  $update() {
+  update() {
 
   }
 
-  $delete() {
+  delete() {
 
   }
 
@@ -320,28 +316,14 @@ export default class Resource {
     });
 
     // Set a reference to the resource on the model
-    model.$resource = resource;
-
-    var methods = {
-      $resource: function(name) {
+    model.$resource = function(name) {
+      if (_.isEmpty(name)) {
+        return resource;
+      } else {
         return resource.api.$resource(name, resource);
       }
     };
 
-    _.each(Resource.extendableMethods, function(method) {
-      methods[method] = function() {
-        return resource[method].apply(resource, arguments);
-      };
-    });
-
-    _.extend(model, methods);
-
     return model;
   }
 }
-
-Resource.extendableMethods = [
-  '$save',
-  '$update',
-  '$delete'
-];

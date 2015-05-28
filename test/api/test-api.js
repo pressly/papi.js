@@ -15,48 +15,51 @@ nock(api.domain)
 
   /** Hub Resource Requests ***************************************************/
 
-  // $all
+  // all
   .get('/hubs').reply(200, mock.hubs)
 
-  // $find
+  // find
   .get(`/hubs/${mock.hubs[0].id}`).reply(200, mock.hubs[0])
 
-  // $resource with prepared params then $find()
+  // $resource with prepared params then find()
   .get(`/hubs/${mock.hubs[0].id}`).reply(200, mock.hubs[0])
 
-  // $all and $limit
+  // all and limit
   .get('/hubs?limit=3').reply(200, mock.hubs.slice(0, 3))
+
+  // all with query
+  .get('/hubs?summaries=true&b=2').reply(200)
 
   /** App Resource Requests ***************************************************/
 
-  // $all
+  // all
   .get(`/hubs/${mock.hubs[0].id}/apps`).reply(200, mock.apps)
 
-  // $find
+  // find
   .get(`/hubs/${mock.hubs[0].id}/apps/${mock.apps[0].id}`).reply(200, mock.apps[0])
 
-  // $resource with prepared params then $all()
+  // $resource with prepared params then all()
   .get(`/hubs/${mock.hubs[0].id}/apps`).reply(200, mock.apps)
 
-  // $all from a result model
+  // all from a result model
   .get(`/hubs/${mock.hubs[0].id}`).reply(200, mock.hubs[0])
   .get(`/hubs/${mock.hubs[0].id}/apps`).reply(200, mock.apps)
 
-  // chainable $find and $all
+  // chainable find and all
   .get(`/hubs/${mock.hubs[0].id}`).reply(200, mock.hubs[0])
   .get(`/hubs/${mock.hubs[0].id}/apps`).reply(200, mock.apps)
 
-  // chainable $find and $find
+  // chainable find and find
   .get(`/hubs/${mock.hubs[0].id}`).reply(200, mock.hubs[0])
   .get(`/hubs/${mock.hubs[0].id}/apps/${mock.apps[0].id}`).reply(200, mock.apps[0])
 
 
   /** Style Resource Requests *************************************************/
 
-  // $all
+  // all
   .get(`/hubs/${mock.hubs[0].id}/apps/${mock.apps[0].id}/styles`).reply(200, mock.styles)
 
-  // $find
+  // find
   .get(`/hubs/${mock.hubs[0].id}/apps/${mock.apps[0].id}/styles/${mock.styles[0].id}`).reply(200, mock.styles[0])
 
   // promises resolved in an inline fashion
@@ -70,13 +73,13 @@ nock(api.domain)
   .get(`/hubs/${mock.hubs[0].id}/apps/${mock.apps[0].id}/styles`).reply(200, mock.styles)
 
   /** Stream Assets Requests **************************************************/
-  // $all
+  // all
   .get(`/hubs/${mock.hubs[0].id}/stream`).reply(200)
 ;
 
 describe('Hubs Resource', function () {
-  it("$all should return an array", function (done) {
-    api.$resource('hubs').$all().then((res) => {
+  it("all should return an array", function (done) {
+    api.$resource('hubs').all().then((res) => {
       res.should.not.be.empty;
       res[0].should.instanceOf(models.Hub);
 
@@ -86,8 +89,8 @@ describe('Hubs Resource', function () {
     });
   });
 
-  it('$find should return one item', function (done) {
-    api.$resource('hubs').$find(mock.hubs[0].id).then((res) => {
+  it('find should return one item', function (done) {
+    api.$resource('hubs').find(mock.hubs[0].id).then((res) => {
       res.should.instanceOf(models.Hub);
       res.id.should.equal(mock.hubs[0].id);
 
@@ -97,8 +100,8 @@ describe('Hubs Resource', function () {
     });
   });
 
-  it('$resource with prepared params then $find should return one item', function (done) {
-    api.$resource('hubs', { id: mock.hubs[0].id }).$find().then((res) => {
+  it('$resource with prepared params then find should return one item', function (done) {
+    api.$resource('hubs', { id: mock.hubs[0].id }).find().then((res) => {
       res.should.instanceOf(models.Hub);
       res.id.should.equal(mock.hubs[0].id);
 
@@ -108,8 +111,8 @@ describe('Hubs Resource', function () {
     });
   });
 
-  it('$all with $limit should return the correct number of results', function (done) {
-    api.$resource('hubs').$limit(3).$all().then((res) => {
+  it('all with limit should return the correct number of results', function (done) {
+    api.$resource('hubs').limit(3).all().then((res) => {
       res.length.should.equal(3);
       res[0].should.instanceOf(models.Hub);
 
@@ -118,11 +121,19 @@ describe('Hubs Resource', function () {
       done(err);
     });
   });
+
+  it('all with query should send query params', function (done) {
+    api.$resource('hubs').query({summaries: true, b: 2}).all().then((res) => {
+      done();
+    }).catch((err) => {
+      done(err);
+    });
+  });
 });
 
 describe('Apps Resource', function() {
-  it('$all should return an array', function(done) {
-    api.$resource('hubs.apps').$all({hubId: mock.hubs[0].id}).then((res) => {
+  it('all should return an array', function(done) {
+    api.$resource('hubs.apps').all({hubId: mock.hubs[0].id}).then((res) => {
       res.should.not.be.empty;
       res[0].should.instanceOf(models.App);
 
@@ -132,8 +143,8 @@ describe('Apps Resource', function() {
     });
   });
 
-  it('$find should return one item', function(done) {
-    api.$resource('hubs.apps').$find({hubId: mock.hubs[0].id, id: mock.apps[0].id}).then((res) => {
+  it('find should return one item', function(done) {
+    api.$resource('hubs.apps').find({hubId: mock.hubs[0].id, id: mock.apps[0].id}).then((res) => {
       res.should.instanceOf(models.App);
       res.id.should.equal(mock.apps[0].id);
 
@@ -143,8 +154,8 @@ describe('Apps Resource', function() {
     });
   });
 
-  it('$resource with prepared params then $all should return an array', function(done) {
-    api.$resource('hubs.apps', { hubId: mock.hubs[0].id }).$all().then((res) => {
+  it('$resource with prepared params then all should return an array', function(done) {
+    api.$resource('hubs.apps', { hubId: mock.hubs[0].id }).all().then((res) => {
       res.should.not.be.empty;
       res[0].should.instanceOf(models.App);
       res[0].id.should.equal(mock.apps[0].id);
@@ -156,8 +167,11 @@ describe('Apps Resource', function() {
   });
 
   it('should support access from the result model', function(done) {
-    api.$resource('hubs').$find(mock.hubs[0].id).then(function(hub) {
-      hub.$resource('apps').$all().then(function(apps) {
+    api.$resource('hubs').find(mock.hubs[0].id).then(function(hub) {
+      hub.$resource().key.should.equal('hubs');
+      hub.$resource().route.params.id.should.equal(mock.hubs[0].id);
+
+      hub.$resource('apps').all().then(function(apps) {
         hub.should.instanceOf(models.Hub);
         apps.should.not.be.empty;
         apps[0].should.instanceOf(models.App);
@@ -169,8 +183,8 @@ describe('Apps Resource', function() {
     });
   });
 
-  it('should support chainable queries $find and then $all', function(done) {
-    api.$resource('hubs').$find(mock.hubs[0].id).$resource('apps').$all().then(function(res) {
+  it('should support chainable queries find and then all', function(done) {
+    api.$resource('hubs').find(mock.hubs[0].id).$resource('apps').all().then(function(res) {
       var hub = res[0];
       var apps = res[1];
 
@@ -184,8 +198,8 @@ describe('Apps Resource', function() {
     });
   });
 
-  it('should support chainable queries on $find and then $find', function(done) {
-    api.$resource('hubs').$find(mock.hubs[0].id).$resource('apps').$find(mock.apps[0].id).then(function(res) {
+  it('should support chainable queries on find and then find', function(done) {
+    api.$resource('hubs').find(mock.hubs[0].id).$resource('apps').find(mock.apps[0].id).then(function(res) {
       var hub = res[0];
       var app = res[1];
 
@@ -200,8 +214,8 @@ describe('Apps Resource', function() {
 });
 
 describe('Styles Resource', function() {
-  it('$all should return an array', function(done) {
-    api.$resource('hubs.apps.styles').$all({hubId: mock.hubs[0].id, appId: mock.apps[0].id}).then((res) => {
+  it('all should return an array', function(done) {
+    api.$resource('hubs.apps.styles').all({hubId: mock.hubs[0].id, appId: mock.apps[0].id}).then((res) => {
       res.should.not.be.empty;
       res[0].should.instanceOf(models.Style);
 
@@ -211,8 +225,8 @@ describe('Styles Resource', function() {
     });
   });
 
-  it('$find should return one item', function(done) {
-    api.$resource('hubs.apps.styles').$find({hubId: mock.hubs[0].id, appId: mock.apps[0].id, id: mock.styles[0].id}).then((res) => {
+  it('find should return one item', function(done) {
+    api.$resource('hubs.apps.styles').find({hubId: mock.hubs[0].id, appId: mock.apps[0].id, id: mock.styles[0].id}).then((res) => {
       res.should.instanceOf(models.Style);
       res.id.should.equal(mock.styles[0].id);
 
@@ -223,9 +237,9 @@ describe('Styles Resource', function() {
   });
 
   it('should fetch styles in an inline fashion', function(done) {
-    api.$resource('hubs').$all().then(function(hubs) {
-      api.$resource('hubs.apps').$all({hubId: hubs[0].id}).then(function(apps) {
-         api.$resource('hubs.apps.styles').$all({hubId: hubs[0].id, appId: apps[0].id}).then((res) => {
+    api.$resource('hubs').all().then(function(hubs) {
+      api.$resource('hubs.apps').all({hubId: hubs[0].id}).then(function(apps) {
+         api.$resource('hubs.apps.styles').all({hubId: hubs[0].id, appId: apps[0].id}).then((res) => {
            res.should.not.be.empty;
            res[0].should.instanceOf(models.Style);
 
@@ -237,13 +251,13 @@ describe('Styles Resource', function() {
     });
   });
 
-  it('should support chainable queries on $find', function(done) {
+  it('should support chainable queries on find', function(done) {
     var a = api.$resource('hubs');
-    var b = a.$find(mock.hubs[0].id);
+    var b = a.find(mock.hubs[0].id);
     var c = b.$resource('apps');
-    var d = c.$find(mock.apps[0].id);
+    var d = c.find(mock.apps[0].id);
     var e = d.$resource('styles');
-    var f = e.$all();
+    var f = e.all();
 
     f.then(function(res) {
       var hub = res[0];
@@ -267,7 +281,7 @@ describe('Styles Resource', function() {
 
 describe('Stream Assets Resource', function() {
   it('should allow assets with custom routeSegment', function(done) {
-    api.$resource('hubs.assets', {hubId: mock.hubs[0].id}).$all().then((res) => {
+    api.$resource('hubs.assets', {hubId: mock.hubs[0].id}).all().then((res) => {
       done();
     }).catch((err) => {
       done(err);

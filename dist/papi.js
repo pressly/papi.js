@@ -951,16 +951,16 @@ var extendPromise = function extendPromise(parentPromise, parentResource, promis
 
       var childResource = parentResource.api.$resource(key, parentResource);
 
-      childResource._all = childResource.$all;
-      childResource._find = childResource.$find;
+      childResource._all = childResource.all;
+      childResource._find = childResource.find;
 
       var result = _lodash2['default'].extend(childResource, {
-        $all: function $all() {
+        all: function all() {
           var promise = childResource._all();
           return _Promise.all(promises.concat(promise));
         },
 
-        $find: function $find(id) {
+        find: function find(id) {
           childResource.includeParams({ id: id });
           var promise = childResource._find(id);
           var finalPromiseChain = _Promise.all(promises.concat(promise));
@@ -1052,22 +1052,22 @@ var Resource = (function () {
       return this;
     }
   }, {
-    key: '$query',
-    value: function $query(params) {
+    key: 'query',
+    value: function query(params) {
       _lodash2['default'].extend(this.route.queryParams, params);
 
       return this;
     }
   }, {
-    key: '$limit',
-    value: function $limit(rpp) {
-      this.$query({ limit: rpp });
+    key: 'limit',
+    value: function limit(rpp) {
+      this.query({ limit: rpp });
 
       return this;
     }
   }, {
-    key: '$find',
-    value: function $find(params) {
+    key: 'find',
+    value: function find(params) {
       if (params && !_lodash2['default'].isObject(params)) {
         params = { id: params };
       }
@@ -1075,8 +1075,6 @@ var Resource = (function () {
       // Create a new resource for this step of the chain with included parameters
       var resource = new Resource(this.api, this.key, this).includeParams(params);
       var path = resource.buildRoute(true);
-
-      //console.log("$find:", path);
 
       var promise = this.api.$request('get', path).then(function (res) {
         var model = resource.hydrateModel(res.body);
@@ -1087,13 +1085,11 @@ var Resource = (function () {
       return extendPromise(promise, resource);
     }
   }, {
-    key: '$all',
-    value: function $all(params) {
+    key: 'all',
+    value: function all(params) {
       // Create a new resource for this step of the chain with included parameters
       var resource = new Resource(this.api, this.key, this).includeParams(params);
       var path = resource.buildRoute(true);
-
-      //console.log("$all:", path);
 
       return this.api.$request('get', path, { query: this.route.queryParams }).then(function (res) {
         var collection = _lodash2['default'].map(res.body, function (item) {
@@ -1105,14 +1101,14 @@ var Resource = (function () {
       });
     }
   }, {
-    key: '$save',
-    value: function $save() {}
+    key: 'save',
+    value: function save() {}
   }, {
-    key: '$update',
-    value: function $update() {}
+    key: 'update',
+    value: function update() {}
   }, {
-    key: '$delete',
-    value: function $delete() {}
+    key: 'delete',
+    value: function _delete() {}
   }, {
     key: 'hydrateModel',
     value: function hydrateModel(data) {
@@ -1127,21 +1123,13 @@ var Resource = (function () {
       });
 
       // Set a reference to the resource on the model
-      model.$resource = resource;
-
-      var methods = {
-        $resource: function $resource(name) {
+      model.$resource = function (name) {
+        if (_lodash2['default'].isEmpty(name)) {
+          return resource;
+        } else {
           return resource.api.$resource(name, resource);
         }
       };
-
-      _lodash2['default'].each(Resource.extendableMethods, function (method) {
-        methods[method] = function () {
-          return resource[method].apply(resource, arguments);
-        };
-      });
-
-      _lodash2['default'].extend(model, methods);
 
       return model;
     }
@@ -1151,8 +1139,6 @@ var Resource = (function () {
 })();
 
 exports['default'] = Resource;
-
-Resource.extendableMethods = ['$save', '$update', '$delete'];
 },{"./models":11,"babel-runtime/core-js/object/define-property":19,"babel-runtime/core-js/promise":20,"babel-runtime/helpers/class-call-check":21,"babel-runtime/helpers/create-class":22,"babel-runtime/helpers/interop-require-default":24,"babel-runtime/helpers/interop-require-wildcard":25,"lodash":60}],18:[function(require,module,exports){
 module.exports = { "default": require("core-js/library/fn/object/create"), __esModule: true };
 },{"core-js/library/fn/object/create":27}],19:[function(require,module,exports){

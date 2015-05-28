@@ -126,7 +126,7 @@ var resource = api.$resource('hubs.assets'); // returns an Assets Resource
 ```
 
 ##### Preparing a resource with params
-In cases where we are creating a nested resource we will need to specify the ids of the parents. This can be done at the time you request data from the resource via the `$all` or `$find` methods *or* you can prepare the resource with default params when you create it.
+In cases where we are creating a nested resource we will need to specify the ids of the parents. This can be done at the time you request data from the resource via the `all` or `find` methods *or* you can prepare the resource with default params when you create it.
 
 **Note** The param names for parent ids take the form `{singular parent name }Id` ie. hubs -> hubId
 
@@ -142,23 +142,45 @@ Here is an example of preparing a resource that is nested 3 deep. The styles res
 var resource = api.$resource('hubs.apps.styles', { hubId: 123, appId: 456 }); // returns a Styles Resource with set hub and app id
 ```
 
+#### Additional Modifiers
+
+You can additionally set modifiers on the resource like limiting the number of results, or setting query params.
+
+##### limit(`rpp`)
+- **rpp** (required) | Integer | Requests per page, Number or results to return for `all` and custom actions
+
+Returns the resource so you can chain modifiers.
+
+```javascript
+resource.limit(15);
+```
+
+##### query(`params`)
+- **params** (required) | Object | Query params that will be set on the request ie. {q:1, b: 2} -> ..?q=1&b=2
+
+Returns the resource so you can chain modifiers.
+
+```javascript
+resource.query({q: 1, b: 2});
+```
+
 ## Requests
 
-Requesting data is done by the `$all` and `$find` methods on a Resource.
+Requesting data is done by the `all` and `find` methods on a Resource.
 
-##### $all(`*params`)
+##### all(`*params`)
 - **params** (optional) | Object | ex. `{ hubId: 123 }`
 params will override anything set in the resource.
 
 Returns a `Promise` which resolves an Array of result models.
 
 ```javascript
-resource.$all().then(function(hubs) {
+resource.all().then(function(hubs) {
   ...
 });
 ```
 
-##### $find(`id` or `params`)
+##### find(`id` or `params`)
 - **id** (optional) | Integer | ex `123`
 - **params** (optional) | Object | ex. `{ hubId: 123, id: 1 }`
 params will override anything set in the resource.
@@ -166,7 +188,7 @@ params will override anything set in the resource.
 returns a `Promise` which resolves a result model.
 
 ```javascript
-resource.$find(123).then(function(hub) {
+resource.find(123).then(function(hub) {
   ...
 });
 ```
@@ -177,8 +199,8 @@ Result models are extended with the resource that generated it so you can
 access `$resource` to generate child resources.
 
 ```javascript
-api.$resource('hubs').$find(123).then(function(hub) {
-  hub.$resource('apps').$all().then(function(apps) {
+api.$resource('hubs').find(123).then(function(hub) {
+  hub.$resource('apps').all().then(function(apps) {
     ..
   });
 });
@@ -189,8 +211,8 @@ Notice that when you chain queries you specify the child name `hubs` rather than
 This is equivalent to:
 
 ```javascript
-api.$resource('hubs').$find(123).then(function(hub) {
-  api.$resource('hubs.apps', { hubId: hub.id }).$all().then(function(apps) {
+api.$resource('hubs').find(123).then(function(hub) {
+  api.$resource('hubs.apps', { hubId: hub.id }).all().then(function(apps) {
     ..
   });
 });
