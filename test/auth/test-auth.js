@@ -8,11 +8,11 @@ import should from 'should';
 const api = new Papi();
 
 // interceptors
-nock(api.domain)
+nock(api.options.host)
 .post('/login', { email: 'incorrect-email', password: 'incorrect-password', }).reply(401)
 .post('/login', { email: mock.session.email, password: mock.session.password }).times(3).reply(200, mock.session);
 
-nock(api.domain)
+nock(api.options.host)
 .get('/auth/logout').reply(200)
 .get('/auth/session').times(2).reply(function() {
   if (api.auth.session) {

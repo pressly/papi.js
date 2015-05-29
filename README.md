@@ -60,12 +60,15 @@ This will expose the `Papi` class globally.
 
 ## Connection
 
-##### Papi::constructor(`*host`, `*jwt`)
+##### Papi::constructor('*options')
+- **options*** (optional) | Object | see below
+
+#### Options
 - **host** (optional) | String | defaults to 'https://beta-api.pressly.com'
-- **jwt*** (optional) | String | a JSON Web Token
+- **timeout** | Integer | Request timeout in ms
 
 ```javascript
-var api = new Papi();
+var api = new Papi({ host: 'https://beta-api.pressly.com', timeout: 20000 });
 ```
 
 ## Authentication

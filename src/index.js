@@ -7,8 +7,8 @@ import Promise from 'bluebird';
 import Resource, { applyResourcing } from './resource';
 
 export default class Papi {
-  constructor(domain = 'https://beta-api.pressly.com', jwt = null) {
-    this.domain = domain;
+  constructor(options = { host: 'https://beta-api.pressly.com' }) {
+    this.options = options;
 
     this.auth = {
       session: null,
@@ -85,9 +85,13 @@ export default class Papi {
 
   $request(method, path, options = {}) {
     return new Promise((resolve, reject) => {
-      var url = /^(https?:)?\/\//.test(path) ? path : this.domain + path;
+      var url = /^(https?:)?\/\//.test(path) ? path : this.options.host + path;
       var req = request[method](url);
       req.set('Content-Type', 'application/json');
+
+      if (this.options.timeout) {
+        req.timeout(this.options.timeout);
+      }
 
       // Allow sending cookies from origin
       if (typeof req.withCredentials == 'function') {
