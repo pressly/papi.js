@@ -244,6 +244,8 @@ var Resource = (function () {
 
     this.api = api;
 
+    this.options = {};
+
     this.name = def.name;
     this.key = def.key;
     this.model = def.model;
@@ -278,6 +280,11 @@ var Resource = (function () {
   }
 
   _createClass(Resource, [{
+    key: 'request',
+    value: function request(method, path, options) {
+      return this.api.request(method, path, _lodash2['default'].extend({}, this.options, options));
+    }
+  }, {
     key: 'buildRoute',
     value: function buildRoute(applyParams) {
       var path = this.route.segments.join('');
@@ -320,6 +327,25 @@ var Resource = (function () {
       return this;
     }
   }, {
+    key: 'timeout',
+    value: function timeout(ms) {
+      this.options.timeout = ms;
+
+      return this;
+    }
+  }, {
+    key: 'get',
+    value: function get(params) {
+      var resource = new Resource(this.api, this.key, this).query(params);
+      var path = resource.buildRoute(true);
+
+      return resource.request('get', path).then(function (res) {
+        var model = resource.hydrateModel(res.body);
+
+        return model;
+      });
+    }
+  }, {
     key: 'find',
     value: function find(params) {
       if (params && !_lodash2['default'].isObject(params)) {
@@ -330,7 +356,7 @@ var Resource = (function () {
       var resource = new Resource(this.api, this.key, this).includeParams(params);
       var path = resource.buildRoute(true);
 
-      var promise = this.api.$request('get', path).then(function (res) {
+      var promise = this.api.request('get', path).then(function (res) {
         var model = resource.hydrateModel(res.body);
 
         return model;
@@ -345,7 +371,7 @@ var Resource = (function () {
       var resource = new Resource(this.api, this.key, this).includeParams(params);
       var path = resource.buildRoute(true);
 
-      return this.api.$request('get', path, { query: this.route.queryParams }).then(function (res) {
+      return this.api.request('get', path, { query: this.route.queryParams }).then(function (res) {
         resource.setResponse(res);
 
         var collection = resource.hydrateCollection(res.body);
@@ -402,7 +428,7 @@ var Resource = (function () {
           var options = arguments[0] === undefined ? {} : arguments[0];
 
           if (_this3.links.next) {
-            return _this3.api.$request('get', _this3.links.next).then(function (res) {
+            return _this3.api.request('get', _this3.links.next).then(function (res) {
               if (options.append || options.prepend) {
                 _this3.setResponse(res);
 

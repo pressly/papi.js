@@ -7,14 +7,15 @@ import Promise from 'bluebird';
 import Resource, { applyResourcing } from './resource';
 
 export default class Papi {
-  constructor(options = { host: 'https://beta-api.pressly.com' }) {
+  constructor(options = {}) {
     this.options = options;
+    this.options.host = (options.host || 'https://beta-api.pressly.com');
 
     this.auth = {
       session: null,
 
       get: () => {
-        return this.$request('get', '/auth/session').then((res) => {
+        return this.request('get', '/auth/session').then((res) => {
           return this.auth.set(res.body);
         });
       },
@@ -40,13 +41,13 @@ export default class Papi {
       },
 
       login: (email, password) => {
-        return this.$request('post', '/login', { data: { email, password } }).then((res) => {
+        return this.request('post', '/login', { data: { email, password } }).then((res) => {
           return this.auth.set(res.body);
         });
       },
 
       logout: () => {
-        return this.$request('get', '/auth/logout').then((res) => {
+        return this.request('get', '/auth/logout').then((res) => {
           this.auth.session = null;
 
           return res;
@@ -56,6 +57,10 @@ export default class Papi {
   }
 
   /*
+
+    Resource selector
+
+    $resource();
     $resource(key);
     $resource(key, params);
     $resource(name, parentResource);
@@ -83,14 +88,14 @@ export default class Papi {
     return new Resource(this, key, parentResource).includeParams(params);
   }
 
-  $request(method, path, options = {}) {
+  request(method, path, options = {}) {
     return new Promise((resolve, reject) => {
       var url = /^(https?:)?\/\//.test(path) ? path : this.options.host + path;
       var req = request[method](url);
       req.set('Content-Type', 'application/json');
 
-      if (this.options.timeout) {
-        req.timeout(this.options.timeout);
+      if (options.timeout || this.options.timeout) {
+        req.timeout(options.timeout || this.options.timeout);
       }
 
       // Allow sending cookies from origin
@@ -115,7 +120,7 @@ export default class Papi {
 
       req.end((err, res) => {
         if (err) {
-          reject(err);
+          return reject(err);
         } else {
           resolve(res);
         }

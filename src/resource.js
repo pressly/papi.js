@@ -208,6 +208,8 @@ export default class Resource {
 
     this.api = api;
 
+    this.options = {};
+
     this.name = def.name;
     this.key = def.key;
     this.model = def.model;
@@ -237,6 +239,10 @@ export default class Resource {
     this.parent = function() {
       return parentResource || (def.parent && this.api.$resource(def.parent.key)) || null;
     };
+  }
+
+  request(method, path, options) {
+    return this.api.request(method, path, _.extend({}, this.options, options));
   }
 
   buildRoute(applyParams) {
@@ -275,6 +281,23 @@ export default class Resource {
     return this;
   }
 
+  timeout(ms) {
+    this.options.timeout = ms;
+
+    return this;
+  }
+
+  get(params) {
+    var resource = new Resource(this.api, this.key, this).query(params);
+    var path = resource.buildRoute(true);
+
+    return resource.request('get', path).then((res) => {
+      var model = resource.hydrateModel(res.body);
+
+      return model;
+    });
+  }
+
   find(params) {
     if (params && !_.isObject(params)) {
       params = { id: params };
@@ -284,7 +307,7 @@ export default class Resource {
     var resource = new Resource(this.api, this.key, this).includeParams(params);
     var path = resource.buildRoute(true);
 
-    var promise = this.api.$request('get', path).then(function(res) {
+    var promise = this.api.request('get', path).then(function(res) {
       var model = resource.hydrateModel(res.body);
 
       return model;
@@ -298,7 +321,7 @@ export default class Resource {
     var resource = new Resource(this.api, this.key, this).includeParams(params);
     var path = resource.buildRoute(true);
 
-    return this.api.$request('get', path, { query: this.route.queryParams }).then((res) => {
+    return this.api.request('get', path, { query: this.route.queryParams }).then((res) => {
       resource.setResponse(res);
 
       var collection = resource.hydrateCollection(res.body);
@@ -346,10 +369,10 @@ export default class Resource {
 
       nextPage: (options = {}) => {
         if (this.links.next) {
-          return this.api.$request('get', this.links.next).then((res) => {
+          return this.api.request('get', this.links.next).then((res) => {
             if (options.append || options.prepend) {
               this.setResponse(res);
-              
+
               var method = options.append ? 'push' : 'unshift';
 
               _.each(res.body, (item) => {

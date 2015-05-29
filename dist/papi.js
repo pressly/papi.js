@@ -33,18 +33,18 @@ var Papi = (function () {
   function Papi() {
     var _this = this;
 
-    var domain = arguments[0] === undefined ? 'https://beta-api.pressly.com' : arguments[0];
-    var jwt = arguments[1] === undefined ? null : arguments[1];
+    var options = arguments[0] === undefined ? {} : arguments[0];
 
     _classCallCheck(this, Papi);
 
-    this.domain = domain;
+    this.options = options;
+    this.options.host = options.host || 'https://beta-api.pressly.com';
 
     this.auth = {
       session: null,
 
       get: function get() {
-        return _this.$request('get', '/auth/session').then(function (res) {
+        return _this.request('get', '/auth/session').then(function (res) {
           return _this.auth.set(res.body);
         });
       },
@@ -70,13 +70,13 @@ var Papi = (function () {
       },
 
       login: function login(email, password) {
-        return _this.$request('post', '/login', { data: { email: email, password: password } }).then(function (res) {
+        return _this.request('post', '/login', { data: { email: email, password: password } }).then(function (res) {
           return _this.auth.set(res.body);
         });
       },
 
       logout: function logout() {
-        return _this.$request('get', '/auth/logout').then(function (res) {
+        return _this.request('get', '/auth/logout').then(function (res) {
           _this.auth.session = null;
 
           return res;
@@ -89,6 +89,8 @@ var Papi = (function () {
     key: '$resource',
 
     /*
+       Resource selector
+       $resource();
       $resource(key);
       $resource(key, params);
       $resource(name, parentResource);
@@ -116,16 +118,20 @@ var Papi = (function () {
       return new _resource2['default'](this, key, parentResource).includeParams(params);
     }
   }, {
-    key: '$request',
-    value: function $request(method, path) {
+    key: 'request',
+    value: function request(method, path) {
       var _this2 = this;
 
       var options = arguments[2] === undefined ? {} : arguments[2];
 
       return new _bluebird2['default'](function (resolve, reject) {
-        var url = /^(https?:)?\/\//.test(path) ? path : _this2.domain + path;
+        var url = /^(https?:)?\/\//.test(path) ? path : _this2.options.host + path;
         var req = _superagent2['default'][method](url);
         req.set('Content-Type', 'application/json');
+
+        if (options.timeout || _this2.options.timeout) {
+          req.timeout(options.timeout || _this2.options.timeout);
+        }
 
         // Allow sending cookies from origin
         if (typeof req.withCredentials == 'function') {
@@ -149,7 +155,7 @@ var Papi = (function () {
 
         req.end(function (err, res) {
           if (err) {
-            reject(err);
+            return reject(err);
           } else {
             resolve(res);
           }
@@ -1014,6 +1020,8 @@ var Resource = (function () {
 
     this.api = api;
 
+    this.options = {};
+
     this.name = def.name;
     this.key = def.key;
     this.model = def.model;
@@ -1048,6 +1056,11 @@ var Resource = (function () {
   }
 
   _createClass(Resource, [{
+    key: 'request',
+    value: function request(method, path, options) {
+      return this.api.request(method, path, _lodash2['default'].extend({}, this.options, options));
+    }
+  }, {
     key: 'buildRoute',
     value: function buildRoute(applyParams) {
       var path = this.route.segments.join('');
@@ -1090,6 +1103,25 @@ var Resource = (function () {
       return this;
     }
   }, {
+    key: 'timeout',
+    value: function timeout(ms) {
+      this.options.timeout = ms;
+
+      return this;
+    }
+  }, {
+    key: 'get',
+    value: function get(params) {
+      var resource = new Resource(this.api, this.key, this).query(params);
+      var path = resource.buildRoute(true);
+
+      return resource.request('get', path).then(function (res) {
+        var model = resource.hydrateModel(res.body);
+
+        return model;
+      });
+    }
+  }, {
     key: 'find',
     value: function find(params) {
       if (params && !_lodash2['default'].isObject(params)) {
@@ -1100,7 +1132,7 @@ var Resource = (function () {
       var resource = new Resource(this.api, this.key, this).includeParams(params);
       var path = resource.buildRoute(true);
 
-      var promise = this.api.$request('get', path).then(function (res) {
+      var promise = this.api.request('get', path).then(function (res) {
         var model = resource.hydrateModel(res.body);
 
         return model;
@@ -1115,7 +1147,7 @@ var Resource = (function () {
       var resource = new Resource(this.api, this.key, this).includeParams(params);
       var path = resource.buildRoute(true);
 
-      return this.api.$request('get', path, { query: this.route.queryParams }).then(function (res) {
+      return this.api.request('get', path, { query: this.route.queryParams }).then(function (res) {
         resource.setResponse(res);
 
         var collection = resource.hydrateCollection(res.body);
@@ -1172,7 +1204,7 @@ var Resource = (function () {
           var options = arguments[0] === undefined ? {} : arguments[0];
 
           if (_this3.links.next) {
-            return _this3.api.$request('get', _this3.links.next).then(function (res) {
+            return _this3.api.request('get', _this3.links.next).then(function (res) {
               if (options.append || options.prepend) {
                 _this3.setResponse(res);
 

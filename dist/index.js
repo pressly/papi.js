@@ -32,18 +32,18 @@ var Papi = (function () {
   function Papi() {
     var _this = this;
 
-    var domain = arguments[0] === undefined ? 'https://beta-api.pressly.com' : arguments[0];
-    var jwt = arguments[1] === undefined ? null : arguments[1];
+    var options = arguments[0] === undefined ? {} : arguments[0];
 
     _classCallCheck(this, Papi);
 
-    this.domain = domain;
+    this.options = options;
+    this.options.host = options.host || 'https://beta-api.pressly.com';
 
     this.auth = {
       session: null,
 
       get: function get() {
-        return _this.$request('get', '/auth/session').then(function (res) {
+        return _this.request('get', '/auth/session').then(function (res) {
           return _this.auth.set(res.body);
         });
       },
@@ -69,13 +69,13 @@ var Papi = (function () {
       },
 
       login: function login(email, password) {
-        return _this.$request('post', '/login', { data: { email: email, password: password } }).then(function (res) {
+        return _this.request('post', '/login', { data: { email: email, password: password } }).then(function (res) {
           return _this.auth.set(res.body);
         });
       },
 
       logout: function logout() {
-        return _this.$request('get', '/auth/logout').then(function (res) {
+        return _this.request('get', '/auth/logout').then(function (res) {
           _this.auth.session = null;
 
           return res;
@@ -88,6 +88,8 @@ var Papi = (function () {
     key: '$resource',
 
     /*
+       Resource selector
+       $resource();
       $resource(key);
       $resource(key, params);
       $resource(name, parentResource);
@@ -115,16 +117,20 @@ var Papi = (function () {
       return new _resource2['default'](this, key, parentResource).includeParams(params);
     }
   }, {
-    key: '$request',
-    value: function $request(method, path) {
+    key: 'request',
+    value: function request(method, path) {
       var _this2 = this;
 
       var options = arguments[2] === undefined ? {} : arguments[2];
 
       return new _bluebird2['default'](function (resolve, reject) {
-        var url = /^(https?:)?\/\//.test(path) ? path : _this2.domain + path;
+        var url = /^(https?:)?\/\//.test(path) ? path : _this2.options.host + path;
         var req = _superagent2['default'][method](url);
         req.set('Content-Type', 'application/json');
+
+        if (options.timeout || _this2.options.timeout) {
+          req.timeout(options.timeout || _this2.options.timeout);
+        }
 
         // Allow sending cookies from origin
         if (typeof req.withCredentials == 'function') {
@@ -148,7 +154,7 @@ var Papi = (function () {
 
         req.end(function (err, res) {
           if (err) {
-            reject(err);
+            return reject(err);
           } else {
             resolve(res);
           }

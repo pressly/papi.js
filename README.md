@@ -60,15 +60,23 @@ This will expose the `Papi` class globally.
 
 ## Connection
 
-##### Papi::constructor('*options')
+##### Papi::constructor(`options`)
 - **options*** (optional) | Object | see below
 
-#### Options
-- **host** (optional) | String | defaults to 'https://beta-api.pressly.com'
-- **timeout** | Integer | Request timeout in ms
+Most of the time you can simply create a new api instance from Papi without specifying any options:
 
 ```javascript
-var api = new Papi({ host: 'https://beta-api.pressly.com', timeout: 20000 });
+var api = new Papi();
+```
+
+You can also optionally specify options.
+
+#### Options
+- **host** | String | defaults to 'https://beta-api.pressly.com'
+- **timeout** | Integer | Global timeout in ms for all requests
+
+```javascript
+var api = new Papi({ host: 'https://dev-api.pressly.com', timeout: 20000 });
 ```
 
 ## Authentication
@@ -184,6 +192,15 @@ Because modifiers return the current resource you can chain them like so:
 ```javascript
 resource.limit(15).query({ q: 1, b: 2 });
 ```
+
+##### timeout(`ms`)
+
+Specify a maximum timeout before an error is triggered for requests on this resource
+
+```javascript
+resource.timeout(20000);
+```
+
 
 ## Requests
 
