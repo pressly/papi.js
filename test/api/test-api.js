@@ -45,15 +45,6 @@ nock(api.options.host)
   .get(`/hubs/${mock.hubs[0].id}`).reply(200, mock.hubs[0])
   .get(`/hubs/${mock.hubs[0].id}/apps`).reply(200, mock.apps)
 
-  // chainable find and all
-  .get(`/hubs/${mock.hubs[0].id}`).reply(200, mock.hubs[0])
-  .get(`/hubs/${mock.hubs[0].id}/apps`).reply(200, mock.apps)
-
-  // chainable find and find
-  .get(`/hubs/${mock.hubs[0].id}`).reply(200, mock.hubs[0])
-  .get(`/hubs/${mock.hubs[0].id}/apps/${mock.apps[0].id}`).reply(200, mock.apps[0])
-
-
   /** Style Resource Requests *************************************************/
 
   // all
@@ -67,14 +58,12 @@ nock(api.options.host)
   .get(`/hubs/${mock.hubs[0].id}/apps`).reply(200, mock.apps)
   .get(`/hubs/${mock.hubs[0].id}/apps/${mock.apps[0].id}/styles`).reply(200, mock.styles)
 
-  // chainable query on find
-  .get(`/hubs/${mock.hubs[0].id}`).reply(200, mock.hubs[0])
-  .get(`/hubs/${mock.hubs[0].id}/apps/${mock.apps[0].id}`).reply(200, mock.apps[0])
-  .get(`/hubs/${mock.hubs[0].id}/apps/${mock.apps[0].id}/styles`).reply(200, mock.styles)
-
   /** Stream Assets Requests **************************************************/
   // all
   .get(`/hubs/${mock.hubs[0].id}/stream`).reply(200)
+
+  .get(`/hubs/${mock.hubs[0].id}/stream?slug=some-slug`).reply(200, {})
+
 ;
 
 describe('Hubs Resource', function () {
@@ -183,35 +172,6 @@ describe('Apps Resource', function() {
       });
     });
   });
-
-  it('should support chainable queries find and then all', function(done) {
-    api.$resource('hubs').find(mock.hubs[0].id).$resource('apps').all().then(function(res) {
-      var hub = res[0];
-      var apps = res[1];
-
-      hub.should.instanceOf(models.Hub);
-      apps.should.not.be.empty;
-      apps[0].should.instanceOf(models.App);
-
-      done();
-    }).catch((err) => {
-      done(err);
-    });
-  });
-
-  it('should support chainable queries on find and then find', function(done) {
-    api.$resource('hubs').find(mock.hubs[0].id).$resource('apps').find(mock.apps[0].id).then(function(res) {
-      var hub = res[0];
-      var app = res[1];
-
-      hub.should.be.instanceOf(models.Hub);
-      app.should.be.instanceOf(models.App);
-
-      done();
-    }).catch((err) => {
-      done(err);
-    });
-  });
 });
 
 describe('Styles Resource', function() {
@@ -251,38 +211,21 @@ describe('Styles Resource', function() {
       });
     });
   });
-
-  it('should support chainable queries on find', function(done) {
-    var a = api.$resource('hubs');
-    var b = a.find(mock.hubs[0].id);
-    var c = b.$resource('apps');
-    var d = c.find(mock.apps[0].id);
-    var e = d.$resource('styles');
-    var f = e.all();
-
-    f.then(function(res) {
-      var hub = res[0];
-      var app = res[1];
-      var styles = res[2];
-      var style = styles[0];
-
-      res.should.not.be.empty;
-      res.length.should.equal(3); // 3 promises resolved
-      hub.should.instanceOf(models.Hub);
-      app.should.instanceOf(models.App);
-      styles.should.not.be.empty;
-      style.should.instanceOf(models.Style);
-
-      done();
-    }).catch((err) => {
-      done(err);
-    });
-  })
 });
 
 describe('Stream Assets Resource', function() {
   it('should allow assets with custom routeSegment', function(done) {
     api.$resource('hubs.assets', {hubId: mock.hubs[0].id}).all().then((res) => {
+      done();
+    }).catch((err) => {
+      done(err);
+    });
+  });
+
+  it('should get asset by slug', function(done) {
+    api.$resource('hubs.assets', {hubId: mock.hubs[0].id}).get({slug: "some-slug"}).then((res) => {
+      res.should.be.instanceOf(models.Asset);
+
       done();
     }).catch((err) => {
       done(err);

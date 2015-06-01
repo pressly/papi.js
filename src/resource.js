@@ -149,40 +149,6 @@ export function applyResourcing(klass) {
 
 /** Resource class ************************************************************/
 
-var extendPromise = function(parentPromise, parentResource, promises) {
-  promises = (promises || [parentPromise]);
-
-  return _.extend(parentPromise, {
-    $resource: function(name) {
-      var key = parentResource.key + '.' + name;
-
-      var childResource = parentResource.api.$resource(key, parentResource);
-
-      childResource._all = childResource.all;
-      childResource._find = childResource.find;
-
-      var result = _.extend(childResource, {
-        all: function() {
-          var promise = childResource._all();
-          return Promise.all(promises.concat(promise));
-        },
-
-        find: function(id) {
-          childResource.includeParams({id: id});
-          var promise = childResource._find(id);
-          var finalPromiseChain = Promise.all(promises.concat(promise));
-
-          promises.push(promise);
-
-          return extendPromise(finalPromiseChain, childResource, promises);
-        }
-      });
-
-      return result;
-    }
-  });
-};
-
 var parseHTTPLinks = function(linksString) {
   var links = {};
 
@@ -291,7 +257,7 @@ export default class Resource {
     var resource = new Resource(this.api, this.key, this).query(params);
     var path = resource.buildRoute(true);
 
-    return resource.request('get', path).then((res) => {
+    return this.api.request('get', path, { query: resource.route.queryParams }).then((res) => {
       var model = resource.hydrateModel(res.body);
 
       return model;
@@ -307,13 +273,11 @@ export default class Resource {
     var resource = new Resource(this.api, this.key, this).includeParams(params);
     var path = resource.buildRoute(true);
 
-    var promise = this.api.request('get', path).then(function(res) {
+    return this.api.request('get', path).then(function(res) {
       var model = resource.hydrateModel(res.body);
 
       return model;
     });
-
-    return extendPromise(promise, resource);
   }
 
   all(params) {
