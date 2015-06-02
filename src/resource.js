@@ -65,7 +65,7 @@ var buildRoute = function(resource) {
     params[paramName] = null;
   });
 
-  return { path: path, segments: segments, mySegment: segments[segments.length - 1], params: params };
+  return { path: path, segments: segments, segment: segments[segments.length - 1], params: params, paramName: resource.options.paramName || 'id' };
 };
 
 var reRouteParams = /:[^\/]+/gi;
@@ -102,14 +102,10 @@ export function applyResourcing(klass) {
         resource.key = buildKey(resource);
         resource.route = buildRoute(resource);
         resource.model = options.model || models[classify(name)] || models.Base;
+        resource.actions = [];
 
         this.current = bucket[name] = klass.resourceDefinitions[resource.key] = resource;
 
-        return this;
-      },
-
-      // XXX Needs impl
-      action: function(name, options) {
         return this;
       },
 
@@ -121,24 +117,33 @@ export function applyResourcing(klass) {
         return parentPointer;
       },
 
+      // XXX Needs impl
+      action: function(method, name, options) {
+        if (parentPointer && parentPointer.current) {
+          parentPointer.current.actions.push({ method, name, options });
+        }
+
+        return this;
+      },
+
       get: function() {
-        return this.action.apply(this, arguments);
+        return this.action.call(this, 'get', arguments[0], arguments[1]);
       },
 
       post: function() {
-        return this.action.apply(this, arguments);
+        return this.action.call(this, 'get', arguments[0], arguments[1]);
       },
 
       put: function() {
-        return this.action.apply(this, arguments);
+        return this.action.call(this, 'get', arguments[0], arguments[1]);
       },
 
       patch: function() {
-        return this.action.apply(this, arguments);
+        return this.action.call(this, 'get', arguments[0], arguments[1]);
       },
 
       delete: function() {
-        return this.action.apply(this, arguments);
+        return this.action.call(this, 'get', arguments[0], arguments[1]);
       }
     };
   };
