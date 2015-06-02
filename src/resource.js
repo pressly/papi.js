@@ -117,7 +117,6 @@ export function applyResourcing(klass) {
         return parentPointer;
       },
 
-      // XXX Needs impl
       action: function(method, name, options) {
         if (parentPointer && parentPointer.current) {
           parentPointer.current.actions.push({ method, name, options });
@@ -131,19 +130,19 @@ export function applyResourcing(klass) {
       },
 
       post: function() {
-        return this.action.call(this, 'get', arguments[0], arguments[1]);
+        return this.action.call(this, 'post', arguments[0], arguments[1]);
       },
 
       put: function() {
-        return this.action.call(this, 'get', arguments[0], arguments[1]);
+        return this.action.call(this, 'put', arguments[0], arguments[1]);
       },
 
       patch: function() {
-        return this.action.call(this, 'get', arguments[0], arguments[1]);
+        return this.action.call(this, 'patch', arguments[0], arguments[1]);
       },
 
       delete: function() {
-        return this.action.call(this, 'get', arguments[0], arguments[1]);
+        return this.action.call(this, 'delete', arguments[0], arguments[1]);
       }
     };
   };
