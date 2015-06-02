@@ -5,6 +5,7 @@ export { default as App }             from './app';
 export { default as Asset }           from './asset';
 export { default as CodeRevision }    from './code-revision';
 export { default as Collection }      from './collection';
+export { default as Comment }         from './comment';
 export { default as Draft }           from './draft';
 export { default as Feed }            from './feed';
 export { default as Hub }             from './hub';

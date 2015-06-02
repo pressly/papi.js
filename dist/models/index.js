@@ -32,6 +32,10 @@ var _collection = require('./collection');
 
 exports.Collection = _interopRequire(_collection);
 
+var _comment = require('./comment');
+
+exports.Comment = _interopRequire(_comment);
+
 var _draft = require('./draft');
 
 exports.Draft = _interopRequire(_draft);

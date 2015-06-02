@@ -175,7 +175,7 @@ Papi.resource('auth').resource('accounts').open().resource('users').resource('hu
 // This resource links to the root hubs resource
 .resource('hubs', { linkTo: 'hubs' }).close();
 module.exports = exports['default'];
-},{"./resource":17,"babel-runtime/core-js/object/define-property":21,"babel-runtime/helpers/class-call-check":22,"babel-runtime/helpers/create-class":23,"babel-runtime/helpers/interop-require-default":25,"bluebird":50,"lodash":52,"superagent":53}],2:[function(require,module,exports){
+},{"./resource":18,"babel-runtime/core-js/object/define-property":22,"babel-runtime/helpers/class-call-check":23,"babel-runtime/helpers/create-class":24,"babel-runtime/helpers/interop-require-default":26,"bluebird":51,"lodash":53,"superagent":54}],2:[function(require,module,exports){
 'use strict';
 
 var _createClass = require('babel-runtime/helpers/create-class')['default'];
@@ -232,7 +232,7 @@ var Model = (function () {
 
 exports['default'] = Model;
 module.exports = exports['default'];
-},{"babel-runtime/core-js/object/define-property":21,"babel-runtime/helpers/class-call-check":22,"babel-runtime/helpers/create-class":23,"babel-runtime/helpers/interop-require-default":25,"lodash":52}],3:[function(require,module,exports){
+},{"babel-runtime/core-js/object/define-property":22,"babel-runtime/helpers/class-call-check":23,"babel-runtime/helpers/create-class":24,"babel-runtime/helpers/interop-require-default":26,"lodash":53}],3:[function(require,module,exports){
 'use strict';
 
 var _inherits = require('babel-runtime/helpers/inherits')['default'];
@@ -267,7 +267,7 @@ var Account = (function (_Model) {
 
 exports['default'] = Account;
 module.exports = exports['default'];
-},{"../model":2,"babel-runtime/core-js/object/define-property":21,"babel-runtime/helpers/class-call-check":22,"babel-runtime/helpers/inherits":24,"babel-runtime/helpers/interop-require-default":25}],4:[function(require,module,exports){
+},{"../model":2,"babel-runtime/core-js/object/define-property":22,"babel-runtime/helpers/class-call-check":23,"babel-runtime/helpers/inherits":25,"babel-runtime/helpers/interop-require-default":26}],4:[function(require,module,exports){
 'use strict';
 
 var _inherits = require('babel-runtime/helpers/inherits')['default'];
@@ -302,7 +302,7 @@ var App = (function (_Model) {
 
 exports['default'] = App;
 module.exports = exports['default'];
-},{"../model":2,"babel-runtime/core-js/object/define-property":21,"babel-runtime/helpers/class-call-check":22,"babel-runtime/helpers/inherits":24,"babel-runtime/helpers/interop-require-default":25}],5:[function(require,module,exports){
+},{"../model":2,"babel-runtime/core-js/object/define-property":22,"babel-runtime/helpers/class-call-check":23,"babel-runtime/helpers/inherits":25,"babel-runtime/helpers/interop-require-default":26}],5:[function(require,module,exports){
 'use strict';
 
 var _inherits = require('babel-runtime/helpers/inherits')['default'];
@@ -382,7 +382,7 @@ var Asset = (function (_Model) {
 
 exports['default'] = Asset;
 module.exports = exports['default'];
-},{"../model":2,"babel-runtime/core-js/object/define-property":21,"babel-runtime/helpers/class-call-check":22,"babel-runtime/helpers/create-class":23,"babel-runtime/helpers/inherits":24,"babel-runtime/helpers/interop-require-default":25,"lodash":52}],6:[function(require,module,exports){
+},{"../model":2,"babel-runtime/core-js/object/define-property":22,"babel-runtime/helpers/class-call-check":23,"babel-runtime/helpers/create-class":24,"babel-runtime/helpers/inherits":25,"babel-runtime/helpers/interop-require-default":26,"lodash":53}],6:[function(require,module,exports){
 'use strict';
 
 var _inherits = require('babel-runtime/helpers/inherits')['default'];
@@ -417,7 +417,7 @@ var CodeRevision = (function (_Model) {
 
 exports['default'] = CodeRevision;
 module.exports = exports['default'];
-},{"../model":2,"babel-runtime/core-js/object/define-property":21,"babel-runtime/helpers/class-call-check":22,"babel-runtime/helpers/inherits":24,"babel-runtime/helpers/interop-require-default":25}],7:[function(require,module,exports){
+},{"../model":2,"babel-runtime/core-js/object/define-property":22,"babel-runtime/helpers/class-call-check":23,"babel-runtime/helpers/inherits":25,"babel-runtime/helpers/interop-require-default":26}],7:[function(require,module,exports){
 'use strict';
 
 var _inherits = require('babel-runtime/helpers/inherits')['default'];
@@ -452,7 +452,42 @@ var Collection = (function (_Model) {
 
 exports['default'] = Collection;
 module.exports = exports['default'];
-},{"../model":2,"babel-runtime/core-js/object/define-property":21,"babel-runtime/helpers/class-call-check":22,"babel-runtime/helpers/inherits":24,"babel-runtime/helpers/interop-require-default":25}],8:[function(require,module,exports){
+},{"../model":2,"babel-runtime/core-js/object/define-property":22,"babel-runtime/helpers/class-call-check":23,"babel-runtime/helpers/inherits":25,"babel-runtime/helpers/interop-require-default":26}],8:[function(require,module,exports){
+'use strict';
+
+var _inherits = require('babel-runtime/helpers/inherits')['default'];
+
+var _classCallCheck = require('babel-runtime/helpers/class-call-check')['default'];
+
+var _Object$defineProperty = require('babel-runtime/core-js/object/define-property')['default'];
+
+var _interopRequireDefault = require('babel-runtime/helpers/interop-require-default')['default'];
+
+_Object$defineProperty(exports, '__esModule', {
+  value: true
+});
+
+var _model = require('../model');
+
+var _model2 = _interopRequireDefault(_model);
+
+var Comment = (function (_Model) {
+  function Comment() {
+    _classCallCheck(this, Comment);
+
+    if (_Model != null) {
+      _Model.apply(this, arguments);
+    }
+  }
+
+  _inherits(Comment, _Model);
+
+  return Comment;
+})(_model2['default']);
+
+exports['default'] = Comment;
+module.exports = exports['default'];
+},{"../model":2,"babel-runtime/core-js/object/define-property":22,"babel-runtime/helpers/class-call-check":23,"babel-runtime/helpers/inherits":25,"babel-runtime/helpers/interop-require-default":26}],9:[function(require,module,exports){
 'use strict';
 
 var _inherits = require('babel-runtime/helpers/inherits')['default'];
@@ -487,7 +522,7 @@ var Draft = (function (_Model) {
 
 exports['default'] = Draft;
 module.exports = exports['default'];
-},{"../model":2,"babel-runtime/core-js/object/define-property":21,"babel-runtime/helpers/class-call-check":22,"babel-runtime/helpers/inherits":24,"babel-runtime/helpers/interop-require-default":25}],9:[function(require,module,exports){
+},{"../model":2,"babel-runtime/core-js/object/define-property":22,"babel-runtime/helpers/class-call-check":23,"babel-runtime/helpers/inherits":25,"babel-runtime/helpers/interop-require-default":26}],10:[function(require,module,exports){
 'use strict';
 
 var _inherits = require('babel-runtime/helpers/inherits')['default'];
@@ -522,7 +557,7 @@ var Feed = (function (_Model) {
 
 exports['default'] = Feed;
 module.exports = exports['default'];
-},{"../model":2,"babel-runtime/core-js/object/define-property":21,"babel-runtime/helpers/class-call-check":22,"babel-runtime/helpers/inherits":24,"babel-runtime/helpers/interop-require-default":25}],10:[function(require,module,exports){
+},{"../model":2,"babel-runtime/core-js/object/define-property":22,"babel-runtime/helpers/class-call-check":23,"babel-runtime/helpers/inherits":25,"babel-runtime/helpers/interop-require-default":26}],11:[function(require,module,exports){
 'use strict';
 
 var _inherits = require('babel-runtime/helpers/inherits')['default'];
@@ -557,7 +592,7 @@ var Hub = (function (_Model) {
 
 exports['default'] = Hub;
 module.exports = exports['default'];
-},{"../model":2,"babel-runtime/core-js/object/define-property":21,"babel-runtime/helpers/class-call-check":22,"babel-runtime/helpers/inherits":24,"babel-runtime/helpers/interop-require-default":25}],11:[function(require,module,exports){
+},{"../model":2,"babel-runtime/core-js/object/define-property":22,"babel-runtime/helpers/class-call-check":23,"babel-runtime/helpers/inherits":25,"babel-runtime/helpers/interop-require-default":26}],12:[function(require,module,exports){
 'use strict';
 
 var _Object$defineProperty = require('babel-runtime/core-js/object/define-property')['default'];
@@ -592,6 +627,10 @@ var _collection = require('./collection');
 
 exports.Collection = _interopRequire(_collection);
 
+var _comment = require('./comment');
+
+exports.Comment = _interopRequire(_comment);
+
 var _draft = require('./draft');
 
 exports.Draft = _interopRequire(_draft);
@@ -623,7 +662,7 @@ exports.Tag = _interopRequire(_tag);
 var _user = require('./user');
 
 exports.User = _interopRequire(_user);
-},{"../model":2,"./account":3,"./app":4,"./asset":5,"./code-revision":6,"./collection":7,"./draft":8,"./feed":9,"./hub":10,"./invite":12,"./recommendation":13,"./style":14,"./tag":15,"./user":16,"babel-runtime/core-js/object/define-property":21,"babel-runtime/helpers/interop-require":27}],12:[function(require,module,exports){
+},{"../model":2,"./account":3,"./app":4,"./asset":5,"./code-revision":6,"./collection":7,"./comment":8,"./draft":9,"./feed":10,"./hub":11,"./invite":13,"./recommendation":14,"./style":15,"./tag":16,"./user":17,"babel-runtime/core-js/object/define-property":22,"babel-runtime/helpers/interop-require":28}],13:[function(require,module,exports){
 'use strict';
 
 var _inherits = require('babel-runtime/helpers/inherits')['default'];
@@ -658,7 +697,7 @@ var Invite = (function (_Model) {
 
 exports['default'] = Invite;
 module.exports = exports['default'];
-},{"../model":2,"babel-runtime/core-js/object/define-property":21,"babel-runtime/helpers/class-call-check":22,"babel-runtime/helpers/inherits":24,"babel-runtime/helpers/interop-require-default":25}],13:[function(require,module,exports){
+},{"../model":2,"babel-runtime/core-js/object/define-property":22,"babel-runtime/helpers/class-call-check":23,"babel-runtime/helpers/inherits":25,"babel-runtime/helpers/interop-require-default":26}],14:[function(require,module,exports){
 'use strict';
 
 var _inherits = require('babel-runtime/helpers/inherits')['default'];
@@ -693,7 +732,7 @@ var Recommendation = (function (_Model) {
 
 exports['default'] = Recommendation;
 module.exports = exports['default'];
-},{"../model":2,"babel-runtime/core-js/object/define-property":21,"babel-runtime/helpers/class-call-check":22,"babel-runtime/helpers/inherits":24,"babel-runtime/helpers/interop-require-default":25}],14:[function(require,module,exports){
+},{"../model":2,"babel-runtime/core-js/object/define-property":22,"babel-runtime/helpers/class-call-check":23,"babel-runtime/helpers/inherits":25,"babel-runtime/helpers/interop-require-default":26}],15:[function(require,module,exports){
 'use strict';
 
 var _inherits = require('babel-runtime/helpers/inherits')['default'];
@@ -728,7 +767,7 @@ var Style = (function (_Model) {
 
 exports['default'] = Style;
 module.exports = exports['default'];
-},{"../model":2,"babel-runtime/core-js/object/define-property":21,"babel-runtime/helpers/class-call-check":22,"babel-runtime/helpers/inherits":24,"babel-runtime/helpers/interop-require-default":25}],15:[function(require,module,exports){
+},{"../model":2,"babel-runtime/core-js/object/define-property":22,"babel-runtime/helpers/class-call-check":23,"babel-runtime/helpers/inherits":25,"babel-runtime/helpers/interop-require-default":26}],16:[function(require,module,exports){
 'use strict';
 
 var _inherits = require('babel-runtime/helpers/inherits')['default'];
@@ -763,7 +802,7 @@ var Tag = (function (_Model) {
 
 exports['default'] = Tag;
 module.exports = exports['default'];
-},{"../model":2,"babel-runtime/core-js/object/define-property":21,"babel-runtime/helpers/class-call-check":22,"babel-runtime/helpers/inherits":24,"babel-runtime/helpers/interop-require-default":25}],16:[function(require,module,exports){
+},{"../model":2,"babel-runtime/core-js/object/define-property":22,"babel-runtime/helpers/class-call-check":23,"babel-runtime/helpers/inherits":25,"babel-runtime/helpers/interop-require-default":26}],17:[function(require,module,exports){
 'use strict';
 
 var _inherits = require('babel-runtime/helpers/inherits')['default'];
@@ -807,7 +846,7 @@ var User = (function (_Model) {
 
 exports['default'] = User;
 module.exports = exports['default'];
-},{"../model":2,"babel-runtime/core-js/object/define-property":21,"babel-runtime/helpers/class-call-check":22,"babel-runtime/helpers/create-class":23,"babel-runtime/helpers/inherits":24,"babel-runtime/helpers/interop-require-default":25}],17:[function(require,module,exports){
+},{"../model":2,"babel-runtime/core-js/object/define-property":22,"babel-runtime/helpers/class-call-check":23,"babel-runtime/helpers/create-class":24,"babel-runtime/helpers/inherits":25,"babel-runtime/helpers/interop-require-default":26}],18:[function(require,module,exports){
 'use strict';
 
 var _createClass = require('babel-runtime/helpers/create-class')['default'];
@@ -1251,15 +1290,15 @@ var Resource = (function () {
 })();
 
 exports['default'] = Resource;
-},{"./models":11,"babel-runtime/core-js/object/define-property":21,"babel-runtime/helpers/class-call-check":22,"babel-runtime/helpers/create-class":23,"babel-runtime/helpers/interop-require-default":25,"babel-runtime/helpers/interop-require-wildcard":26,"babel-runtime/helpers/sliced-to-array":28,"lodash":52}],18:[function(require,module,exports){
+},{"./models":12,"babel-runtime/core-js/object/define-property":22,"babel-runtime/helpers/class-call-check":23,"babel-runtime/helpers/create-class":24,"babel-runtime/helpers/interop-require-default":26,"babel-runtime/helpers/interop-require-wildcard":27,"babel-runtime/helpers/sliced-to-array":29,"lodash":53}],19:[function(require,module,exports){
 module.exports = { "default": require("core-js/library/fn/get-iterator"), __esModule: true };
-},{"core-js/library/fn/get-iterator":29}],19:[function(require,module,exports){
+},{"core-js/library/fn/get-iterator":30}],20:[function(require,module,exports){
 module.exports = { "default": require("core-js/library/fn/is-iterable"), __esModule: true };
-},{"core-js/library/fn/is-iterable":30}],20:[function(require,module,exports){
+},{"core-js/library/fn/is-iterable":31}],21:[function(require,module,exports){
 module.exports = { "default": require("core-js/library/fn/object/create"), __esModule: true };
-},{"core-js/library/fn/object/create":31}],21:[function(require,module,exports){
+},{"core-js/library/fn/object/create":32}],22:[function(require,module,exports){
 module.exports = { "default": require("core-js/library/fn/object/define-property"), __esModule: true };
-},{"core-js/library/fn/object/define-property":32}],22:[function(require,module,exports){
+},{"core-js/library/fn/object/define-property":33}],23:[function(require,module,exports){
 "use strict";
 
 exports["default"] = function (instance, Constructor) {
@@ -1269,7 +1308,7 @@ exports["default"] = function (instance, Constructor) {
 };
 
 exports.__esModule = true;
-},{}],23:[function(require,module,exports){
+},{}],24:[function(require,module,exports){
 "use strict";
 
 var _Object$defineProperty = require("babel-runtime/core-js/object/define-property")["default"];
@@ -1294,7 +1333,7 @@ exports["default"] = (function () {
 })();
 
 exports.__esModule = true;
-},{"babel-runtime/core-js/object/define-property":21}],24:[function(require,module,exports){
+},{"babel-runtime/core-js/object/define-property":22}],25:[function(require,module,exports){
 "use strict";
 
 var _Object$create = require("babel-runtime/core-js/object/create")["default"];
@@ -1316,7 +1355,7 @@ exports["default"] = function (subClass, superClass) {
 };
 
 exports.__esModule = true;
-},{"babel-runtime/core-js/object/create":20}],25:[function(require,module,exports){
+},{"babel-runtime/core-js/object/create":21}],26:[function(require,module,exports){
 "use strict";
 
 exports["default"] = function (obj) {
@@ -1326,7 +1365,7 @@ exports["default"] = function (obj) {
 };
 
 exports.__esModule = true;
-},{}],26:[function(require,module,exports){
+},{}],27:[function(require,module,exports){
 "use strict";
 
 exports["default"] = function (obj) {
@@ -1347,7 +1386,7 @@ exports["default"] = function (obj) {
 };
 
 exports.__esModule = true;
-},{}],27:[function(require,module,exports){
+},{}],28:[function(require,module,exports){
 "use strict";
 
 exports["default"] = function (obj) {
@@ -1355,7 +1394,7 @@ exports["default"] = function (obj) {
 };
 
 exports.__esModule = true;
-},{}],28:[function(require,module,exports){
+},{}],29:[function(require,module,exports){
 "use strict";
 
 var _isIterable = require("babel-runtime/core-js/is-iterable")["default"];
@@ -1395,27 +1434,27 @@ exports["default"] = function (arr, i) {
 };
 
 exports.__esModule = true;
-},{"babel-runtime/core-js/get-iterator":18,"babel-runtime/core-js/is-iterable":19}],29:[function(require,module,exports){
+},{"babel-runtime/core-js/get-iterator":19,"babel-runtime/core-js/is-iterable":20}],30:[function(require,module,exports){
 require('../modules/web.dom.iterable');
 require('../modules/es6.string.iterator');
 require('../modules/core.iter-helpers');
 module.exports = require('../modules/$').core.getIterator;
-},{"../modules/$":39,"../modules/core.iter-helpers":46,"../modules/es6.string.iterator":48,"../modules/web.dom.iterable":49}],30:[function(require,module,exports){
+},{"../modules/$":40,"../modules/core.iter-helpers":47,"../modules/es6.string.iterator":49,"../modules/web.dom.iterable":50}],31:[function(require,module,exports){
 require('../modules/web.dom.iterable');
 require('../modules/es6.string.iterator');
 require('../modules/core.iter-helpers');
 module.exports = require('../modules/$').core.isIterable;
-},{"../modules/$":39,"../modules/core.iter-helpers":46,"../modules/es6.string.iterator":48,"../modules/web.dom.iterable":49}],31:[function(require,module,exports){
+},{"../modules/$":40,"../modules/core.iter-helpers":47,"../modules/es6.string.iterator":49,"../modules/web.dom.iterable":50}],32:[function(require,module,exports){
 var $ = require('../../modules/$');
 module.exports = function create(P, D){
   return $.create(P, D);
 };
-},{"../../modules/$":39}],32:[function(require,module,exports){
+},{"../../modules/$":40}],33:[function(require,module,exports){
 var $ = require('../../modules/$');
 module.exports = function defineProperty(it, key, desc){
   return $.setDesc(it, key, desc);
 };
-},{"../../modules/$":39}],33:[function(require,module,exports){
+},{"../../modules/$":40}],34:[function(require,module,exports){
 var $ = require('./$');
 function assert(condition, msg1, msg2){
   if(!condition)throw TypeError(msg2 ? msg1 + msg2 : msg1);
@@ -1434,7 +1473,7 @@ assert.inst = function(it, Constructor, name){
   return it;
 };
 module.exports = assert;
-},{"./$":39}],34:[function(require,module,exports){
+},{"./$":40}],35:[function(require,module,exports){
 var $        = require('./$')
   , TAG      = require('./$.wks')('toStringTag')
   , toString = {}.toString;
@@ -1450,7 +1489,7 @@ cof.set = function(it, tag, stat){
   if(it && !$.has(it = stat ? it : it.prototype, TAG))$.hide(it, TAG, tag);
 };
 module.exports = cof;
-},{"./$":39,"./$.wks":45}],35:[function(require,module,exports){
+},{"./$":40,"./$.wks":46}],36:[function(require,module,exports){
 var $          = require('./$')
   , global     = $.g
   , core       = $.core
@@ -1499,13 +1538,13 @@ function $def(type, name, source){
   }
 }
 module.exports = $def;
-},{"./$":39}],36:[function(require,module,exports){
+},{"./$":40}],37:[function(require,module,exports){
 module.exports = function($){
   $.FW   = false;
   $.path = $.core;
   return $;
 };
-},{}],37:[function(require,module,exports){
+},{}],38:[function(require,module,exports){
 var $def            = require('./$.def')
   , $redef          = require('./$.redef')
   , $               = require('./$')
@@ -1556,7 +1595,7 @@ module.exports = function(Base, NAME, Constructor, next, DEFAULT, IS_SET, FORCE)
     } else $def($def.P + $def.F * $iter.BUGGY, NAME, methods);
   }
 };
-},{"./$":39,"./$.cof":34,"./$.def":35,"./$.iter":38,"./$.redef":40,"./$.wks":45}],38:[function(require,module,exports){
+},{"./$":40,"./$.cof":35,"./$.def":36,"./$.iter":39,"./$.redef":41,"./$.wks":46}],39:[function(require,module,exports){
 'use strict';
 var $                 = require('./$')
   , cof               = require('./$.cof')
@@ -1598,7 +1637,7 @@ module.exports = {
     cof.set(Constructor, NAME + ' Iterator');
   }
 };
-},{"./$":39,"./$.assert":33,"./$.cof":34,"./$.shared":41,"./$.wks":45}],39:[function(require,module,exports){
+},{"./$":40,"./$.assert":34,"./$.cof":35,"./$.shared":42,"./$.wks":46}],40:[function(require,module,exports){
 'use strict';
 var global = typeof self != 'undefined' ? self : Function('return this')()
   , core   = {}
@@ -1695,16 +1734,16 @@ var $ = module.exports = require('./$.fw')({
 /* eslint-disable no-undef */
 if(typeof __e != 'undefined')__e = core;
 if(typeof __g != 'undefined')__g = global;
-},{"./$.fw":36}],40:[function(require,module,exports){
+},{"./$.fw":37}],41:[function(require,module,exports){
 module.exports = require('./$').hide;
-},{"./$":39}],41:[function(require,module,exports){
+},{"./$":40}],42:[function(require,module,exports){
 var $      = require('./$')
   , SHARED = '__core-js_shared__'
   , store  = $.g[SHARED] || $.hide($.g, SHARED, {})[SHARED];
 module.exports = function(key){
   return store[key] || (store[key] = {});
 };
-},{"./$":39}],42:[function(require,module,exports){
+},{"./$":40}],43:[function(require,module,exports){
 // true  -> String#at
 // false -> String#codePointAt
 var $ = require('./$');
@@ -1722,14 +1761,14 @@ module.exports = function(TO_STRING){
         : TO_STRING ? s.slice(i, i + 2) : (a - 0xd800 << 10) + (b - 0xdc00) + 0x10000;
   };
 };
-},{"./$":39}],43:[function(require,module,exports){
+},{"./$":40}],44:[function(require,module,exports){
 var sid = 0;
 function uid(key){
   return 'Symbol('.concat(key === undefined ? '' : key, ')_', (++sid + Math.random()).toString(36));
 }
 uid.safe = require('./$').g.Symbol || uid;
 module.exports = uid;
-},{"./$":39}],44:[function(require,module,exports){
+},{"./$":40}],45:[function(require,module,exports){
 // 22.1.3.31 Array.prototype[@@unscopables]
 var $           = require('./$')
   , UNSCOPABLES = require('./$.wks')('unscopables');
@@ -1737,19 +1776,19 @@ if($.FW && !(UNSCOPABLES in []))$.hide(Array.prototype, UNSCOPABLES, {});
 module.exports = function(key){
   if($.FW)[][UNSCOPABLES][key] = true;
 };
-},{"./$":39,"./$.wks":45}],45:[function(require,module,exports){
+},{"./$":40,"./$.wks":46}],46:[function(require,module,exports){
 var global = require('./$').g
   , store  = require('./$.shared')('wks');
 module.exports = function(name){
   return store[name] || (store[name] =
     global.Symbol && global.Symbol[name] || require('./$.uid').safe('Symbol.' + name));
 };
-},{"./$":39,"./$.shared":41,"./$.uid":43}],46:[function(require,module,exports){
+},{"./$":40,"./$.shared":42,"./$.uid":44}],47:[function(require,module,exports){
 var core  = require('./$').core
   , $iter = require('./$.iter');
 core.isIterable  = $iter.is;
 core.getIterator = $iter.get;
-},{"./$":39,"./$.iter":38}],47:[function(require,module,exports){
+},{"./$":40,"./$.iter":39}],48:[function(require,module,exports){
 var $          = require('./$')
   , setUnscope = require('./$.unscope')
   , ITER       = require('./$.uid').safe('iter')
@@ -1784,7 +1823,7 @@ Iterators.Arguments = Iterators.Array;
 setUnscope('keys');
 setUnscope('values');
 setUnscope('entries');
-},{"./$":39,"./$.iter":38,"./$.iter-define":37,"./$.uid":43,"./$.unscope":44}],48:[function(require,module,exports){
+},{"./$":40,"./$.iter":39,"./$.iter-define":38,"./$.uid":44,"./$.unscope":45}],49:[function(require,module,exports){
 var set   = require('./$').set
   , $at   = require('./$.string-at')(true)
   , ITER  = require('./$.uid').safe('iter')
@@ -1805,7 +1844,7 @@ require('./$.iter-define')(String, 'String', function(iterated){
   iter.i += point.length;
   return step(0, point);
 });
-},{"./$":39,"./$.iter":38,"./$.iter-define":37,"./$.string-at":42,"./$.uid":43}],49:[function(require,module,exports){
+},{"./$":40,"./$.iter":39,"./$.iter-define":38,"./$.string-at":43,"./$.uid":44}],50:[function(require,module,exports){
 require('./es6.array.iterator');
 var $           = require('./$')
   , Iterators   = require('./$.iter').Iterators
@@ -1820,7 +1859,7 @@ if($.FW){
   if(HTC && !(ITERATOR in HTCProto))$.hide(HTCProto, ITERATOR, ArrayValues);
 }
 Iterators.NodeList = Iterators.HTMLCollection = ArrayValues;
-},{"./$":39,"./$.iter":38,"./$.wks":45,"./es6.array.iterator":47}],50:[function(require,module,exports){
+},{"./$":40,"./$.iter":39,"./$.wks":46,"./es6.array.iterator":48}],51:[function(require,module,exports){
 (function (process,global){
 /* @preserve
  * The MIT License (MIT)
@@ -6928,7 +6967,7 @@ function isUndefined(arg) {
 },{}]},{},[4])(4)
 });                    ;if (typeof window !== 'undefined' && window !== null) {                               window.P = window.Promise;                                                     } else if (typeof self !== 'undefined' && self !== null) {                             self.P = self.Promise;                                                         }
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"_process":51}],51:[function(require,module,exports){
+},{"_process":52}],52:[function(require,module,exports){
 // shim for using process in browser
 
 var process = module.exports = {};
@@ -7020,7 +7059,7 @@ process.chdir = function (dir) {
 };
 process.umask = function() { return 0; };
 
-},{}],52:[function(require,module,exports){
+},{}],53:[function(require,module,exports){
 (function (global){
 /**
  * @license
@@ -19259,7 +19298,7 @@ process.umask = function() { return 0; };
 }.call(this));
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],53:[function(require,module,exports){
+},{}],54:[function(require,module,exports){
 /**
  * Module dependencies.
  */
@@ -20384,7 +20423,7 @@ request.put = function(url, data, fn){
 
 module.exports = request;
 
-},{"emitter":54,"reduce":55}],54:[function(require,module,exports){
+},{"emitter":55,"reduce":56}],55:[function(require,module,exports){
 
 /**
  * Expose `Emitter`.
@@ -20550,7 +20589,7 @@ Emitter.prototype.hasListeners = function(event){
   return !! this.listeners(event).length;
 };
 
-},{}],55:[function(require,module,exports){
+},{}],56:[function(require,module,exports){
 
 /**
  * Reduce `arr` with `fn`.
