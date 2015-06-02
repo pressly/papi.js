@@ -8,8 +8,6 @@ var _slicedToArray = require('babel-runtime/helpers/sliced-to-array')['default']
 
 var _Object$defineProperty = require('babel-runtime/core-js/object/define-property')['default'];
 
-var _Promise = require('babel-runtime/core-js/promise')['default'];
-
 var _interopRequireDefault = require('babel-runtime/helpers/interop-require-default')['default'];
 
 var _interopRequireWildcard = require('babel-runtime/helpers/interop-require-wildcard')['default'];
@@ -90,7 +88,7 @@ var buildRoute = function buildRoute(resource) {
     params[paramName] = null;
   });
 
-  return { path: path, segments: segments, mySegment: segments[segments.length - 1], params: params };
+  return { path: path, segments: segments, segment: segments[segments.length - 1], params: params, paramName: resource.options.paramName || 'id' };
 };
 
 var reRouteParams = /:[^\/]+/gi;
@@ -127,14 +125,10 @@ function applyResourcing(klass) {
         resource.key = buildKey(resource);
         resource.route = buildRoute(resource);
         resource.model = options.model || models[classify(name)] || models.Base;
+        resource.actions = [];
 
         this.current = bucket[name] = klass.resourceDefinitions[resource.key] = resource;
 
-        return this;
-      },
-
-      // XXX Needs impl
-      action: function action(name, options) {
         return this;
       },
 
@@ -146,24 +140,32 @@ function applyResourcing(klass) {
         return parentPointer;
       },
 
+      action: function action(method, name, options) {
+        if (parentPointer && parentPointer.current) {
+          parentPointer.current.actions.push({ method: method, name: name, options: options });
+        }
+
+        return this;
+      },
+
       get: function get() {
-        return this.action.apply(this, arguments);
+        return this.action.call(this, 'get', arguments[0], arguments[1]);
       },
 
       post: function post() {
-        return this.action.apply(this, arguments);
+        return this.action.call(this, 'post', arguments[0], arguments[1]);
       },
 
       put: function put() {
-        return this.action.apply(this, arguments);
+        return this.action.call(this, 'put', arguments[0], arguments[1]);
       },
 
       patch: function patch() {
-        return this.action.apply(this, arguments);
+        return this.action.call(this, 'patch', arguments[0], arguments[1]);
       },
 
       'delete': function _delete() {
-        return this.action.apply(this, arguments);
+        return this.action.call(this, 'delete', arguments[0], arguments[1]);
       }
     };
   };
@@ -174,40 +176,6 @@ function applyResourcing(klass) {
 ;
 
 /** Resource class ************************************************************/
-
-var extendPromise = function extendPromise(parentPromise, parentResource, promises) {
-  promises = promises || [parentPromise];
-
-  return _lodash2['default'].extend(parentPromise, {
-    $resource: function $resource(name) {
-      var key = parentResource.key + '.' + name;
-
-      var childResource = parentResource.api.$resource(key, parentResource);
-
-      childResource._all = childResource.all;
-      childResource._find = childResource.find;
-
-      var result = _lodash2['default'].extend(childResource, {
-        all: function all() {
-          var promise = childResource._all();
-          return _Promise.all(promises.concat(promise));
-        },
-
-        find: function find(id) {
-          childResource.includeParams({ id: id });
-          var promise = childResource._find(id);
-          var finalPromiseChain = _Promise.all(promises.concat(promise));
-
-          promises.push(promise);
-
-          return extendPromise(finalPromiseChain, childResource, promises);
-        }
-      });
-
-      return result;
-    }
-  });
-};
 
 var parseHTTPLinks = function parseHTTPLinks(linksString) {
   var links = {};
@@ -272,41 +240,62 @@ var Resource = (function () {
       });
 
       _lodash2['default'].extend(this.route.params, parentParams);
+
+      this.route.queryParams = _lodash2['default'].clone(parentResource.route.queryParams);
     }
 
     this.parent = function () {
       return parentResource || def.parent && this.api.$resource(def.parent.key) || null;
     };
+
+    _lodash2['default'].each(def.actions, function (action) {
+      _this[action.name] = function () {
+        var options = arguments[0] === undefined ? {} : arguments[0];
+
+        return _this.request(_lodash2['default'].extend({ method: action.method, path: action.options.path || '/' + action.name }, options)).then(function (res) {
+          return _this.hydrateModel(res);
+        });
+      };
+    });
   }
 
   _createClass(Resource, [{
     key: 'request',
-    value: function request(method, path, options) {
-      return this.api.request(method, path, _lodash2['default'].extend({}, this.options, options));
+    value: function request() {
+      var _this2 = this;
+
+      var options = arguments[0] === undefined ? {} : arguments[0];
+
+      return this.api.request(options.method || 'get', this.buildRoute(options.path), { query: _lodash2['default'].extend({}, this.route.queryParams, options.query), data: options.data }).then(function (res) {
+        _this2.setResponse(res);
+        return res.body;
+      });
     }
   }, {
     key: 'buildRoute',
-    value: function buildRoute(applyParams) {
-      var path = this.route.segments.join('');
+    value: function buildRoute(appendPath) {
+      var route = this.route.segments.join('');
 
-      applyParams = applyParams || false;
+      _lodash2['default'].each(this.route.params, function (value, paramName) {
+        route = route.replace('/:' + paramName, value ? '/' + value : '');
+      });
 
-      if (applyParams == true) {
-        _lodash2['default'].each(this.route.params, function (value, paramName) {
-          path = path.replace('/:' + paramName, value ? '/' + value : '');
-        });
+      if (appendPath) {
+        route += appendPath;
       }
 
-      return path;
+      return route;
     }
   }, {
     key: 'includeParams',
     value: function includeParams(params) {
-      var _this2 = this;
+      var _this3 = this;
 
       _lodash2['default'].each(params, function (value, paramName) {
-        if (_this2.route.params.hasOwnProperty(paramName)) {
-          _this2.route.params[paramName] = value;
+        if (_this3.route.params.hasOwnProperty(paramName)) {
+          _this3.route.params[paramName] = value;
+        } else {
+          _this3.route.queryParams[paramName] = value;
         }
       });
 
@@ -337,9 +326,9 @@ var Resource = (function () {
     key: 'get',
     value: function get(params) {
       var resource = new Resource(this.api, this.key, this).query(params);
-      var path = resource.buildRoute(true);
+      var path = resource.buildRoute();
 
-      return resource.request('get', path).then(function (res) {
+      return this.api.request('get', path, { query: resource.route.queryParams }).then(function (res) {
         var model = resource.hydrateModel(res.body);
 
         return model;
@@ -352,31 +341,19 @@ var Resource = (function () {
         params = { id: params };
       }
 
-      // Create a new resource for this step of the chain with included parameters
       var resource = new Resource(this.api, this.key, this).includeParams(params);
-      var path = resource.buildRoute(true);
 
-      var promise = this.api.request('get', path).then(function (res) {
-        var model = resource.hydrateModel(res.body);
-
-        return model;
+      return resource.request().then(function (res) {
+        return resource.hydrateModel(res);
       });
-
-      return extendPromise(promise, resource);
     }
   }, {
     key: 'all',
     value: function all(params) {
-      // Create a new resource for this step of the chain with included parameters
       var resource = new Resource(this.api, this.key, this).includeParams(params);
-      var path = resource.buildRoute(true);
 
-      return this.api.request('get', path, { query: this.route.queryParams }).then(function (res) {
-        resource.setResponse(res);
-
-        var collection = resource.hydrateCollection(res.body);
-
-        return collection;
+      return resource.request().then(function (res) {
+        return resource.hydrateCollection(res);
       });
     }
   }, {
@@ -389,22 +366,21 @@ var Resource = (function () {
   }, {
     key: 'hydrateModel',
     value: function hydrateModel(data) {
-      // Create a new resource for the model based on the current resource and maintain the parent relationship
-      var resource = new Resource(this.api, this.key, this);
-      var model = new resource.model(data);
+      var _this4 = this;
 
-      _lodash2['default'].each(resource.route.params, function (value, paramName) {
-        if (data[paramName]) {
-          resource.route.params[paramName] = data[paramName];
-        }
-      });
+      var model = new this.model(data, { persisted: true });
+
+      // Set route params based on data from the model
+      if (data[this.route.paramName]) {
+        this.route.params[this.route.paramName] = data[this.route.paramName];
+      }
 
       // Set a reference to the resource on the model
       model.$resource = function (name) {
         if (_lodash2['default'].isEmpty(name)) {
-          return resource;
+          return _this4;
         } else {
-          return resource.api.$resource(name, resource);
+          return _this4.api.$resource(name, _this4);
         }
       };
 
@@ -413,29 +389,33 @@ var Resource = (function () {
   }, {
     key: 'hydrateCollection',
     value: function hydrateCollection(data) {
-      var _this3 = this;
+      var _this5 = this;
 
       var collection = _lodash2['default'].map(data, function (item) {
-        return _this3.hydrateModel(item);
+        // Models in a collection need a new resource created
+        var resource = new Resource(_this5.api, _this5.key, _this5);
+        var model = resource.hydrateModel(item);
+
+        return model;
       });
 
       _lodash2['default'].extend(collection, {
         $resource: function $resource() {
-          return _this3;
+          return _this5;
         },
 
         nextPage: function nextPage() {
           var options = arguments[0] === undefined ? {} : arguments[0];
 
-          if (_this3.links.next) {
-            return _this3.api.request('get', _this3.links.next).then(function (res) {
+          if (_this5.links.next) {
+            return _this5.api.request('get', _this5.links.next).then(function (res) {
               if (options.append || options.prepend) {
-                _this3.setResponse(res);
+                _this5.setResponse(res);
 
                 var method = options.append ? 'push' : 'unshift';
 
                 _lodash2['default'].each(res.body, function (item) {
-                  collection[method](_this3.hydrateModel(item));
+                  collection[method](_this5.hydrateModel(item));
                 });
 
                 return collection;
@@ -449,7 +429,7 @@ var Resource = (function () {
         },
 
         hasPage: function hasPage(name) {
-          return !!_this3.links[name];
+          return !!_this5.links[name];
         }
       });
 
