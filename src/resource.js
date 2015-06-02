@@ -306,22 +306,19 @@ export default class Resource {
   }
 
   hydrateModel(data) {
-    // Create a new resource for the model based on the current resource and maintain the parent relationship
-    var resource = new Resource(this.api, this.key, this);
-    var model = new resource.model(data);
+    var model = new this.model(data, { persisted: true });
 
-    _.each(resource.route.params, function(value, paramName) {
-      if (data[paramName]) {
-        resource.route.params[paramName] = data[paramName] ;
-      }
-    });
+    // Set route params based on data from the model
+    if (data[this.route.paramName]) {
+      this.route.params[this.route.paramName] = data[this.route.paramName];
+    }
 
     // Set a reference to the resource on the model
-    model.$resource = function(name) {
+    model.$resource = (name) => {
       if (_.isEmpty(name)) {
-        return resource;
+        return this;
       } else {
-        return resource.api.$resource(name, resource);
+        return this.api.$resource(name, this);
       }
     };
 
@@ -329,7 +326,13 @@ export default class Resource {
   }
 
   hydrateCollection(data) {
-    var collection = _.map(data, (item) => { return this.hydrateModel(item); });
+    var collection = _.map(data, (item) => {
+      // Models in a collection need a new resource created
+      var resource = new Resource(this.api, this.key, this);
+      var model = resource.hydrateModel(item);
+
+      return model;
+    });
 
     _.extend(collection, {
       $resource: () => {
