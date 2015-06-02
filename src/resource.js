@@ -204,28 +204,39 @@ export default class Resource {
       });
 
       _.extend(this.route.params, parentParams);
+
+      this.route.queryParams = _.clone(parentResource.route.queryParams);
     }
 
     this.parent = function() {
       return parentResource || (def.parent && this.api.$resource(def.parent.key)) || null;
     };
+
+    _.each(def.actions, (action) => {
+      this[action.name] = (options = {}) => {
+        return this.request(_.extend({ method: action.method, path: action.options.path || `/${action.name}`}, options)).then((res) => {
+          return this.hydrateModel(res);
+        });
+      }
+    });
   }
 
   request(options = {}) {
-    return this.api.request(options.method || 'get', this.buildRoute(options.path), _.extend({}, this.options, options)).then((res) => {
+    return this.api.request(options.method || 'get', this.buildRoute(options.path), { query: _.extend({}, this.route.queryParams, options.query), data: options.data }).then((res) => {
+      this.setResponse(res);
       return res.body;
     });
   }
 
-  buildRoute(path) {
+  buildRoute(appendPath) {
     var route = this.route.segments.join('');
 
     _.each(this.route.params, (value, paramName) => {
       route = route.replace('/:' + paramName, value ? '/' + value : '');
     });
 
-    if (path) {
-      route += path;
+    if (appendPath) {
+      route += appendPath;
     }
 
     return route;
@@ -235,6 +246,8 @@ export default class Resource {
     _.each(params, (value, paramName) => {
       if (this.route.params.hasOwnProperty(paramName)) {
         this.route.params[paramName] = value;
+      } else {
+        this.route.queryParams[paramName] = value;
       }
     });
 
@@ -275,28 +288,18 @@ export default class Resource {
       params = { id: params };
     }
 
-    // Create a new resource for this step of the chain with included parameters
     var resource = new Resource(this.api, this.key, this).includeParams(params);
-    var path = resource.buildRoute();
 
-    return this.api.request('get', path, { query: this.route.queryParams }).then(function(res) {
-      var model = resource.hydrateModel(res.body);
-
-      return model;
+    return resource.request().then((res) => {
+      return resource.hydrateModel(res);
     });
   }
 
   all(params) {
-    // Create a new resource for this step of the chain with included parameters
     var resource = new Resource(this.api, this.key, this).includeParams(params);
-    var path = resource.buildRoute();
 
-    return this.api.request('get', path, { query: this.route.queryParams }).then((res) => {
-      resource.setResponse(res);
-
-      var collection = resource.hydrateCollection(res.body);
-
-      return collection;
+    return resource.request().then((res) => {
+      return resource.hydrateCollection(res);
     });
   }
 

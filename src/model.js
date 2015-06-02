@@ -12,13 +12,13 @@ export default class Model {
   }
 
   $delete() {
-    return this.$resource().request('delete');
+    return this.$resource().request({ method: 'delete' });
   }
 
   $save() {
     var method = this.$newRecord ? 'post' : 'put';
 
-    return this.$resource().request({method: method, data: this }).then((res) => {
+    return this.$resource().request({ method: method, data: this }).then((res) => {
       delete this.$newRecord;
 
       return _.extend(this, res);

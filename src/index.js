@@ -141,9 +141,11 @@ Papi
 
   .resource('hubs').open()
     .post('upgrade')
-    .get('search', {on: 'collection'})
+    .get('search', { on: 'collection' })
 
     .resource('apps').open()
+      .get('current', { path: '/current' })
+
       .resource('styles')
     .close()
 
@@ -162,22 +164,21 @@ Papi
     .resource('tags')
 
     .resource('assets', { routeSegment: '/stream/:id' }).open()
-      .resource('likes')
-      .resource('comments')
-
       .put('feature')
       .put('unfeature')
-
       .put('hide')
       .put('unhide')
-
       .put('lock')
       .put('unlock')
+
+      .resource('likes')
+      .resource('comments')
     .close()
 
     .resource('drafts')
   .close()
 
   .resource('code_revisions').open()
-    .resource('hubs')
+    // This resource links to the root hubs resource
+    .resource('hubs', { linkTo: 'hubs' })
   .close()

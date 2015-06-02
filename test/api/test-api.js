@@ -30,6 +30,11 @@ nock(api.options.host)
   // all with query
   .get('/hubs?summaries=true&b=2').reply(200)
 
+
+  // updating
+  .get(`/hubs/${mock.hubs[0].id}`).reply(200, mock.hubs[0])
+  .put(`/hubs/${mock.hubs[0].id}`).reply(200, mock.hubs[0])
+
   /** App Resource Requests ***************************************************/
 
   // all
@@ -44,6 +49,13 @@ nock(api.options.host)
   // all from a result model
   .get(`/hubs/${mock.hubs[0].id}`).reply(200, mock.hubs[0])
   .get(`/hubs/${mock.hubs[0].id}/apps`).reply(200, mock.apps)
+
+  // multiple params for find
+  .get(`/hubs/${mock.hubs[0].id}/apps/${mock.apps[0].id}`).reply(200, mock.apps[0])
+
+  // current action
+  .get(`/hubs/${mock.hubs[0].id}/apps/current`).reply(200, mock.apps[0])
+
 
   /** Style Resource Requests *************************************************/
 
@@ -60,9 +72,10 @@ nock(api.options.host)
 
   /** Stream Assets Requests **************************************************/
   // all
-  .get(`/hubs/${mock.hubs[0].id}/stream`).reply(200)
+  .get(`/hubs/${mock.hubs[0].id}/stream`).reply(200, mock.assets)
 
-  .get(`/hubs/${mock.hubs[0].id}/stream?slug=some-slug`).reply(200, {})
+  .get(`/hubs/${mock.hubs[0].id}/stream?slug=some-slug`).times(2).reply(200, mock.assets[0])
+
 
 ;
 
@@ -115,6 +128,18 @@ describe('Hubs Resource', function () {
   it('all with query should send query params', function (done) {
     api.$resource('hubs').query({summaries: true, b: 2}).all().then((res) => {
       done();
+    }).catch((err) => {
+      done(err);
+    });
+  });
+
+  it('can update', function (done) {
+    api.$resource('hubs').find(mock.hubs[0].id).then((res) => {
+      res.$save().then(() => {
+        done();
+      }).catch((err) => {
+        done(err);
+      });
     }).catch((err) => {
       done(err);
     });
@@ -172,6 +197,24 @@ describe('Apps Resource', function() {
       });
     });
   });
+
+  it('should support multiple params for find', function(done) {
+    api.$resource('hubs.apps').find({ hubId: mock.hubs[0].id, id: mock.apps[0].id }).then(function(app) {
+      app.should.be.instanceOf(models.App);
+      done();
+    }).catch((err) => {
+      done(err);
+    });
+  });
+
+  it('should support accessing actions', function(done) {
+    api.$resource('hubs.apps', { hubId: mock.hubs[0].id }).current().then(function(app) {
+      app.should.be.instanceOf(models.App);
+      done();
+    }).catch((err) => {
+      done(err);
+    });
+  });
 });
 
 describe('Styles Resource', function() {
@@ -222,8 +265,18 @@ describe('Stream Assets Resource', function() {
     });
   });
 
-  it('should get asset by slug', function(done) {
-    api.$resource('hubs.assets', {hubId: mock.hubs[0].id}).get({slug: "some-slug"}).then((res) => {
+  it('should find asset by slug', function(done) {
+    api.$resource('hubs.assets', { hubId: mock.hubs[0].id }).find({slug: "some-slug"}).then((res) => {
+      res.should.be.instanceOf(models.Asset);
+
+      done();
+    }).catch((err) => {
+      done(err);
+    });
+  });
+
+  it('should find asset by slug with query set', function(done) {
+    api.$resource('hubs.assets', { hubId: mock.hubs[0].id }).query({slug: "some-slug"}).find().then((res) => {
       res.should.be.instanceOf(models.Asset);
 
       done();
