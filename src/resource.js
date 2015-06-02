@@ -212,22 +212,24 @@ export default class Resource {
     };
   }
 
-  request(method, path, options) {
-    return this.api.request(method, path, _.extend({}, this.options, options));
+  request(options = {}) {
+    return this.api.request(options.method || 'get', this.buildRoute(options.path), _.extend({}, this.options, options)).then((res) => {
+      return res.body;
+    });
   }
 
-  buildRoute(applyParams) {
-    var path = this.route.segments.join('');
+  buildRoute(path) {
+    var route = this.route.segments.join('');
 
-    applyParams = (applyParams || false);
+    _.each(this.route.params, (value, paramName) => {
+      route = route.replace('/:' + paramName, value ? '/' + value : '');
+    });
 
-    if (applyParams == true) {
-      _.each(this.route.params, (value, paramName) => {
-        path = path.replace('/:' + paramName, value ? '/' + value : '');
-      });
+    if (path) {
+      route += path;
     }
 
-    return path;
+    return route;
   }
 
   includeParams(params) {
@@ -260,7 +262,7 @@ export default class Resource {
 
   get(params) {
     var resource = new Resource(this.api, this.key, this).query(params);
-    var path = resource.buildRoute(true);
+    var path = resource.buildRoute();
 
     return this.api.request('get', path, { query: resource.route.queryParams }).then((res) => {
       var model = resource.hydrateModel(res.body);
@@ -276,9 +278,9 @@ export default class Resource {
 
     // Create a new resource for this step of the chain with included parameters
     var resource = new Resource(this.api, this.key, this).includeParams(params);
-    var path = resource.buildRoute(true);
+    var path = resource.buildRoute();
 
-    return this.api.request('get', path).then(function(res) {
+    return this.api.request('get', path, { query: this.route.queryParams }).then(function(res) {
       var model = resource.hydrateModel(res.body);
 
       return model;
@@ -288,7 +290,7 @@ export default class Resource {
   all(params) {
     // Create a new resource for this step of the chain with included parameters
     var resource = new Resource(this.api, this.key, this).includeParams(params);
-    var path = resource.buildRoute(true);
+    var path = resource.buildRoute();
 
     return this.api.request('get', path, { query: this.route.queryParams }).then((res) => {
       resource.setResponse(res);
