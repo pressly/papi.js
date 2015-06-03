@@ -240,8 +240,6 @@ api.$resource('hubs').find(123).then(function(hub) {
 
 Below outlines the schema of all the RESTful resources, their routes, associated model, and child resources.
 
-####accounts
-
 model: `Account`
 
 GET /accounts
@@ -256,8 +254,8 @@ DELETE /accounts/:id
 
 **Associated Resources**
 
-- [users](#accounts.users)
-- [hubs](#accounts.hubs)
+- [users](#accountsusers)
+- [hubs](#accountshubs)
 
 
 
@@ -315,15 +313,15 @@ GET /hubs/:id/search
 
 **Associated Resources**
 
-- [apps](#hubs.apps)
-- [feeds](#hubs.feeds)
-- [invites](#hubs.invites)
-- [recommendations](#hubs.recommendations)
-- [users](#hubs.users)
-- [collections](#hubs.collections)
-- [tags](#hubs.tags)
-- [assets](#hubs.assets)
-- [drafts](#hubs.drafts)
+- [apps](#hubsapps)
+- [feeds](#hubsfeeds)
+- [invites](#hubsinvites)
+- [recommendations](#hubsrecommendations)
+- [users](#hubsusers)
+- [collections](#hubscollections)
+- [tags](#hubstags)
+- [assets](#hubsassets)
+- [drafts](#hubsdrafts)
 
 
 
@@ -345,7 +343,7 @@ GET /hubs/:hubId/apps/:id/current
 
 **Associated Resources**
 
-- [styles](#hubs.apps.styles)
+- [styles](#hubsappsstyles)
 
 
 
@@ -382,7 +380,7 @@ DELETE /hubs/:hubId/feeds/:id
 
 **Associated Resources**
 
-- [assets](#hubs.feeds.assets)
+- [assets](#hubsfeedsassets)
 
 
 
@@ -516,8 +514,8 @@ PUT /hubs/:hubId/stream/:id/unlock
 
 **Associated Resources**
 
-- [likes](#hubs.assets.likes)
-- [comments](#hubs.assets.comments)
+- [likes](#hubsassetslikes)
+- [comments](#hubsassetscomments)
 
 
 
@@ -588,7 +586,7 @@ DELETE /code_revisions/:id
 
 **Associated Resources**
 
-- [hubs](#code_revisions.hubs)
+- [hubs](#code_revisionshubs)
 
 
 
@@ -605,4 +603,5 @@ GET /code_revisions/:code_revisionId/hubs/:id
 PUT /code_revisions/:code_revisionId/hubs/:id
 
 DELETE /code_revisions/:code_revisionId/hubs/:id
+
 

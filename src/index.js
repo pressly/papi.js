@@ -158,8 +158,6 @@ export default class Papi {
 applyResourcing(Papi);
 
 Papi
-  .resource('auth')
-
   .resource('accounts').open()
     .resource('users')
     .resource('hubs')
@@ -208,3 +206,38 @@ Papi
     // This resource links to the root hubs resource
     .resource('hubs', { linkTo: 'hubs' })
   .close()
+
+
+Papi.generateMarkdown = () => {
+  let markdown = "";
+
+  _.each(Papi.resourceDefinitions, (def) => {
+    markdown += `####${def.key}\n\n`;
+    markdown += `model: \`${def.model.name}\`\n\n`;
+
+    let pathRoot = def.route.path.replace(/\/:.+$/, '');
+
+    markdown += `GET ${pathRoot}\n\n`;
+    markdown += `POST ${pathRoot}\n\n`;
+    markdown += `GET ${def.route.path}\n\n`;
+    markdown += `PUT ${def.route.path}\n\n`;
+    markdown += `DELETE ${def.route.path}\n\n`;
+
+    _.each(def.actions, (action) => {
+      markdown += `${action.method.toUpperCase()} ${def.route.path}/${action.name}\n\n`
+    });
+
+    if (!_.isEmpty(def.children)) {
+      markdown += '**Associated Resources**\n\n';
+      _.each(def.children, (child) => {
+        markdown += `- [${child.name}](#${child.key.replace(/\./g, '')})\n`;
+      });
+    }
+
+    markdown += "\n\n\n";
+  });
+
+  console.log(Papi.resourceDefinitions);
+
+  console.log(markdown);
+};
