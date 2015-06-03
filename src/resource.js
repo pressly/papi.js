@@ -169,7 +169,7 @@ var parseHTTPLinks = function(linksString) {
 };
 
 export default class Resource {
-  constructor(api, key, parentResource) {
+  constructor(api, key, parentResource, inherit = false) {
     var def = api.constructor.resourceDefinitions[key];
 
     if (typeof def == 'undefined') {
@@ -205,7 +205,9 @@ export default class Resource {
 
       _.extend(this.route.params, parentParams);
 
-      this.route.queryParams = _.clone(parentResource.route.queryParams);
+      if (inherit) {
+        this.route.queryParams = _.clone(parentResource.route.queryParams);
+      }
     }
 
     this.parent = function() {
@@ -222,7 +224,7 @@ export default class Resource {
   }
 
   request(options = {}) {
-    return this.api.request(options.method || 'get', this.buildRoute(options.path), { query: _.extend({}, this.route.queryParams, options.query), data: options.data }).then((res) => {
+    return this.api.request(options.method || 'get', this.buildRoute(options.path), _.extend({}, this.options, { query: _.extend({}, this.route.queryParams, options.query), data: options.data })).then((res) => {
       this.setResponse(res);
       return res.body;
     });
@@ -247,6 +249,7 @@ export default class Resource {
       if (this.route.params.hasOwnProperty(paramName)) {
         this.route.params[paramName] = value;
       } else {
+        // Break out query params from route params
         this.route.queryParams[paramName] = value;
       }
     });
@@ -273,7 +276,7 @@ export default class Resource {
   }
 
   get(params) {
-    var resource = new Resource(this.api, this.key, this).query(params);
+    var resource = new Resource(this.api, this.key, this, true).query(params);
     var path = resource.buildRoute();
 
     return this.api.request('get', path, { query: resource.route.queryParams }).then((res) => {
@@ -288,7 +291,7 @@ export default class Resource {
       params = { id: params };
     }
 
-    var resource = new Resource(this.api, this.key, this).includeParams(params);
+    var resource = new Resource(this.api, this.key, this, true).includeParams(params);
 
     return resource.request().then((res) => {
       return resource.hydrateModel(res);
@@ -296,7 +299,7 @@ export default class Resource {
   }
 
   all(params) {
-    var resource = new Resource(this.api, this.key, this).includeParams(params);
+    var resource = new Resource(this.api, this.key, this, true).includeParams(params);
 
     return resource.request().then((res) => {
       return resource.hydrateCollection(res);
@@ -313,6 +316,7 @@ export default class Resource {
     var model = new this.model(data, { persisted: true });
 
     // Set route params based on data from the model
+    // This is important step to take if the model queried from an all, queryParams, or action
     if (data[this.route.paramName]) {
       this.route.params[this.route.paramName] = data[this.route.paramName];
     }
@@ -333,6 +337,7 @@ export default class Resource {
     var collection = _.map(data, (item) => {
       // Models in a collection need a new resource created
       var resource = new Resource(this.api, this.key, this);
+
       var model = resource.hydrateModel(item);
 
       return model;

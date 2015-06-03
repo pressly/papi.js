@@ -74,9 +74,9 @@ nock(api.options.host)
   // all
   .get(`/hubs/${mock.hubs[0].id}/stream`).reply(200, mock.assets)
 
-  .get(`/hubs/${mock.hubs[0].id}/stream?slug=some-slug`).times(2).reply(200, mock.assets[0])
+  .get(`/hubs/${mock.hubs[0].id}/stream?slug=some-slug`).times(3).reply(200, mock.assets[0])
 
-
+  .get(`/hubs/${mock.hubs[0].id}/stream/${mock.assets[0].id}/comments`).reply(200, mock.comments)
 ;
 
 describe('Hubs Resource', function () {
@@ -280,6 +280,21 @@ describe('Stream Assets Resource', function() {
       res.should.be.instanceOf(models.Asset);
 
       done();
+    }).catch((err) => {
+      done(err);
+    });
+  });
+
+  it('should find asset by slug with query set and then find associated data with no query set', function(done) {
+    api.$resource('hubs.assets', { hubId: mock.hubs[0].id }).query({slug: "some-slug"}).find().then((res) => {
+      res.should.be.instanceOf(models.Asset);
+      res.$resource('comments').all().then((res) => {
+        res[0].should.be.instanceOf(models.Comment);
+
+        done();
+      }).catch((err) => {
+        done(err);
+      });
     }).catch((err) => {
       done(err);
     });
