@@ -255,3 +255,104 @@ api.$resource('hubs').find(123).then(function(hub) {
   });
 });
 ```
+
+## REST API Map
+
+####accounts
+model: `Account`
+
+
+####accounts.users
+model: `User`
+
+
+####accounts.hubs
+model: `Hub`
+
+
+####hubs
+model: `Hub`
+
+#####Actions
+
+POST **upgrade**
+
+GET **search**
+
+
+####hubs.apps
+model: `App`
+
+#####Actions
+
+GET **current**
+
+
+####hubs.apps.styles
+model: `Style`
+
+
+####hubs.feeds
+model: `Feed`
+
+
+####hubs.feeds.assets
+model: `Asset`
+
+
+####hubs.invites
+model: `Invite`
+
+
+####hubs.recommendations
+model: `Recommendation`
+
+
+####hubs.users
+model: `User`
+
+
+####hubs.collections
+model: `Collection`
+
+
+####hubs.tags
+model: `Tag`
+
+
+####hubs.assets
+model: `Asset`
+
+#####Actions
+
+PUT **feature**
+
+PUT **unfeature**
+
+PUT **hide**
+
+PUT **unhide**
+
+PUT **lock**
+
+PUT **unlock**
+
+
+####hubs.assets.likes
+model: `Model`
+
+
+####hubs.assets.comments
+model: `Comment`
+
+
+####hubs.drafts
+model: `Draft`
+
+
+####code_revisions
+model: `CodeRevision`
+
+
+####code_revisions.hubs
+model: `Hub`
