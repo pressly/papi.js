@@ -38,26 +38,6 @@ This will expose the `Papi` class globally.
 1. Login to https://beta.pressly.com
 2. Visit https://beta-api.pressly.com/auth/session and copy the `jwt` string
 
-## API Schema
-
-* accounts
-    * users
-    * hubs
-* hubs
-    * assets
-    * apps
-        * styles
-    * collections
-    * tags
-    * users
-    * invites
-    * recommendations
-    * feeds
-      * assets
-    * drafts
-* code_revisions
-  * hubs
-
 ## Connection
 
 ##### Papi::constructor(`options`)
@@ -256,103 +236,373 @@ api.$resource('hubs').find(123).then(function(hub) {
 });
 ```
 
-## REST API Map
+## API Schema
+
+Below outlines the schema of all the RESTful resources, their routes, associated model, and child resources.
 
 ####accounts
+
 model: `Account`
+
+GET /accounts
+
+POST /accounts
+
+GET /accounts/:id
+
+PUT /accounts/:id
+
+DELETE /accounts/:id
+
+**Associated Resources**
+
+- [users](#accounts.users)
+- [hubs](#accounts.hubs)
+
 
 
 ####accounts.users
+
 model: `User`
+
+GET /accounts
+
+POST /accounts
+
+GET /accounts/:accountId/users/:id
+
+PUT /accounts/:accountId/users/:id
+
+DELETE /accounts/:accountId/users/:id
+
+
 
 
 ####accounts.hubs
+
 model: `Hub`
+
+GET /accounts
+
+POST /accounts
+
+GET /accounts/:accountId/hubs/:id
+
+PUT /accounts/:accountId/hubs/:id
+
+DELETE /accounts/:accountId/hubs/:id
+
+
 
 
 ####hubs
+
 model: `Hub`
 
-#####Actions
+GET /hubs
 
-POST **upgrade**
+POST /hubs
 
-GET **search**
+GET /hubs/:id
+
+PUT /hubs/:id
+
+DELETE /hubs/:id
+
+POST /hubs/:id/upgrade
+
+GET /hubs/:id/search
+
+**Associated Resources**
+
+- [apps](#hubs.apps)
+- [feeds](#hubs.feeds)
+- [invites](#hubs.invites)
+- [recommendations](#hubs.recommendations)
+- [users](#hubs.users)
+- [collections](#hubs.collections)
+- [tags](#hubs.tags)
+- [assets](#hubs.assets)
+- [drafts](#hubs.drafts)
+
 
 
 ####hubs.apps
+
 model: `App`
 
-#####Actions
+GET /hubs
 
-GET **current**
+POST /hubs
+
+GET /hubs/:hubId/apps/:id
+
+PUT /hubs/:hubId/apps/:id
+
+DELETE /hubs/:hubId/apps/:id
+
+GET /hubs/:hubId/apps/:id/current
+
+**Associated Resources**
+
+- [styles](#hubs.apps.styles)
+
 
 
 ####hubs.apps.styles
+
 model: `Style`
+
+GET /hubs
+
+POST /hubs
+
+GET /hubs/:hubId/apps/:appId/styles/:id
+
+PUT /hubs/:hubId/apps/:appId/styles/:id
+
+DELETE /hubs/:hubId/apps/:appId/styles/:id
+
+
 
 
 ####hubs.feeds
+
 model: `Feed`
+
+GET /hubs
+
+POST /hubs
+
+GET /hubs/:hubId/feeds/:id
+
+PUT /hubs/:hubId/feeds/:id
+
+DELETE /hubs/:hubId/feeds/:id
+
+**Associated Resources**
+
+- [assets](#hubs.feeds.assets)
+
 
 
 ####hubs.feeds.assets
+
 model: `Asset`
+
+GET /hubs
+
+POST /hubs
+
+GET /hubs/:hubId/feeds/:feedId/assets/:id
+
+PUT /hubs/:hubId/feeds/:feedId/assets/:id
+
+DELETE /hubs/:hubId/feeds/:feedId/assets/:id
+
+
 
 
 ####hubs.invites
+
 model: `Invite`
+
+GET /hubs
+
+POST /hubs
+
+GET /hubs/:hubId/invites/:id
+
+PUT /hubs/:hubId/invites/:id
+
+DELETE /hubs/:hubId/invites/:id
+
+
 
 
 ####hubs.recommendations
+
 model: `Recommendation`
+
+GET /hubs
+
+POST /hubs
+
+GET /hubs/:hubId/recommendations/:id
+
+PUT /hubs/:hubId/recommendations/:id
+
+DELETE /hubs/:hubId/recommendations/:id
+
+
 
 
 ####hubs.users
+
 model: `User`
+
+GET /hubs
+
+POST /hubs
+
+GET /hubs/:hubId/users/:id
+
+PUT /hubs/:hubId/users/:id
+
+DELETE /hubs/:hubId/users/:id
+
+
 
 
 ####hubs.collections
+
 model: `Collection`
+
+GET /hubs
+
+POST /hubs
+
+GET /hubs/:hubId/collections/:id
+
+PUT /hubs/:hubId/collections/:id
+
+DELETE /hubs/:hubId/collections/:id
+
+
 
 
 ####hubs.tags
+
 model: `Tag`
+
+GET /hubs
+
+POST /hubs
+
+GET /hubs/:hubId/tags/:id
+
+PUT /hubs/:hubId/tags/:id
+
+DELETE /hubs/:hubId/tags/:id
+
+
 
 
 ####hubs.assets
+
 model: `Asset`
 
-#####Actions
+GET /hubs
 
-PUT **feature**
+POST /hubs
 
-PUT **unfeature**
+GET /hubs/:hubId/stream/:id
 
-PUT **hide**
+PUT /hubs/:hubId/stream/:id
 
-PUT **unhide**
+DELETE /hubs/:hubId/stream/:id
 
-PUT **lock**
+PUT /hubs/:hubId/stream/:id/feature
 
-PUT **unlock**
+PUT /hubs/:hubId/stream/:id/unfeature
+
+PUT /hubs/:hubId/stream/:id/hide
+
+PUT /hubs/:hubId/stream/:id/unhide
+
+PUT /hubs/:hubId/stream/:id/lock
+
+PUT /hubs/:hubId/stream/:id/unlock
+
+**Associated Resources**
+
+- [likes](#hubs.assets.likes)
+- [comments](#hubs.assets.comments)
+
 
 
 ####hubs.assets.likes
+
 model: `Model`
+
+GET /hubs
+
+POST /hubs
+
+GET /hubs/:hubId/stream/:assetId/likes/:id
+
+PUT /hubs/:hubId/stream/:assetId/likes/:id
+
+DELETE /hubs/:hubId/stream/:assetId/likes/:id
+
+
 
 
 ####hubs.assets.comments
+
 model: `Comment`
+
+GET /hubs
+
+POST /hubs
+
+GET /hubs/:hubId/stream/:assetId/comments/:id
+
+PUT /hubs/:hubId/stream/:assetId/comments/:id
+
+DELETE /hubs/:hubId/stream/:assetId/comments/:id
+
+
 
 
 ####hubs.drafts
+
 model: `Draft`
+
+GET /hubs
+
+POST /hubs
+
+GET /hubs/:hubId/drafts/:id
+
+PUT /hubs/:hubId/drafts/:id
+
+DELETE /hubs/:hubId/drafts/:id
+
+
 
 
 ####code_revisions
+
 model: `CodeRevision`
+
+GET /code_revisions
+
+POST /code_revisions
+
+GET /code_revisions/:id
+
+PUT /code_revisions/:id
+
+DELETE /code_revisions/:id
+
+**Associated Resources**
+
+- [hubs](#code_revisions.hubs)
+
 
 
 ####code_revisions.hubs
+
 model: `Hub`
+
+GET /code_revisions
+
+POST /code_revisions
+
+GET /code_revisions/:code_revisionId/hubs/:id
+
+PUT /code_revisions/:code_revisionId/hubs/:id
+
+DELETE /code_revisions/:code_revisionId/hubs/:id
+
