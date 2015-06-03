@@ -239,20 +239,19 @@ api.$resource('hubs').find(123).then(function(hub) {
 ## API Schema
 
 Below outlines the schema of all the RESTful resources, their routes, associated model, and child resources.
-###Account `accounts`
 
-####REST Endpoints
 
-GET /accounts
+###Account
 
-POST /accounts
+**`accounts`**
 
-GET /accounts/:id
+#####REST Endpoints
 
-PUT /accounts/:id
-
-DELETE /accounts/:id
-
+- `GET` /accounts
+- `POST` /accounts
+- `GET` /accounts/:id
+- `PUT` /accounts/:id
+- `DELETE` /accounts/:id
 #####Children
 
 - [User](#user)
@@ -260,59 +259,50 @@ DELETE /accounts/:id
 
 
 
-###User `accounts.users`
+###User
 
-####REST Endpoints
+**`accounts.users`**
 
-GET /accounts
+#####REST Endpoints
 
-POST /accounts
-
-GET /accounts/:accountId/users/:id
-
-PUT /accounts/:accountId/users/:id
-
-DELETE /accounts/:accountId/users/:id
+- `GET` /accounts
+- `POST` /accounts
+- `GET` /accounts/:accountId/users/:id
+- `PUT` /accounts/:accountId/users/:id
+- `DELETE` /accounts/:accountId/users/:id
 
 
 
+###Hub
 
-###Hub `accounts.hubs`
+**`accounts.hubs`**
 
-####REST Endpoints
+#####REST Endpoints
 
-GET /accounts
-
-POST /accounts
-
-GET /accounts/:accountId/hubs/:id
-
-PUT /accounts/:accountId/hubs/:id
-
-DELETE /accounts/:accountId/hubs/:id
+- `GET` /accounts
+- `POST` /accounts
+- `GET` /accounts/:accountId/hubs/:id
+- `PUT` /accounts/:accountId/hubs/:id
+- `DELETE` /accounts/:accountId/hubs/:id
 
 
 
+###Hub
 
-###Hub `hubs`
+**`hubs`**
 
-####REST Endpoints
+#####REST Endpoints
 
-GET /hubs
+- `GET` /hubs
+- `POST` /hubs
+- `GET` /hubs/:id
+- `PUT` /hubs/:id
+- `DELETE` /hubs/:id
+*Additional Actions*
 
-POST /hubs
+- `POST` /hubs/:id/upgrade
 
-GET /hubs/:id
-
-PUT /hubs/:id
-
-DELETE /hubs/:id
-
-**Additional Actions**
-
-POST /hubs/:id/upgrade
-
-GET /hubs/:id/search
+- `GET` /hubs/:id/search
 
 #####Children
 
@@ -328,23 +318,20 @@ GET /hubs/:id/search
 
 
 
-###App `hubs.apps`
+###App
 
-####REST Endpoints
+**`hubs.apps`**
 
-GET /hubs
+#####REST Endpoints
 
-POST /hubs
+- `GET` /hubs
+- `POST` /hubs
+- `GET` /hubs/:hubId/apps/:id
+- `PUT` /hubs/:hubId/apps/:id
+- `DELETE` /hubs/:hubId/apps/:id
+*Additional Actions*
 
-GET /hubs/:hubId/apps/:id
-
-PUT /hubs/:hubId/apps/:id
-
-DELETE /hubs/:hubId/apps/:id
-
-**Additional Actions**
-
-GET /hubs/:hubId/apps/:id/current
+- `GET` /hubs/:hubId/apps/:id/current
 
 #####Children
 
@@ -352,172 +339,145 @@ GET /hubs/:hubId/apps/:id/current
 
 
 
-###Style `hubs.apps.styles`
+###Style
 
-####REST Endpoints
+**`hubs.apps.styles`**
 
-GET /hubs
+#####REST Endpoints
 
-POST /hubs
-
-GET /hubs/:hubId/apps/:appId/styles/:id
-
-PUT /hubs/:hubId/apps/:appId/styles/:id
-
-DELETE /hubs/:hubId/apps/:appId/styles/:id
+- `GET` /hubs
+- `POST` /hubs
+- `GET` /hubs/:hubId/apps/:appId/styles/:id
+- `PUT` /hubs/:hubId/apps/:appId/styles/:id
+- `DELETE` /hubs/:hubId/apps/:appId/styles/:id
 
 
 
+###Feed
 
-###Feed `hubs.feeds`
+**`hubs.feeds`**
 
-####REST Endpoints
+#####REST Endpoints
 
-GET /hubs
-
-POST /hubs
-
-GET /hubs/:hubId/feeds/:id
-
-PUT /hubs/:hubId/feeds/:id
-
-DELETE /hubs/:hubId/feeds/:id
-
+- `GET` /hubs
+- `POST` /hubs
+- `GET` /hubs/:hubId/feeds/:id
+- `PUT` /hubs/:hubId/feeds/:id
+- `DELETE` /hubs/:hubId/feeds/:id
 #####Children
 
 - [Asset](#asset)
 
 
 
-###Asset `hubs.feeds.assets`
+###Asset
 
-####REST Endpoints
+**`hubs.feeds.assets`**
 
-GET /hubs
+#####REST Endpoints
 
-POST /hubs
+- `GET` /hubs
+- `POST` /hubs
+- `GET` /hubs/:hubId/feeds/:feedId/assets/:id
+- `PUT` /hubs/:hubId/feeds/:feedId/assets/:id
+- `DELETE` /hubs/:hubId/feeds/:feedId/assets/:id
 
-GET /hubs/:hubId/feeds/:feedId/assets/:id
 
-PUT /hubs/:hubId/feeds/:feedId/assets/:id
 
-DELETE /hubs/:hubId/feeds/:feedId/assets/:id
+###Invite
 
+**`hubs.invites`**
 
+#####REST Endpoints
 
+- `GET` /hubs
+- `POST` /hubs
+- `GET` /hubs/:hubId/invites/:id
+- `PUT` /hubs/:hubId/invites/:id
+- `DELETE` /hubs/:hubId/invites/:id
 
-###Invite `hubs.invites`
 
-####REST Endpoints
 
-GET /hubs
+###Recommendation
 
-POST /hubs
+**`hubs.recommendations`**
 
-GET /hubs/:hubId/invites/:id
+#####REST Endpoints
 
-PUT /hubs/:hubId/invites/:id
+- `GET` /hubs
+- `POST` /hubs
+- `GET` /hubs/:hubId/recommendations/:id
+- `PUT` /hubs/:hubId/recommendations/:id
+- `DELETE` /hubs/:hubId/recommendations/:id
 
-DELETE /hubs/:hubId/invites/:id
 
 
+###User
 
+**`hubs.users`**
 
-###Recommendation `hubs.recommendations`
+#####REST Endpoints
 
-####REST Endpoints
+- `GET` /hubs
+- `POST` /hubs
+- `GET` /hubs/:hubId/users/:id
+- `PUT` /hubs/:hubId/users/:id
+- `DELETE` /hubs/:hubId/users/:id
 
-GET /hubs
 
-POST /hubs
 
-GET /hubs/:hubId/recommendations/:id
+###Collection
 
-PUT /hubs/:hubId/recommendations/:id
+**`hubs.collections`**
 
-DELETE /hubs/:hubId/recommendations/:id
+#####REST Endpoints
 
+- `GET` /hubs
+- `POST` /hubs
+- `GET` /hubs/:hubId/collections/:id
+- `PUT` /hubs/:hubId/collections/:id
+- `DELETE` /hubs/:hubId/collections/:id
 
 
 
-###User `hubs.users`
+###Tag
 
-####REST Endpoints
+**`hubs.tags`**
 
-GET /hubs
+#####REST Endpoints
 
-POST /hubs
+- `GET` /hubs
+- `POST` /hubs
+- `GET` /hubs/:hubId/tags/:id
+- `PUT` /hubs/:hubId/tags/:id
+- `DELETE` /hubs/:hubId/tags/:id
 
-GET /hubs/:hubId/users/:id
 
-PUT /hubs/:hubId/users/:id
 
-DELETE /hubs/:hubId/users/:id
+###Asset
 
+**`hubs.assets`**
 
+#####REST Endpoints
 
+- `GET` /hubs
+- `POST` /hubs
+- `GET` /hubs/:hubId/stream/:id
+- `PUT` /hubs/:hubId/stream/:id
+- `DELETE` /hubs/:hubId/stream/:id
+*Additional Actions*
 
-###Collection `hubs.collections`
+- `PUT` /hubs/:hubId/stream/:id/feature
 
-####REST Endpoints
+- `PUT` /hubs/:hubId/stream/:id/unfeature
 
-GET /hubs
+- `PUT` /hubs/:hubId/stream/:id/hide
 
-POST /hubs
+- `PUT` /hubs/:hubId/stream/:id/unhide
 
-GET /hubs/:hubId/collections/:id
+- `PUT` /hubs/:hubId/stream/:id/lock
 
-PUT /hubs/:hubId/collections/:id
-
-DELETE /hubs/:hubId/collections/:id
-
-
-
-
-###Tag `hubs.tags`
-
-####REST Endpoints
-
-GET /hubs
-
-POST /hubs
-
-GET /hubs/:hubId/tags/:id
-
-PUT /hubs/:hubId/tags/:id
-
-DELETE /hubs/:hubId/tags/:id
-
-
-
-
-###Asset `hubs.assets`
-
-####REST Endpoints
-
-GET /hubs
-
-POST /hubs
-
-GET /hubs/:hubId/stream/:id
-
-PUT /hubs/:hubId/stream/:id
-
-DELETE /hubs/:hubId/stream/:id
-
-**Additional Actions**
-
-PUT /hubs/:hubId/stream/:id/feature
-
-PUT /hubs/:hubId/stream/:id/unfeature
-
-PUT /hubs/:hubId/stream/:id/hide
-
-PUT /hubs/:hubId/stream/:id/unhide
-
-PUT /hubs/:hubId/stream/:id/lock
-
-PUT /hubs/:hubId/stream/:id/unlock
+- `PUT` /hubs/:hubId/stream/:id/unlock
 
 #####Children
 
@@ -526,87 +486,73 @@ PUT /hubs/:hubId/stream/:id/unlock
 
 
 
-###Model `hubs.assets.likes`
+###Model
 
-####REST Endpoints
+**`hubs.assets.likes`**
 
-GET /hubs
+#####REST Endpoints
 
-POST /hubs
-
-GET /hubs/:hubId/stream/:assetId/likes/:id
-
-PUT /hubs/:hubId/stream/:assetId/likes/:id
-
-DELETE /hubs/:hubId/stream/:assetId/likes/:id
+- `GET` /hubs
+- `POST` /hubs
+- `GET` /hubs/:hubId/stream/:assetId/likes/:id
+- `PUT` /hubs/:hubId/stream/:assetId/likes/:id
+- `DELETE` /hubs/:hubId/stream/:assetId/likes/:id
 
 
 
+###Comment
 
-###Comment `hubs.assets.comments`
+**`hubs.assets.comments`**
 
-####REST Endpoints
+#####REST Endpoints
 
-GET /hubs
-
-POST /hubs
-
-GET /hubs/:hubId/stream/:assetId/comments/:id
-
-PUT /hubs/:hubId/stream/:assetId/comments/:id
-
-DELETE /hubs/:hubId/stream/:assetId/comments/:id
+- `GET` /hubs
+- `POST` /hubs
+- `GET` /hubs/:hubId/stream/:assetId/comments/:id
+- `PUT` /hubs/:hubId/stream/:assetId/comments/:id
+- `DELETE` /hubs/:hubId/stream/:assetId/comments/:id
 
 
 
+###Draft
 
-###Draft `hubs.drafts`
+**`hubs.drafts`**
 
-####REST Endpoints
+#####REST Endpoints
 
-GET /hubs
-
-POST /hubs
-
-GET /hubs/:hubId/drafts/:id
-
-PUT /hubs/:hubId/drafts/:id
-
-DELETE /hubs/:hubId/drafts/:id
+- `GET` /hubs
+- `POST` /hubs
+- `GET` /hubs/:hubId/drafts/:id
+- `PUT` /hubs/:hubId/drafts/:id
+- `DELETE` /hubs/:hubId/drafts/:id
 
 
 
+###CodeRevision
 
-###CodeRevision `code_revisions`
+**`code_revisions`**
 
-####REST Endpoints
+#####REST Endpoints
 
-GET /code_revisions
-
-POST /code_revisions
-
-GET /code_revisions/:id
-
-PUT /code_revisions/:id
-
-DELETE /code_revisions/:id
-
+- `GET` /code_revisions
+- `POST` /code_revisions
+- `GET` /code_revisions/:id
+- `PUT` /code_revisions/:id
+- `DELETE` /code_revisions/:id
 #####Children
 
 - [Hub](#hub)
 
 
 
-###Hub `code_revisions.hubs`
+###Hub
 
-####REST Endpoints
+**`code_revisions.hubs`**
 
-GET /code_revisions
+#####REST Endpoints
 
-POST /code_revisions
-
-GET /code_revisions/:code_revisionId/hubs/:id
-
-PUT /code_revisions/:code_revisionId/hubs/:id
-
-DELETE /code_revisions/:code_revisionId/hubs/:id
+- `GET` /code_revisions
+- `POST` /code_revisions
+- `GET` /code_revisions/:code_revisionId/hubs/:id
+- `PUT` /code_revisions/:code_revisionId/hubs/:id
+- `DELETE` /code_revisions/:code_revisionId/hubs/:id
