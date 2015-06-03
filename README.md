@@ -240,7 +240,11 @@ api.$resource('hubs').find(123).then(function(hub) {
 
 Below outlines the schema of all the RESTful resources, their routes, associated model, and child resources.
 
-model: `Account`
+###Account
+
+**Resource Key:** `accounts`
+
+#####REST Endpoints
 
 GET /accounts
 
@@ -252,16 +256,18 @@ PUT /accounts/:id
 
 DELETE /accounts/:id
 
-**Associated Resources**
+#####Children
 
-- [users](#accountsusers)
-- [hubs](#accountshubs)
+- [User](#User)
+- [Hub](#Hub)
 
 
 
-####accounts.users
+###User
 
-model: `User`
+**Resource Key:** `accounts.users`
+
+#####REST Endpoints
 
 GET /accounts
 
@@ -276,9 +282,11 @@ DELETE /accounts/:accountId/users/:id
 
 
 
-####accounts.hubs
+###Hub
 
-model: `Hub`
+**Resource Key:** `accounts.hubs`
+
+#####REST Endpoints
 
 GET /accounts
 
@@ -293,9 +301,11 @@ DELETE /accounts/:accountId/hubs/:id
 
 
 
-####hubs
+###Hub
 
-model: `Hub`
+**Resource Key:** `hubs`
+
+#####REST Endpoints
 
 GET /hubs
 
@@ -307,27 +317,31 @@ PUT /hubs/:id
 
 DELETE /hubs/:id
 
+**Additional Actions**
+
 POST /hubs/:id/upgrade
 
 GET /hubs/:id/search
 
-**Associated Resources**
+#####Children
 
-- [apps](#hubsapps)
-- [feeds](#hubsfeeds)
-- [invites](#hubsinvites)
-- [recommendations](#hubsrecommendations)
-- [users](#hubsusers)
-- [collections](#hubscollections)
-- [tags](#hubstags)
-- [assets](#hubsassets)
-- [drafts](#hubsdrafts)
+- [App](#App)
+- [Feed](#Feed)
+- [Invite](#Invite)
+- [Recommendation](#Recommendation)
+- [User](#User)
+- [Collection](#Collection)
+- [Tag](#Tag)
+- [Asset](#Asset)
+- [Draft](#Draft)
 
 
 
-####hubs.apps
+###App
 
-model: `App`
+**Resource Key:** `hubs.apps`
+
+#####REST Endpoints
 
 GET /hubs
 
@@ -339,17 +353,21 @@ PUT /hubs/:hubId/apps/:id
 
 DELETE /hubs/:hubId/apps/:id
 
+**Additional Actions**
+
 GET /hubs/:hubId/apps/:id/current
 
-**Associated Resources**
+#####Children
 
-- [styles](#hubsappsstyles)
+- [Style](#Style)
 
 
 
-####hubs.apps.styles
+###Style
 
-model: `Style`
+**Resource Key:** `hubs.apps.styles`
+
+#####REST Endpoints
 
 GET /hubs
 
@@ -364,9 +382,11 @@ DELETE /hubs/:hubId/apps/:appId/styles/:id
 
 
 
-####hubs.feeds
+###Feed
 
-model: `Feed`
+**Resource Key:** `hubs.feeds`
+
+#####REST Endpoints
 
 GET /hubs
 
@@ -378,15 +398,17 @@ PUT /hubs/:hubId/feeds/:id
 
 DELETE /hubs/:hubId/feeds/:id
 
-**Associated Resources**
+#####Children
 
-- [assets](#hubsfeedsassets)
+- [Asset](#Asset)
 
 
 
-####hubs.feeds.assets
+###Asset
 
-model: `Asset`
+**Resource Key:** `hubs.feeds.assets`
+
+#####REST Endpoints
 
 GET /hubs
 
@@ -401,9 +423,11 @@ DELETE /hubs/:hubId/feeds/:feedId/assets/:id
 
 
 
-####hubs.invites
+###Invite
 
-model: `Invite`
+**Resource Key:** `hubs.invites`
+
+#####REST Endpoints
 
 GET /hubs
 
@@ -418,9 +442,11 @@ DELETE /hubs/:hubId/invites/:id
 
 
 
-####hubs.recommendations
+###Recommendation
 
-model: `Recommendation`
+**Resource Key:** `hubs.recommendations`
+
+#####REST Endpoints
 
 GET /hubs
 
@@ -435,9 +461,11 @@ DELETE /hubs/:hubId/recommendations/:id
 
 
 
-####hubs.users
+###User
 
-model: `User`
+**Resource Key:** `hubs.users`
+
+#####REST Endpoints
 
 GET /hubs
 
@@ -452,9 +480,11 @@ DELETE /hubs/:hubId/users/:id
 
 
 
-####hubs.collections
+###Collection
 
-model: `Collection`
+**Resource Key:** `hubs.collections`
+
+#####REST Endpoints
 
 GET /hubs
 
@@ -469,9 +499,11 @@ DELETE /hubs/:hubId/collections/:id
 
 
 
-####hubs.tags
+###Tag
 
-model: `Tag`
+**Resource Key:** `hubs.tags`
+
+#####REST Endpoints
 
 GET /hubs
 
@@ -486,9 +518,11 @@ DELETE /hubs/:hubId/tags/:id
 
 
 
-####hubs.assets
+###Asset
 
-model: `Asset`
+**Resource Key:** `hubs.assets`
+
+#####REST Endpoints
 
 GET /hubs
 
@@ -499,6 +533,8 @@ GET /hubs/:hubId/stream/:id
 PUT /hubs/:hubId/stream/:id
 
 DELETE /hubs/:hubId/stream/:id
+
+**Additional Actions**
 
 PUT /hubs/:hubId/stream/:id/feature
 
@@ -512,16 +548,18 @@ PUT /hubs/:hubId/stream/:id/lock
 
 PUT /hubs/:hubId/stream/:id/unlock
 
-**Associated Resources**
+#####Children
 
-- [likes](#hubsassetslikes)
-- [comments](#hubsassetscomments)
+- [Model](#Model)
+- [Comment](#Comment)
 
 
 
-####hubs.assets.likes
+###Model
 
-model: `Model`
+**Resource Key:** `hubs.assets.likes`
+
+#####REST Endpoints
 
 GET /hubs
 
@@ -536,9 +574,11 @@ DELETE /hubs/:hubId/stream/:assetId/likes/:id
 
 
 
-####hubs.assets.comments
+###Comment
 
-model: `Comment`
+**Resource Key:** `hubs.assets.comments`
+
+#####REST Endpoints
 
 GET /hubs
 
@@ -553,9 +593,11 @@ DELETE /hubs/:hubId/stream/:assetId/comments/:id
 
 
 
-####hubs.drafts
+###Draft
 
-model: `Draft`
+**Resource Key:** `hubs.drafts`
+
+#####REST Endpoints
 
 GET /hubs
 
@@ -570,9 +612,11 @@ DELETE /hubs/:hubId/drafts/:id
 
 
 
-####code_revisions
+###CodeRevision
 
-model: `CodeRevision`
+**Resource Key:** `code_revisions`
+
+#####REST Endpoints
 
 GET /code_revisions
 
@@ -584,15 +628,17 @@ PUT /code_revisions/:id
 
 DELETE /code_revisions/:id
 
-**Associated Resources**
+#####Children
 
-- [hubs](#code_revisionshubs)
+- [Hub](#Hub)
 
 
 
-####code_revisions.hubs
+###Hub
 
-model: `Hub`
+**Resource Key:** `code_revisions.hubs`
+
+#####REST Endpoints
 
 GET /code_revisions
 
@@ -603,5 +649,3 @@ GET /code_revisions/:code_revisionId/hubs/:id
 PUT /code_revisions/:code_revisionId/hubs/:id
 
 DELETE /code_revisions/:code_revisionId/hubs/:id
-
-
