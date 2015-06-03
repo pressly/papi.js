@@ -215,6 +215,20 @@ Papi.generateMarkdown = () => {
     markdown += `###${def.model.name}\n\n`;
     markdown += `**\`${def.key}\`**\n\n`;
 
+    if (def.parent) {
+      markdown += '#####Parent\n\n';
+      markdown += `- [${def.parent.model.name}](#${def.parent.model.name.toLowerCase()}) \`${def.parent.key}\`\n\n`;
+    }
+
+    if (!_.isEmpty(def.children)) {
+      markdown += '#####Children\n\n';
+      _.each(def.children, (child) => {
+        markdown += `- [${child.model.name}](#${child.model.name.toLowerCase()}) \`${child.key}\`\n`;
+      });
+    }
+
+    markdown += '\n\n';
+
     let pathRoot = def.route.path.replace(/\/:.+$/, '');
 
     markdown += '#####REST Endpoints\n\n';
@@ -230,13 +244,6 @@ Papi.generateMarkdown = () => {
 
       _.each(def.actions, (action) => {
         markdown += `- \`${action.method.toUpperCase()}\` ${def.route.path}/${action.name}\n\n`
-      });
-    }
-
-    if (!_.isEmpty(def.children)) {
-      markdown += '#####Children\n\n';
-      _.each(def.children, (child) => {
-        markdown += `- [${child.model.name}](#${child.model.name.toLowerCase()})\n`;
       });
     }
 

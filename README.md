@@ -244,6 +244,12 @@ Below outlines the schema of all the RESTful resources, their routes, associated
 
 **`accounts`**
 
+#####Children
+
+- [User](#user) `accounts.users`
+- [Hub](#hub) `accounts.hubs`
+
+
 #####REST Endpoints
 
 - `GET` /accounts
@@ -252,16 +258,18 @@ Below outlines the schema of all the RESTful resources, their routes, associated
 - `PUT` /accounts/:id
 - `DELETE` /accounts/:id
 
-#####Children
-
-- [User](#user)
-- [Hub](#hub)
 
 
 
 ###User
 
 **`accounts.users`**
+
+#####Parent
+
+- [Account](#account) `accounts`
+
+
 
 #####REST Endpoints
 
@@ -278,6 +286,12 @@ Below outlines the schema of all the RESTful resources, their routes, associated
 
 **`accounts.hubs`**
 
+#####Parent
+
+- [Account](#account) `accounts`
+
+
+
 #####REST Endpoints
 
 - `GET` /accounts
@@ -293,6 +307,19 @@ Below outlines the schema of all the RESTful resources, their routes, associated
 
 **`hubs`**
 
+#####Children
+
+- [App](#app) `hubs.apps`
+- [Feed](#feed) `hubs.feeds`
+- [Invite](#invite) `hubs.invites`
+- [Recommendation](#recommendation) `hubs.recommendations`
+- [User](#user) `hubs.users`
+- [Collection](#collection) `hubs.collections`
+- [Tag](#tag) `hubs.tags`
+- [Asset](#asset) `hubs.assets`
+- [Draft](#draft) `hubs.drafts`
+
+
 #####REST Endpoints
 
 - `GET` /hubs
@@ -307,23 +334,21 @@ Below outlines the schema of all the RESTful resources, their routes, associated
 
 - `GET` /hubs/:id/search
 
-#####Children
-
-- [App](#app)
-- [Feed](#feed)
-- [Invite](#invite)
-- [Recommendation](#recommendation)
-- [User](#user)
-- [Collection](#collection)
-- [Tag](#tag)
-- [Asset](#asset)
-- [Draft](#draft)
 
 
 
 ###App
 
 **`hubs.apps`**
+
+#####Parent
+
+- [Hub](#hub) `hubs`
+
+#####Children
+
+- [Style](#style) `hubs.apps.styles`
+
 
 #####REST Endpoints
 
@@ -337,15 +362,18 @@ Below outlines the schema of all the RESTful resources, their routes, associated
 
 - `GET` /hubs/:hubId/apps/:id/current
 
-#####Children
-
-- [Style](#style)
 
 
 
 ###Style
 
 **`hubs.apps.styles`**
+
+#####Parent
+
+- [App](#app) `hubs.apps`
+
+
 
 #####REST Endpoints
 
@@ -362,6 +390,15 @@ Below outlines the schema of all the RESTful resources, their routes, associated
 
 **`hubs.feeds`**
 
+#####Parent
+
+- [Hub](#hub) `hubs`
+
+#####Children
+
+- [Asset](#asset) `hubs.feeds.assets`
+
+
 #####REST Endpoints
 
 - `GET` /hubs
@@ -370,15 +407,18 @@ Below outlines the schema of all the RESTful resources, their routes, associated
 - `PUT` /hubs/:hubId/feeds/:id
 - `DELETE` /hubs/:hubId/feeds/:id
 
-#####Children
-
-- [Asset](#asset)
 
 
 
 ###Asset
 
 **`hubs.feeds.assets`**
+
+#####Parent
+
+- [Feed](#feed) `hubs.feeds`
+
+
 
 #####REST Endpoints
 
@@ -395,6 +435,12 @@ Below outlines the schema of all the RESTful resources, their routes, associated
 
 **`hubs.invites`**
 
+#####Parent
+
+- [Hub](#hub) `hubs`
+
+
+
 #####REST Endpoints
 
 - `GET` /hubs
@@ -409,6 +455,12 @@ Below outlines the schema of all the RESTful resources, their routes, associated
 ###Recommendation
 
 **`hubs.recommendations`**
+
+#####Parent
+
+- [Hub](#hub) `hubs`
+
+
 
 #####REST Endpoints
 
@@ -425,6 +477,12 @@ Below outlines the schema of all the RESTful resources, their routes, associated
 
 **`hubs.users`**
 
+#####Parent
+
+- [Hub](#hub) `hubs`
+
+
+
 #####REST Endpoints
 
 - `GET` /hubs
@@ -439,6 +497,12 @@ Below outlines the schema of all the RESTful resources, their routes, associated
 ###Collection
 
 **`hubs.collections`**
+
+#####Parent
+
+- [Hub](#hub) `hubs`
+
+
 
 #####REST Endpoints
 
@@ -455,6 +519,12 @@ Below outlines the schema of all the RESTful resources, their routes, associated
 
 **`hubs.tags`**
 
+#####Parent
+
+- [Hub](#hub) `hubs`
+
+
+
 #####REST Endpoints
 
 - `GET` /hubs
@@ -469,6 +539,16 @@ Below outlines the schema of all the RESTful resources, their routes, associated
 ###Asset
 
 **`hubs.assets`**
+
+#####Parent
+
+- [Hub](#hub) `hubs`
+
+#####Children
+
+- [Model](#model) `hubs.assets.likes`
+- [Comment](#comment) `hubs.assets.comments`
+
 
 #####REST Endpoints
 
@@ -492,16 +572,18 @@ Below outlines the schema of all the RESTful resources, their routes, associated
 
 - `PUT` /hubs/:hubId/stream/:id/unlock
 
-#####Children
-
-- [Model](#model)
-- [Comment](#comment)
 
 
 
 ###Model
 
 **`hubs.assets.likes`**
+
+#####Parent
+
+- [Asset](#asset) `hubs.assets`
+
+
 
 #####REST Endpoints
 
@@ -518,6 +600,12 @@ Below outlines the schema of all the RESTful resources, their routes, associated
 
 **`hubs.assets.comments`**
 
+#####Parent
+
+- [Asset](#asset) `hubs.assets`
+
+
+
 #####REST Endpoints
 
 - `GET` /hubs
@@ -532,6 +620,12 @@ Below outlines the schema of all the RESTful resources, their routes, associated
 ###Draft
 
 **`hubs.drafts`**
+
+#####Parent
+
+- [Hub](#hub) `hubs`
+
+
 
 #####REST Endpoints
 
@@ -548,6 +642,11 @@ Below outlines the schema of all the RESTful resources, their routes, associated
 
 **`code_revisions`**
 
+#####Children
+
+- [Hub](#hub) `code_revisions.hubs`
+
+
 #####REST Endpoints
 
 - `GET` /code_revisions
@@ -556,15 +655,18 @@ Below outlines the schema of all the RESTful resources, their routes, associated
 - `PUT` /code_revisions/:id
 - `DELETE` /code_revisions/:id
 
-#####Children
-
-- [Hub](#hub)
 
 
 
 ###Hub
 
 **`code_revisions.hubs`**
+
+#####Parent
+
+- [CodeRevision](#coderevision) `code_revisions`
+
+
 
 #####REST Endpoints
 
