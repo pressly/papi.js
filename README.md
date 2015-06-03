@@ -258,8 +258,8 @@ DELETE /accounts/:id
 
 #####Children
 
-- [User](#User)
-- [Hub](#Hub)
+- [User](#user)
+- [Hub](#hub)
 
 
 
@@ -325,15 +325,15 @@ GET /hubs/:id/search
 
 #####Children
 
-- [App](#App)
-- [Feed](#Feed)
-- [Invite](#Invite)
-- [Recommendation](#Recommendation)
-- [User](#User)
-- [Collection](#Collection)
-- [Tag](#Tag)
-- [Asset](#Asset)
-- [Draft](#Draft)
+- [App](#app)
+- [Feed](#feed)
+- [Invite](#invite)
+- [Recommendation](#recommendation)
+- [User](#user)
+- [Collection](#collection)
+- [Tag](#tag)
+- [Asset](#asset)
+- [Draft](#draft)
 
 
 
@@ -359,7 +359,7 @@ GET /hubs/:hubId/apps/:id/current
 
 #####Children
 
-- [Style](#Style)
+- [Style](#style)
 
 
 
@@ -400,7 +400,7 @@ DELETE /hubs/:hubId/feeds/:id
 
 #####Children
 
-- [Asset](#Asset)
+- [Asset](#asset)
 
 
 
@@ -550,8 +550,8 @@ PUT /hubs/:hubId/stream/:id/unlock
 
 #####Children
 
-- [Model](#Model)
-- [Comment](#Comment)
+- [Model](#model)
+- [Comment](#comment)
 
 
 
@@ -630,7 +630,7 @@ DELETE /code_revisions/:id
 
 #####Children
 
-- [Hub](#Hub)
+- [Hub](#hub)
 
 
 
@@ -649,3 +649,5 @@ GET /code_revisions/:code_revisionId/hubs/:id
 PUT /code_revisions/:code_revisionId/hubs/:id
 
 DELETE /code_revisions/:code_revisionId/hubs/:id
+
+

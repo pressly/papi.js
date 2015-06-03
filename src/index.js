@@ -212,10 +212,12 @@ Papi.generateMarkdown = () => {
   let markdown = "";
 
   _.each(Papi.resourceDefinitions, (def) => {
-    markdown += `####${def.key}\n\n`;
-    markdown += `model: \`${def.model.name}\`\n\n`;
+    markdown += `###${def.model.name}\n\n`;
+    markdown += `**Resource Key:** \`${def.key}\`\n\n`;
 
     let pathRoot = def.route.path.replace(/\/:.+$/, '');
+
+    markdown += '#####REST Endpoints\n\n';
 
     markdown += `GET ${pathRoot}\n\n`;
     markdown += `POST ${pathRoot}\n\n`;
@@ -223,14 +225,18 @@ Papi.generateMarkdown = () => {
     markdown += `PUT ${def.route.path}\n\n`;
     markdown += `DELETE ${def.route.path}\n\n`;
 
-    _.each(def.actions, (action) => {
-      markdown += `${action.method.toUpperCase()} ${def.route.path}/${action.name}\n\n`
-    });
+    if (!_.isEmpty(def.actions)) {
+      markdown += "**Additional Actions**\n\n";
+
+      _.each(def.actions, (action) => {
+        markdown += `${action.method.toUpperCase()} ${def.route.path}/${action.name}\n\n`
+      });
+    }
 
     if (!_.isEmpty(def.children)) {
-      markdown += '**Associated Resources**\n\n';
+      markdown += '#####Children\n\n';
       _.each(def.children, (child) => {
-        markdown += `- [${child.name}](#${child.key.replace(/\./g, '')})\n`;
+        markdown += `- [${child.model.name}](#${child.model.name.toLowerCase()})\n`;
       });
     }
 
