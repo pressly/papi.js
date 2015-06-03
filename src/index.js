@@ -212,12 +212,11 @@ Papi.generateMarkdown = () => {
   let markdown = "";
 
   _.each(Papi.resourceDefinitions, (def) => {
-    markdown += `###${def.model.name}\n\n`;
-    markdown += `**Resource Key:** \`${def.key}\`\n\n`;
+    markdown += `###${def.model.name} \`${def.key}\`\n\n`;
 
     let pathRoot = def.route.path.replace(/\/:.+$/, '');
 
-    markdown += '#####REST Endpoints\n\n';
+    markdown += '####REST Endpoints\n\n';
 
     markdown += `GET ${pathRoot}\n\n`;
     markdown += `POST ${pathRoot}\n\n`;

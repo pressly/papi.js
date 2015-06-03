@@ -239,12 +239,9 @@ api.$resource('hubs').find(123).then(function(hub) {
 ## API Schema
 
 Below outlines the schema of all the RESTful resources, their routes, associated model, and child resources.
+###Account `accounts`
 
-###Account
-
-**Resource Key:** `accounts`
-
-#####REST Endpoints
+####REST Endpoints
 
 GET /accounts
 
@@ -263,11 +260,9 @@ DELETE /accounts/:id
 
 
 
-###User
+###User `accounts.users`
 
-**Resource Key:** `accounts.users`
-
-#####REST Endpoints
+####REST Endpoints
 
 GET /accounts
 
@@ -282,11 +277,9 @@ DELETE /accounts/:accountId/users/:id
 
 
 
-###Hub
+###Hub `accounts.hubs`
 
-**Resource Key:** `accounts.hubs`
-
-#####REST Endpoints
+####REST Endpoints
 
 GET /accounts
 
@@ -301,11 +294,9 @@ DELETE /accounts/:accountId/hubs/:id
 
 
 
-###Hub
+###Hub `hubs`
 
-**Resource Key:** `hubs`
-
-#####REST Endpoints
+####REST Endpoints
 
 GET /hubs
 
@@ -337,11 +328,9 @@ GET /hubs/:id/search
 
 
 
-###App
+###App `hubs.apps`
 
-**Resource Key:** `hubs.apps`
-
-#####REST Endpoints
+####REST Endpoints
 
 GET /hubs
 
@@ -363,11 +352,9 @@ GET /hubs/:hubId/apps/:id/current
 
 
 
-###Style
+###Style `hubs.apps.styles`
 
-**Resource Key:** `hubs.apps.styles`
-
-#####REST Endpoints
+####REST Endpoints
 
 GET /hubs
 
@@ -382,11 +369,9 @@ DELETE /hubs/:hubId/apps/:appId/styles/:id
 
 
 
-###Feed
+###Feed `hubs.feeds`
 
-**Resource Key:** `hubs.feeds`
-
-#####REST Endpoints
+####REST Endpoints
 
 GET /hubs
 
@@ -404,11 +389,9 @@ DELETE /hubs/:hubId/feeds/:id
 
 
 
-###Asset
+###Asset `hubs.feeds.assets`
 
-**Resource Key:** `hubs.feeds.assets`
-
-#####REST Endpoints
+####REST Endpoints
 
 GET /hubs
 
@@ -423,11 +406,9 @@ DELETE /hubs/:hubId/feeds/:feedId/assets/:id
 
 
 
-###Invite
+###Invite `hubs.invites`
 
-**Resource Key:** `hubs.invites`
-
-#####REST Endpoints
+####REST Endpoints
 
 GET /hubs
 
@@ -442,11 +423,9 @@ DELETE /hubs/:hubId/invites/:id
 
 
 
-###Recommendation
+###Recommendation `hubs.recommendations`
 
-**Resource Key:** `hubs.recommendations`
-
-#####REST Endpoints
+####REST Endpoints
 
 GET /hubs
 
@@ -461,11 +440,9 @@ DELETE /hubs/:hubId/recommendations/:id
 
 
 
-###User
+###User `hubs.users`
 
-**Resource Key:** `hubs.users`
-
-#####REST Endpoints
+####REST Endpoints
 
 GET /hubs
 
@@ -480,11 +457,9 @@ DELETE /hubs/:hubId/users/:id
 
 
 
-###Collection
+###Collection `hubs.collections`
 
-**Resource Key:** `hubs.collections`
-
-#####REST Endpoints
+####REST Endpoints
 
 GET /hubs
 
@@ -499,11 +474,9 @@ DELETE /hubs/:hubId/collections/:id
 
 
 
-###Tag
+###Tag `hubs.tags`
 
-**Resource Key:** `hubs.tags`
-
-#####REST Endpoints
+####REST Endpoints
 
 GET /hubs
 
@@ -518,11 +491,9 @@ DELETE /hubs/:hubId/tags/:id
 
 
 
-###Asset
+###Asset `hubs.assets`
 
-**Resource Key:** `hubs.assets`
-
-#####REST Endpoints
+####REST Endpoints
 
 GET /hubs
 
@@ -555,11 +526,9 @@ PUT /hubs/:hubId/stream/:id/unlock
 
 
 
-###Model
+###Model `hubs.assets.likes`
 
-**Resource Key:** `hubs.assets.likes`
-
-#####REST Endpoints
+####REST Endpoints
 
 GET /hubs
 
@@ -574,11 +543,9 @@ DELETE /hubs/:hubId/stream/:assetId/likes/:id
 
 
 
-###Comment
+###Comment `hubs.assets.comments`
 
-**Resource Key:** `hubs.assets.comments`
-
-#####REST Endpoints
+####REST Endpoints
 
 GET /hubs
 
@@ -593,11 +560,9 @@ DELETE /hubs/:hubId/stream/:assetId/comments/:id
 
 
 
-###Draft
+###Draft `hubs.drafts`
 
-**Resource Key:** `hubs.drafts`
-
-#####REST Endpoints
+####REST Endpoints
 
 GET /hubs
 
@@ -612,11 +577,9 @@ DELETE /hubs/:hubId/drafts/:id
 
 
 
-###CodeRevision
+###CodeRevision `code_revisions`
 
-**Resource Key:** `code_revisions`
-
-#####REST Endpoints
+####REST Endpoints
 
 GET /code_revisions
 
@@ -634,11 +597,9 @@ DELETE /code_revisions/:id
 
 
 
-###Hub
+###Hub `code_revisions.hubs`
 
-**Resource Key:** `code_revisions.hubs`
-
-#####REST Endpoints
+####REST Endpoints
 
 GET /code_revisions
 
@@ -649,5 +610,3 @@ GET /code_revisions/:code_revisionId/hubs/:id
 PUT /code_revisions/:code_revisionId/hubs/:id
 
 DELETE /code_revisions/:code_revisionId/hubs/:id
-
-
