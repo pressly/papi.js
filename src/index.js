@@ -223,7 +223,7 @@ Papi.generateMarkdown = () => {
     markdown += `- \`POST\` ${pathRoot}\n`;
     markdown += `- \`GET\` ${def.route.path}\n`;
     markdown += `- \`PUT\` ${def.route.path}\n`;
-    markdown += `- \`DELETE\` ${def.route.path}\n`;
+    markdown += `- \`DELETE\` ${def.route.path}\n\n`;
 
     if (!_.isEmpty(def.actions)) {
       markdown += "*Additional Actions*\n\n";
