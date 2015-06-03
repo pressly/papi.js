@@ -40,6 +40,8 @@ var Papi = (function () {
     this.options = options;
     this.options.host = options.host || 'https://beta-api.pressly.com';
 
+    this.callbacks = [];
+
     this.auth = {
       session: null,
 
@@ -154,6 +156,12 @@ var Papi = (function () {
         }
 
         req.end(function (err, res) {
+          setTimeout(function () {
+            _lodash2['default'].each(_this2.callbacks, function (cb) {
+              cb(res);
+            });
+          });
+
           if (err) {
             return reject(err);
           } else {
@@ -161,6 +169,29 @@ var Papi = (function () {
           }
         });
       });
+    }
+  }, {
+    key: 'on',
+
+    // Register callback to fire after each request finishes
+    // returns a deregister function.
+    value: function on(callback) {
+      var _this3 = this;
+
+      this.callbacks.push(callback);
+
+      return function () {
+        _this3.off(callback);
+      };
+    }
+  }, {
+    key: 'off',
+    value: function off(callback) {
+      var idx = this.callbacks.indexOf(callback);
+
+      if (idx >= 0) {
+        this.callbacks.splice(idx, 1);
+      }
     }
   }]);
 

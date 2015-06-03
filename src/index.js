@@ -11,6 +11,8 @@ export default class Papi {
     this.options = options;
     this.options.host = (options.host || 'https://beta-api.pressly.com');
 
+    this.callbacks = [];
+
     this.auth = {
       session: null,
 
@@ -119,6 +121,12 @@ export default class Papi {
       }
 
       req.end((err, res) => {
+        setTimeout(() => {
+          _.each(this.callbacks, (cb) => {
+            cb(res);
+          });
+        });
+
         if (err) {
           return reject(err);
         } else {
@@ -126,6 +134,24 @@ export default class Papi {
         }
       });
     });
+  }
+
+  // Register callback to fire after each request finishes
+  // returns a deregister function.
+  on(callback) {
+    this.callbacks.push(callback);
+
+    return () => {
+      this.off(callback);
+    };
+  }
+
+  off(callback) {
+    let idx = this.callbacks.indexOf(callback);
+
+    if (idx >= 0) {
+      this.callbacks.splice(idx, 1);
+    }
   }
 }
 
