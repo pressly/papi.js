@@ -122,14 +122,14 @@ function applyResourcing(klass) {
         var parent = parentPointer ? parentPointer.current : null;
         var resource = { name: name, parent: parent, children: {}, options: options };
 
+        if (options.linkTo) {
+          resource.linkTo = options.linkTo;
+        }
+
         resource.key = buildKey(resource);
         resource.route = buildRoute(resource);
         resource.model = options.model || models[options.modelName] || models[classify(name)] || models.Base;
         resource.actions = [];
-
-        if (options.linkTo) {
-          resource.linkTo = options.linkTo;
-        }
 
         this.current = bucket[name] = klass.resourceDefinitions[resource.key] = resource;
 
@@ -211,6 +211,10 @@ var Resource = (function () {
     _classCallCheck(this, Resource);
 
     var def = api.constructor.resourceDefinitions[key];
+
+    if (!inherit && def.linkTo) {
+      def = api.constructor.resourceDefinitions[def.linkTo];
+    }
 
     if (typeof def == 'undefined') {
       throw new Error('Resource: Must supply a proper definition');
@@ -377,7 +381,13 @@ var Resource = (function () {
     value: function hydrateModel(data) {
       var _this4 = this;
 
-      var model = new this.model(data, { persisted: true });
+      var options = arguments[1] === undefined ? {} : arguments[1];
+
+      var model = new this.model(data);
+
+      if (!options.newRecord) {
+        model.$newRecord = false;
+      }
 
       // Set route params based on data from the model
       // This is important step to take if the model queried from an all, queryParams, or action
@@ -463,14 +473,6 @@ var Resource = (function () {
           return _lodash2['default'].last(collection);
         },
 
-        at: function at(idx) {
-          return collection[idx];
-        },
-
-        where: function where(params) {
-          return _lodash2['default'].where(collection, params);
-        },
-
         find: function find(id) {
           return _lodash2['default'].detect(collection, function (item) {
             return item.id == id;
@@ -481,22 +483,26 @@ var Resource = (function () {
           return _lodash2['default'].findWhere(collection, params);
         },
 
-        build: function build() {
+        where: function where(params) {
+          return _lodash2['default'].where(collection, params);
+        },
+
+        create: function create() {
           var data = arguments[0] === undefined ? {} : arguments[0];
 
           var resource = new Resource(_this5.api, _this5.key, _this5);
 
-          var model = resource.hydrateModel(data);
+          var model = resource.hydrateModel(data, { newRecord: true });
 
           return model;
         },
 
-        add: function add(_x8, idx) {
+        add: function add(_x9, idx) {
           var model = arguments[0] === undefined ? {} : arguments[0];
           var applySorting = arguments[2] === undefined ? false : arguments[2];
 
           if (typeof model == 'object' && !(model instanceof _this5.model)) {
-            model = collection.build(model);
+            model = collection.create(model);
           }
 
           if (_lodash2['default'].isNumber(idx)) {

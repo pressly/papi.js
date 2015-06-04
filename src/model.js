@@ -6,9 +6,7 @@ export default class Model {
   constructor(data, options = {}) {
     _.extend(this, data);
 
-    if (!options.persisted) {
-      this.$newRecord = true;
-    }
+    this.$newRecord = true;
   }
 
   $delete() {

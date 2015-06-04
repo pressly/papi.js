@@ -24,9 +24,7 @@ var Model = (function () {
 
     _lodash2['default'].extend(this, data);
 
-    if (!options.persisted) {
-      this.$newRecord = true;
-    }
+    this.$newRecord = true;
   }
 
   _createClass(Model, [{

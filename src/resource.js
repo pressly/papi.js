@@ -320,8 +320,12 @@ export default class Resource {
     this.links = parseHTTPLinks(res.headers.link);
   }
 
-  hydrateModel(data) {
-    var model = new this.model(data, { persisted: true });
+  hydrateModel(data, options = {}) {
+    var model = new this.model(data);
+
+    if (!options.newRecord) {
+      model.$newRecord = false;
+    }
 
     // Set route params based on data from the model
     // This is important step to take if the model queried from an all, queryParams, or action
@@ -398,14 +402,6 @@ export default class Resource {
         return _.last(collection);
       },
 
-      at: (idx) => {
-        return collection[idx];
-      },
-
-      where: (params) => {
-        return _.where(collection, params);
-      },
-
       find: (id) => {
         return _.detect(collection, (item) => {
           return item.id == id;
@@ -416,17 +412,21 @@ export default class Resource {
         return _.findWhere(collection, params);
       },
 
-      build: (data = {}) => {
+      where: (params) => {
+        return _.where(collection, params);
+      },
+
+      create: (data = {}) => {
         var resource = new Resource(this.api, this.key, this);
 
-        var model = resource.hydrateModel(data);
+        var model = resource.hydrateModel(data, { newRecord: true });
 
         return model;
       },
 
       add: (model = {}, idx, applySorting = false) => {
         if (typeof model == 'object' && !(model instanceof this.model)) {
-          model = collection.build(model);
+          model = collection.create(model);
         }
 
         if (_.isNumber(idx)) {

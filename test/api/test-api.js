@@ -319,8 +319,8 @@ describe('Collections', function() {
     });
   });
 
-  it('should build a new model', function(done) {
-    var model = collection.build({ name: 'Hello' });
+  it('should create a new model', function(done) {
+    var model = collection.create({ name: 'Hello' });
     model.should.be.instanceOf(models.Hub);
     model.name.should.equal('Hello');
     should(model.$newRecord).equal(true);
@@ -330,7 +330,7 @@ describe('Collections', function() {
 
   it('should add a new model', function(done) {
     collection.length.should.equal(mock.hubs.length);
-    var model = collection.build({ name: 'Hello' });
+    var model = collection.create({ name: 'Hello' });
 
     collection.add(model);
     collection.length.should.equal(mock.hubs.length + 1);
@@ -349,11 +349,11 @@ describe('Collections', function() {
 
   it('should add a new model at an index', function(done) {
     collection.length.should.equal(mock.hubs.length);
-    var model = collection.build({ name: 'Hello' });
+    var model = collection.create({ name: 'Hello' });
 
     collection.add(model, 3);
     collection.length.should.equal(mock.hubs.length + 1);
-    collection.at(3).should.equal(model);
+    collection[3].should.equal(model);
 
     done();
   });
@@ -370,11 +370,11 @@ describe('Collections', function() {
     var model = collection.add({name: 'Hello'});
 
     collection.reposition(mock.hubs.length, 0);
-    collection.at(0).should.equal(model);
+    collection[0].should.equal(model);
     collection.reposition(0, 1);
-    collection.at(1).should.equal(model);
+    collection[1].should.equal(model);
     collection.reposition(1, mock.hubs.length);
-    collection.at(mock.hubs.length).should.equal(model);
+    collection[mock.hubs.length].should.equal(model);
 
     collection.length.should.equal(mock.hubs.length + 1);
 

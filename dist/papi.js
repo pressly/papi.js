@@ -202,9 +202,10 @@ exports['default'] = Papi;
 
 (0, _resource.applyResourcing)(Papi);
 
-Papi.resource('accounts').open().resource('users').resource('hubs', { linkTo: 'hubs' }).close().resource('hubs').open().post('upgrade', { on: 'member' }).get('search', { on: 'collection' }).resource('apps').open().get('current', { path: '/current' }).resource('styles').close().resource('analytics').resource('feeds').open().resource('assets', { modelName: 'FeedAsset' }).close().resource('invites').resource('recommendations').resource('users').resource('collections').resource('tags').resource('assets', { routeSegment: '/stream/:id' }).open().put('feature', { on: 'member' }).put('unfeature', { on: 'member' }).put('hide', { on: 'member' }).put('unhide', { on: 'member' }).put('lock', { on: 'member' }).put('unlock', { on: 'member' }).resource('likes').resource('comments').close().resource('drafts').close().resource('code_revisions').open()
+Papi.resource('accounts').open().post('become', { on: 'member' }).resource('users').resource('hubs', { linkTo: 'hubs' }).close().resource('hubs').open().post('upgrade', { on: 'member' }).get('search', { on: 'collection' }).post('accept_invite', { on: 'member' }).post('reject_invite', { on: 'member' }).resource('apps').open().get('current', { path: '/current', on: 'collection' }).get('build', { path: '/build_app', on: 'member' }).get('status', { on: 'member' }).resource('styles').close().resource('analytics').open().get('summary', { on: 'collection' }).get('visitors', { on: 'collection' }).get('pageviews', { on: 'collection' }).get('duration', { on: 'collection' }).close().resource('feeds').open().resource('assets', { modelName: 'FeedAsset' }).close().resource('invites').open().post('bulk_invite', { on: 'collection' }).post('resend', { on: 'member' }).post('accept', { on: 'member' }).post('reject', { on: 'member' }).close().resource('recommendations').resource('users').open().post('grant_access', { on: 'collection' })['delete']('revoke_access', { on: 'member' }).close().resource('collections').open().put('reorder', { on: 'collection' }).close().resource('tags').resource('assets', { routeSegment: '/stream/:id' }).open().put('feature', { on: 'member' }).put('unfeature', { on: 'member' }).put('hide', { on: 'member' }).put('unhide', { on: 'member' }).put('lock', { on: 'member' }).put('unlock', { on: 'member' }).resource('likes').resource('comments').close().resource('drafts').open().put('publish', { on: 'member' }).close().close().resource('code_revisions').open().get('fetch_repo', { on: 'member' })
+
 // This resource links to the root hubs resource
-.resource('hubs', { linkTo: 'hubs' }).close();
+.resource('hubs', { linkTo: 'hubs' }).close().resource('signup').open().get('account_uid_available', { on: 'member' }).get('account_email_available', { on: 'member' }).close().resource('users').open().get('roles', { on: 'collection' }).close();
 
 Papi.generateMarkdown = function () {
   var markdown = '';
@@ -303,9 +304,7 @@ var Model = (function () {
 
     _lodash2['default'].extend(this, data);
 
-    if (!options.persisted) {
-      this.$newRecord = true;
-    }
+    this.$newRecord = true;
   }
 
   _createClass(Model, [{
@@ -1150,14 +1149,14 @@ function applyResourcing(klass) {
         var parent = parentPointer ? parentPointer.current : null;
         var resource = { name: name, parent: parent, children: {}, options: options };
 
+        if (options.linkTo) {
+          resource.linkTo = options.linkTo;
+        }
+
         resource.key = buildKey(resource);
         resource.route = buildRoute(resource);
         resource.model = options.model || models[options.modelName] || models[classify(name)] || models.Base;
         resource.actions = [];
-
-        if (options.linkTo) {
-          resource.linkTo = options.linkTo;
-        }
 
         this.current = bucket[name] = klass.resourceDefinitions[resource.key] = resource;
 
@@ -1239,6 +1238,10 @@ var Resource = (function () {
     _classCallCheck(this, Resource);
 
     var def = api.constructor.resourceDefinitions[key];
+
+    if (!inherit && def.linkTo) {
+      def = api.constructor.resourceDefinitions[def.linkTo];
+    }
 
     if (typeof def == 'undefined') {
       throw new Error('Resource: Must supply a proper definition');
@@ -1405,7 +1408,13 @@ var Resource = (function () {
     value: function hydrateModel(data) {
       var _this4 = this;
 
-      var model = new this.model(data, { persisted: true });
+      var options = arguments[1] === undefined ? {} : arguments[1];
+
+      var model = new this.model(data);
+
+      if (!options.newRecord) {
+        model.$newRecord = false;
+      }
 
       // Set route params based on data from the model
       // This is important step to take if the model queried from an all, queryParams, or action
@@ -1491,14 +1500,6 @@ var Resource = (function () {
           return _lodash2['default'].last(collection);
         },
 
-        at: function at(idx) {
-          return collection[idx];
-        },
-
-        where: function where(params) {
-          return _lodash2['default'].where(collection, params);
-        },
-
         find: function find(id) {
           return _lodash2['default'].detect(collection, function (item) {
             return item.id == id;
@@ -1509,22 +1510,26 @@ var Resource = (function () {
           return _lodash2['default'].findWhere(collection, params);
         },
 
-        build: function build() {
+        where: function where(params) {
+          return _lodash2['default'].where(collection, params);
+        },
+
+        create: function create() {
           var data = arguments[0] === undefined ? {} : arguments[0];
 
           var resource = new Resource(_this5.api, _this5.key, _this5);
 
-          var model = resource.hydrateModel(data);
+          var model = resource.hydrateModel(data, { newRecord: true });
 
           return model;
         },
 
-        add: function add(_x8, idx) {
+        add: function add(_x9, idx) {
           var model = arguments[0] === undefined ? {} : arguments[0];
           var applySorting = arguments[2] === undefined ? false : arguments[2];
 
           if (typeof model == 'object' && !(model instanceof _this5.model)) {
-            model = collection.build(model);
+            model = collection.create(model);
           }
 
           if (_lodash2['default'].isNumber(idx)) {
