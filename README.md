@@ -328,10 +328,14 @@ See [Hub](#hub) `hubs`
 - `PUT` /hubs/:id
 - `DELETE` /hubs/:id
 
-*Additional Actions*
+*Collection Actions*
+
+- `GET` /hubs/search
+
+
+*Member Actions*
 
 - `POST` /hubs/:id/upgrade
-- `GET` /hubs/:id/search
 
 
 ###App
@@ -355,9 +359,8 @@ See [Hub](#hub) `hubs`
 - `PUT` /hubs/:hubId/apps/:id
 - `DELETE` /hubs/:hubId/apps/:id
 
-*Additional Actions*
 
-- `GET` /hubs/:hubId/apps/:id/current
+
 
 
 ###Style
@@ -565,7 +568,9 @@ See [Hub](#hub) `hubs`
 - `PUT` /hubs/:hubId/stream/:id
 - `DELETE` /hubs/:hubId/stream/:id
 
-*Additional Actions*
+
+
+*Member Actions*
 
 - `PUT` /hubs/:hubId/stream/:id/feature
 - `PUT` /hubs/:hubId/stream/:id/unfeature
@@ -673,3 +678,7 @@ See [Hub](#hub) `hubs`
 - `GET` /code_revisions/:code_revisionId/hubs/:id
 - `PUT` /code_revisions/:code_revisionId/hubs/:id
 - `DELETE` /code_revisions/:code_revisionId/hubs/:id
+
+
+
+

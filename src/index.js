@@ -163,8 +163,8 @@ Papi
   .close()
 
   .resource('hubs').open()
-    .post('upgrade')
-    .get('search', { on: 'collection' })
+    .post('upgrade',  { on: 'member' })
+    .get('search',    { on: 'collection' })
 
     .resource('apps').open()
       .get('current', { path: '/current' })
@@ -189,12 +189,12 @@ Papi
     .resource('tags')
 
     .resource('assets', { routeSegment: '/stream/:id' }).open()
-      .put('feature')
-      .put('unfeature')
-      .put('hide')
-      .put('unhide')
-      .put('lock')
-      .put('unlock')
+      .put('feature',   { on: 'member' })
+      .put('unfeature', { on: 'member' })
+      .put('hide',      { on: 'member' })
+      .put('unhide',    { on: 'member' })
+      .put('lock',      { on: 'member' })
+      .put('unlock',    { on: 'member' })
 
       .resource('likes')
       .resource('comments')
@@ -246,11 +246,32 @@ Papi.generateMarkdown = () => {
     markdown += `- \`DELETE\` ${def.route.path}\n\n`;
 
     if (!_.isEmpty(def.actions)) {
-      markdown += "*Additional Actions*\n\n";
-
-      _.each(def.actions, (action) => {
-        markdown += `- \`${action.method.toUpperCase()}\` ${def.route.path}/${action.name}\n`
+      let memberActions = _.select(def.actions, (action) => {
+        return action.options.on == 'member';
       });
+
+      let collectionActions = _.select(def.actions, (action) => {
+        return action.options.on == 'collection';
+      });
+
+
+      if (!_.isEmpty(collectionActions)) {
+        markdown += "*Collection Actions*\n\n";
+
+        _.each(collectionActions, (action) => {
+          markdown += `- \`${action.method.toUpperCase()}\` ${pathRoot}/${action.name}\n`
+        });
+      }
+
+      markdown += "\n\n";
+
+      if (!_.isEmpty(memberActions)) {
+        markdown += "*Member Actions*\n\n";
+
+        _.each(memberActions, (action) => {
+          markdown += `- \`${action.method.toUpperCase()}\` ${def.route.path}/${action.name}\n`
+        });
+      }
     }
 
     markdown += "\n\n";
