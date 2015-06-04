@@ -99,14 +99,14 @@ export function applyResourcing(klass) {
         var parent = parentPointer ? parentPointer.current : null
         var resource = { name: name, parent: parent, children: {}, options: options };
 
+        if (options.linkTo) {
+          resource.linkTo = options.linkTo;
+        }
+
         resource.key = buildKey(resource);
         resource.route = buildRoute(resource);
         resource.model = options.model || models[options.modelName] || models[classify(name)] || models.Base;
         resource.actions = [];
-
-        if (options.linkTo) {
-          resource.linkTo = options.linkTo;
-        }
 
         this.current = bucket[name] = klass.resourceDefinitions[resource.key] = resource;
 
@@ -175,6 +175,10 @@ var parseHTTPLinks = function(linksString) {
 export default class Resource {
   constructor(api, key, parentResource, inherit = false) {
     var def = api.constructor.resourceDefinitions[key];
+
+    if (!inherit && def.linkTo) {
+      def = api.constructor.resourceDefinitions[def.linkTo];
+    }
 
     if (typeof def == 'undefined') {
       throw new Error("Resource: Must supply a proper definition");
