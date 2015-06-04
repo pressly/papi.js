@@ -44,6 +44,10 @@ var _feed = require('./feed');
 
 exports.Feed = _interopRequire(_feed);
 
+var _feedAsset = require('./feed-asset');
+
+exports.FeedAsset = _interopRequire(_feedAsset);
+
 var _hub = require('./hub');
 
 exports.Hub = _interopRequire(_hub);
@@ -51,6 +55,10 @@ exports.Hub = _interopRequire(_hub);
 var _invite = require('./invite');
 
 exports.Invite = _interopRequire(_invite);
+
+var _like = require('./like');
+
+exports.Like = _interopRequire(_like);
 
 var _recommendation = require('./recommendation');
 

@@ -124,8 +124,12 @@ function applyResourcing(klass) {
 
         resource.key = buildKey(resource);
         resource.route = buildRoute(resource);
-        resource.model = options.model || models[classify(name)] || models.Base;
+        resource.model = options.model || models[options.modelName] || models[classify(name)] || models.Base;
         resource.actions = [];
+
+        if (options.linkTo) {
+          resource.linkTo = options.linkTo;
+        }
 
         this.current = bucket[name] = klass.resourceDefinitions[resource.key] = resource;
 
@@ -202,6 +206,8 @@ var Resource = (function () {
   function Resource(api, key, parentResource) {
     var _this = this;
 
+    var inherit = arguments[3] === undefined ? false : arguments[3];
+
     _classCallCheck(this, Resource);
 
     var def = api.constructor.resourceDefinitions[key];
@@ -241,7 +247,9 @@ var Resource = (function () {
 
       _lodash2['default'].extend(this.route.params, parentParams);
 
-      this.route.queryParams = _lodash2['default'].clone(parentResource.route.queryParams);
+      if (inherit) {
+        this.route.queryParams = _lodash2['default'].clone(parentResource.route.queryParams);
+      }
     }
 
     this.parent = function () {
@@ -266,7 +274,7 @@ var Resource = (function () {
 
       var options = arguments[0] === undefined ? {} : arguments[0];
 
-      return this.api.request(options.method || 'get', this.buildRoute(options.path), { query: _lodash2['default'].extend({}, this.route.queryParams, options.query), data: options.data }).then(function (res) {
+      return this.api.request(options.method || 'get', this.buildRoute(options.path), _lodash2['default'].extend({}, this.options, { query: _lodash2['default'].extend({}, this.route.queryParams, options.query), data: options.data })).then(function (res) {
         _this2.setResponse(res);
         return res.body;
       });
@@ -295,6 +303,7 @@ var Resource = (function () {
         if (_this3.route.params.hasOwnProperty(paramName)) {
           _this3.route.params[paramName] = value;
         } else {
+          // Break out query params from route params
           _this3.route.queryParams[paramName] = value;
         }
       });
@@ -325,7 +334,7 @@ var Resource = (function () {
   }, {
     key: 'get',
     value: function get(params) {
-      var resource = new Resource(this.api, this.key, this).query(params);
+      var resource = new Resource(this.api, this.key, this, true).query(params);
       var path = resource.buildRoute();
 
       return this.api.request('get', path, { query: resource.route.queryParams }).then(function (res) {
@@ -341,7 +350,7 @@ var Resource = (function () {
         params = { id: params };
       }
 
-      var resource = new Resource(this.api, this.key, this).includeParams(params);
+      var resource = new Resource(this.api, this.key, this, true).includeParams(params);
 
       return resource.request().then(function (res) {
         return resource.hydrateModel(res);
@@ -350,7 +359,7 @@ var Resource = (function () {
   }, {
     key: 'all',
     value: function all(params) {
-      var resource = new Resource(this.api, this.key, this).includeParams(params);
+      var resource = new Resource(this.api, this.key, this, true).includeParams(params);
 
       return resource.request().then(function (res) {
         return resource.hydrateCollection(res);
@@ -371,6 +380,7 @@ var Resource = (function () {
       var model = new this.model(data, { persisted: true });
 
       // Set route params based on data from the model
+      // This is important step to take if the model queried from an all, queryParams, or action
       if (data[this.route.paramName]) {
         this.route.params[this.route.paramName] = data[this.route.paramName];
       }
@@ -394,6 +404,7 @@ var Resource = (function () {
       var collection = _lodash2['default'].map(data, function (item) {
         // Models in a collection need a new resource created
         var resource = new Resource(_this5.api, _this5.key, _this5);
+
         var model = resource.hydrateModel(item);
 
         return model;

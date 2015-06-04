@@ -201,7 +201,57 @@ exports['default'] = Papi;
 
 (0, _resource.applyResourcing)(Papi);
 
-Papi.resource('auth').resource('accounts').open().resource('users').resource('hubs').close().resource('hubs').open().post('upgrade').get('search', { on: 'collection' }).resource('apps').open().get('current', { path: '/current' }).resource('styles').close().resource('feeds').open().resource('assets').close().resource('invites').resource('recommendations').resource('users').resource('collections').resource('tags').resource('assets', { routeSegment: '/stream/:id' }).open().put('feature').put('unfeature').put('hide').put('unhide').put('lock').put('unlock').resource('likes').resource('comments').close().resource('drafts').close().resource('code_revisions').open()
+Papi.resource('accounts').open().resource('users').resource('hubs', { linkTo: 'hubs' }).close().resource('hubs').open().post('upgrade').get('search', { on: 'collection' }).resource('apps').open().get('current', { path: '/current' }).resource('styles').close().resource('analytics').resource('feeds').open().resource('assets', { modelName: 'FeedAsset' }).close().resource('invites').resource('recommendations').resource('users').resource('collections').resource('tags').resource('assets', { routeSegment: '/stream/:id' }).open().put('feature').put('unfeature').put('hide').put('unhide').put('lock').put('unlock').resource('likes').resource('comments').close().resource('drafts').close().resource('code_revisions').open()
 // This resource links to the root hubs resource
 .resource('hubs', { linkTo: 'hubs' }).close();
+
+Papi.generateMarkdown = function () {
+  var markdown = '';
+
+  _lodash2['default'].each(Papi.resourceDefinitions, function (def) {
+    markdown += '###' + def.model.name + '\n\n';
+    markdown += '**`' + def.key + '`**\n\n';
+
+    if (def.parent) {
+      markdown += '#####Parent\n\n';
+      markdown += '- [' + def.parent.model.name + '](#' + def.parent.model.name.toLowerCase() + ') `' + def.parent.key + '`\n\n';
+    }
+
+    if (!_lodash2['default'].isEmpty(def.children)) {
+      markdown += '#####Children\n\n';
+      _lodash2['default'].each(def.children, function (child) {
+        markdown += '- [' + child.model.name + '](#' + child.model.name.toLowerCase() + ') `' + child.key + '`\n';
+      });
+    }
+
+    markdown += '\n\n';
+
+    if (def.linkTo) {
+      var linkTo = Papi.resourceDefinitions[def.linkTo];
+      markdown += 'See [' + linkTo.model.name + '](#' + linkTo.model.name.toLowerCase() + ') `' + linkTo.key + '`\n\n';
+    }
+
+    var pathRoot = def.route.path.replace(/\/:.+$/, '');
+
+    markdown += '#####REST Endpoints\n\n';
+
+    markdown += '- `GET` ' + pathRoot + '\n';
+    markdown += '- `POST` ' + pathRoot + '\n';
+    markdown += '- `GET` ' + def.route.path + '\n';
+    markdown += '- `PUT` ' + def.route.path + '\n';
+    markdown += '- `DELETE` ' + def.route.path + '\n\n';
+
+    if (!_lodash2['default'].isEmpty(def.actions)) {
+      markdown += '*Additional Actions*\n\n';
+
+      _lodash2['default'].each(def.actions, function (action) {
+        markdown += '- `' + action.method.toUpperCase() + '` ' + def.route.path + '/' + action.name + '\n';
+      });
+    }
+
+    markdown += '\n\n';
+  });
+
+  console.log(markdown);
+};
 module.exports = exports['default'];
