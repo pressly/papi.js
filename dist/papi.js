@@ -202,7 +202,7 @@ exports['default'] = Papi;
 
 (0, _resource.applyResourcing)(Papi);
 
-Papi.resource('accounts').open().resource('users').resource('hubs', { linkTo: 'hubs' }).close().resource('hubs').open().post('upgrade').get('search', { on: 'collection' }).resource('apps').open().get('current', { path: '/current' }).resource('styles').close().resource('analytics').resource('feeds').open().resource('assets', { modelName: 'FeedAsset' }).close().resource('invites').resource('recommendations').resource('users').resource('collections').resource('tags').resource('assets', { routeSegment: '/stream/:id' }).open().put('feature').put('unfeature').put('hide').put('unhide').put('lock').put('unlock').resource('likes').resource('comments').close().resource('drafts').close().resource('code_revisions').open()
+Papi.resource('accounts').open().resource('users').resource('hubs', { linkTo: 'hubs' }).close().resource('hubs').open().post('upgrade', { on: 'member' }).get('search', { on: 'collection' }).resource('apps').open().get('current', { path: '/current' }).resource('styles').close().resource('analytics').resource('feeds').open().resource('assets', { modelName: 'FeedAsset' }).close().resource('invites').resource('recommendations').resource('users').resource('collections').resource('tags').resource('assets', { routeSegment: '/stream/:id' }).open().put('feature', { on: 'member' }).put('unfeature', { on: 'member' }).put('hide', { on: 'member' }).put('unhide', { on: 'member' }).put('lock', { on: 'member' }).put('unlock', { on: 'member' }).resource('likes').resource('comments').close().resource('drafts').close().resource('code_revisions').open()
 // This resource links to the root hubs resource
 .resource('hubs', { linkTo: 'hubs' }).close();
 
@@ -243,11 +243,31 @@ Papi.generateMarkdown = function () {
     markdown += '- `DELETE` ' + def.route.path + '\n\n';
 
     if (!_lodash2['default'].isEmpty(def.actions)) {
-      markdown += '*Additional Actions*\n\n';
-
-      _lodash2['default'].each(def.actions, function (action) {
-        markdown += '- `' + action.method.toUpperCase() + '` ' + def.route.path + '/' + action.name + '\n';
+      var memberActions = _lodash2['default'].select(def.actions, function (action) {
+        return action.options.on == 'member';
       });
+
+      var collectionActions = _lodash2['default'].select(def.actions, function (action) {
+        return action.options.on == 'collection';
+      });
+
+      if (!_lodash2['default'].isEmpty(collectionActions)) {
+        markdown += '*Collection Actions*\n\n';
+
+        _lodash2['default'].each(collectionActions, function (action) {
+          markdown += '- `' + action.method.toUpperCase() + '` ' + pathRoot + '/' + action.name + '\n';
+        });
+      }
+
+      markdown += '\n\n';
+
+      if (!_lodash2['default'].isEmpty(memberActions)) {
+        markdown += '*Member Actions*\n\n';
+
+        _lodash2['default'].each(memberActions, function (action) {
+          markdown += '- `' + action.method.toUpperCase() + '` ' + def.route.path + '/' + action.name + '\n';
+        });
+      }
     }
 
     markdown += '\n\n';
@@ -1407,7 +1427,8 @@ var Resource = (function () {
   }, {
     key: 'hydrateCollection',
     value: function hydrateCollection(data) {
-      var _this5 = this;
+      var _this5 = this,
+          _arguments = arguments;
 
       var collection = _lodash2['default'].map(data, function (item) {
         // Models in a collection need a new resource created
@@ -1418,16 +1439,16 @@ var Resource = (function () {
         return model;
       });
 
-      _lodash2['default'].extend(collection, {
+      var methods = {
         $resource: function $resource() {
           return _this5;
         },
 
-        nextPage: function nextPage() {
-          var options = arguments[0] === undefined ? {} : arguments[0];
+        getPage: function getPage(page) {
+          var options = arguments[1] === undefined ? {} : arguments[1];
 
-          if (_this5.links.next) {
-            return _this5.api.request('get', _this5.links.next).then(function (res) {
+          if (_this5.links[page]) {
+            return _this5.api.request('get', _this5.links[page]).then(function (res) {
               if (options.append || options.prepend) {
                 _this5.setResponse(res);
 
@@ -1447,10 +1468,138 @@ var Resource = (function () {
           }
         },
 
+        nextPage: function nextPage() {
+          var options = arguments[0] === undefined ? {} : arguments[0];
+
+          return collection.getPage('next', options);
+        },
+
+        prevPage: function prevPage() {
+          var options = arguments[0] === undefined ? {} : arguments[0];
+
+          return collection.getPage('prev', options);
+        },
+
         hasPage: function hasPage(name) {
           return !!_this5.links[name];
+        },
+
+        first: function first() {
+          return _lodash2['default'].first(collection);
+        },
+
+        last: function last() {
+          return _lodash2['default'].last(collection);
+        },
+
+        at: function at(idx) {
+          return collection[0];
+        },
+
+        where: function where(params) {
+          return _lodash2['default'].where(collection, params);
+        },
+
+        find: function find(id) {
+          return _lodash2['default'].detect(collection, function (item) {
+            return item.id == id;
+          });
+        },
+
+        findWhere: function findWhere(params) {
+          return _lodash2['default'].findWhere(collection, params);
+        },
+
+        build: function build() {
+          var data = arguments[0] === undefined ? {} : arguments[0];
+
+          var resource = new Resource(_this5.api, _this5.key, _this5);
+
+          var model = resource.hydrateModel(item);
+
+          return model;
+        },
+
+        add: function add(_x8, idx) {
+          var model = arguments[0] === undefined ? {} : arguments[0];
+          var applySorting = arguments[2] === undefined ? false : arguments[2];
+
+          if (typeof model == 'object' && !(model instanceof _this5.model)) {
+            model = collection.build(model);
+          }
+
+          if (_lodash2['default'].isNumber(idx)) {
+            collection.splice(idx, 0, model);
+          } else {
+            collection.push(model);
+          }
+
+          if (applySorting) {
+            collection.sort();
+          }
+
+          return model;
+        },
+
+        remove: function remove() {
+          // Remove multiples
+          if (_lodash2['default'].isArray(_arguments[0])) {
+            _lodash2['default'].each(model, function (item) {
+              collection.remove(item);
+            });
+
+            return _arguments[0];
+          }
+
+          var idx;
+          if (_lodash2['default'].isNumber(_arguments[0])) {
+            idx = _arguments[0];
+          } else if (_arguments[0] instanceof _this5.model) {
+            idx = collection.indexOf(_arguments[0]);
+          }
+
+          if (idx >= 0 && idx < collection.length) {
+            return collection.splice(idx, 1)[0];
+          }
+        },
+
+        reposition: function reposition(fromIdx, toIdx) {
+          if (fromIdx != toIdx && (fromIdx >= 0 && fromIdx < collection.length) && (toIdx >= 0 && toIdx < collection.length)) {
+            var model = collection.remove(fromIdx);
+
+            if (model) {
+              return collection.add(model, toIdx, false);
+            }
+          }
+        },
+
+        sort: function sort() {},
+
+        // save: () => {
+        //   var promises = [];
+        //
+        //   for (var idx = 0; i < collection.length; i++) {
+        //     var item = collection.at(idx);
+        //     promises.push(item.save());
+        //   }
+        //
+        //   return Promise.all(promises);
+        // },
+
+        // update: () => {},
+
+        'delete': function _delete(model) {
+          var params = arguments[1] === undefined ? {} : arguments[1];
+
+          if (model instanceof _this5.model) {
+            model['delete'](params).then(function () {
+              return collection.remove(model);
+            });
+          }
         }
-      });
+      };
+
+      _lodash2['default'].extend(collection, methods);
 
       return collection;
     }

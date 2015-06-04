@@ -399,7 +399,8 @@ var Resource = (function () {
   }, {
     key: 'hydrateCollection',
     value: function hydrateCollection(data) {
-      var _this5 = this;
+      var _this5 = this,
+          _arguments = arguments;
 
       var collection = _lodash2['default'].map(data, function (item) {
         // Models in a collection need a new resource created
@@ -410,16 +411,16 @@ var Resource = (function () {
         return model;
       });
 
-      _lodash2['default'].extend(collection, {
+      var methods = {
         $resource: function $resource() {
           return _this5;
         },
 
-        nextPage: function nextPage() {
-          var options = arguments[0] === undefined ? {} : arguments[0];
+        getPage: function getPage(page) {
+          var options = arguments[1] === undefined ? {} : arguments[1];
 
-          if (_this5.links.next) {
-            return _this5.api.request('get', _this5.links.next).then(function (res) {
+          if (_this5.links[page]) {
+            return _this5.api.request('get', _this5.links[page]).then(function (res) {
               if (options.append || options.prepend) {
                 _this5.setResponse(res);
 
@@ -439,10 +440,138 @@ var Resource = (function () {
           }
         },
 
+        nextPage: function nextPage() {
+          var options = arguments[0] === undefined ? {} : arguments[0];
+
+          return collection.getPage('next', options);
+        },
+
+        prevPage: function prevPage() {
+          var options = arguments[0] === undefined ? {} : arguments[0];
+
+          return collection.getPage('prev', options);
+        },
+
         hasPage: function hasPage(name) {
           return !!_this5.links[name];
+        },
+
+        first: function first() {
+          return _lodash2['default'].first(collection);
+        },
+
+        last: function last() {
+          return _lodash2['default'].last(collection);
+        },
+
+        at: function at(idx) {
+          return collection[0];
+        },
+
+        where: function where(params) {
+          return _lodash2['default'].where(collection, params);
+        },
+
+        find: function find(id) {
+          return _lodash2['default'].detect(collection, function (item) {
+            return item.id == id;
+          });
+        },
+
+        findWhere: function findWhere(params) {
+          return _lodash2['default'].findWhere(collection, params);
+        },
+
+        build: function build() {
+          var data = arguments[0] === undefined ? {} : arguments[0];
+
+          var resource = new Resource(_this5.api, _this5.key, _this5);
+
+          var model = resource.hydrateModel(item);
+
+          return model;
+        },
+
+        add: function add(_x8, idx) {
+          var model = arguments[0] === undefined ? {} : arguments[0];
+          var applySorting = arguments[2] === undefined ? false : arguments[2];
+
+          if (typeof model == 'object' && !(model instanceof _this5.model)) {
+            model = collection.build(model);
+          }
+
+          if (_lodash2['default'].isNumber(idx)) {
+            collection.splice(idx, 0, model);
+          } else {
+            collection.push(model);
+          }
+
+          if (applySorting) {
+            collection.sort();
+          }
+
+          return model;
+        },
+
+        remove: function remove() {
+          // Remove multiples
+          if (_lodash2['default'].isArray(_arguments[0])) {
+            _lodash2['default'].each(model, function (item) {
+              collection.remove(item);
+            });
+
+            return _arguments[0];
+          }
+
+          var idx;
+          if (_lodash2['default'].isNumber(_arguments[0])) {
+            idx = _arguments[0];
+          } else if (_arguments[0] instanceof _this5.model) {
+            idx = collection.indexOf(_arguments[0]);
+          }
+
+          if (idx >= 0 && idx < collection.length) {
+            return collection.splice(idx, 1)[0];
+          }
+        },
+
+        reposition: function reposition(fromIdx, toIdx) {
+          if (fromIdx != toIdx && (fromIdx >= 0 && fromIdx < collection.length) && (toIdx >= 0 && toIdx < collection.length)) {
+            var model = collection.remove(fromIdx);
+
+            if (model) {
+              return collection.add(model, toIdx, false);
+            }
+          }
+        },
+
+        sort: function sort() {},
+
+        // save: () => {
+        //   var promises = [];
+        //
+        //   for (var idx = 0; i < collection.length; i++) {
+        //     var item = collection.at(idx);
+        //     promises.push(item.save());
+        //   }
+        //
+        //   return Promise.all(promises);
+        // },
+
+        // update: () => {},
+
+        'delete': function _delete(model) {
+          var params = arguments[1] === undefined ? {} : arguments[1];
+
+          if (model instanceof _this5.model) {
+            model['delete'](params).then(function () {
+              return collection.remove(model);
+            });
+          }
         }
-      });
+      };
+
+      _lodash2['default'].extend(collection, methods);
 
       return collection;
     }

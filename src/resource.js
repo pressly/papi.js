@@ -347,14 +347,14 @@ export default class Resource {
       return model;
     });
 
-    _.extend(collection, {
+    var methods = {
       $resource: () => {
         return this;
       },
 
-      nextPage: (options = {}) => {
-        if (this.links.next) {
-          return this.api.request('get', this.links.next).then((res) => {
+      getPage: (page, options = {}) => {
+        if (this.links[page]) {
+          return this.api.request('get', this.links[page]).then((res) => {
             if (options.append || options.prepend) {
               this.setResponse(res);
 
@@ -374,10 +374,127 @@ export default class Resource {
         }
       },
 
+      nextPage: (options = {}) => {
+        return collection.getPage('next', options);
+      },
+
+      prevPage: (options = {}) => {
+        return collection.getPage('prev', options);
+      },
+
       hasPage: (name) => {
         return !!this.links[name];
+      },
+
+      first: () => {
+        return _.first(collection);
+      },
+
+      last: () => {
+        return _.last(collection);
+      },
+
+      at: (idx) => {
+        return collection[0];
+      },
+
+      where: (params) => {
+        return _.where(collection, params);
+      },
+
+      find: (id) => {
+        return _.detect(collection, (item) => {
+          return item.id == id;
+        });
+      },
+
+      findWhere: (params) => {
+        return _.findWhere(collection, params);
+      },
+
+      build: (data = {}) => {
+        var resource = new Resource(this.api, this.key, this);
+
+        var model = resource.hydrateModel(item);
+
+        return model;
+      },
+
+      add: (model = {}, idx, applySorting = false) => {
+        if (typeof model == 'object' && !(model instanceof this.model)) {
+          model = collection.build(model);
+        }
+
+        if (_.isNumber(idx)) {
+          collection.splice(idx, 0, model);
+        } else {
+          collection.push(model);
+        }
+
+        if (applySorting) {
+          collection.sort();
+        }
+
+        return model;
+      },
+
+      remove: () => {
+        // Remove multiples
+        if (_.isArray(arguments[0])) {
+          _.each(model, (item) => {
+            collection.remove(item);
+          })
+
+          return arguments[0];
+        }
+
+        var idx;
+        if (_.isNumber(arguments[0])) {
+          idx = arguments[0];
+        } else if (arguments[0] instanceof this.model) {
+          idx = collection.indexOf(arguments[0]);
+        }
+
+        if (idx >= 0 && idx < collection.length) {
+          return collection.splice(idx, 1)[0];
+        }
+      },
+
+      reposition: (fromIdx, toIdx) => {
+        if (fromIdx != toIdx && (fromIdx >= 0 && fromIdx < collection.length) && (toIdx >= 0 && toIdx < collection.length)) {
+          var model = collection.remove(fromIdx);
+
+          if (model) {
+            return collection.add(model, toIdx, false);
+          }
+        }
+      },
+
+      sort: () => {},
+
+      // save: () => {
+      //   var promises = [];
+      //
+      //   for (var idx = 0; i < collection.length; i++) {
+      //     var item = collection.at(idx);
+      //     promises.push(item.save());
+      //   }
+      //
+      //   return Promise.all(promises);
+      // },
+
+      // update: () => {},
+
+      delete: (model, params = {}) => {
+        if (model instanceof this.model) {
+          model.delete(params).then(() => {
+            return collection.remove(model);
+          });
+        }
       }
-    });
+    };
+
+    _.extend(collection, methods);
 
     return collection;
   }
