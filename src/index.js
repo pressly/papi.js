@@ -3,7 +3,6 @@
 import _ from 'lodash';
 import request from 'superagent';
 import Promise from 'bluebird';
-
 import Resource, { applyResourcing } from './resource';
 
 export default class Papi {
@@ -173,8 +172,10 @@ Papi
       .resource('styles')
     .close()
 
+    .resource('analytics')
+
     .resource('feeds').open()
-      .resource('assets')
+      .resource('assets', { modelName: 'FeedAsset' })
     .close()
 
     .resource('invites')
@@ -251,11 +252,9 @@ Papi.generateMarkdown = () => {
         markdown += `- \`${action.method.toUpperCase()}\` ${def.route.path}/${action.name}\n`
       });
     }
-    
+
     markdown += "\n\n";
   });
-
-  console.log(Papi.resourceDefinitions);
 
   console.log(markdown);
 };

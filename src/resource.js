@@ -101,7 +101,7 @@ export function applyResourcing(klass) {
 
         resource.key = buildKey(resource);
         resource.route = buildRoute(resource);
-        resource.model = options.model || models[classify(name)] || models.Base;
+        resource.model = options.model || models[options.modelName] || models[classify(name)] || models.Base;
         resource.actions = [];
 
         if (options.linkTo) {

@@ -8,6 +8,8 @@ import * as models from '../../src/models';
 
 const api = new Papi();
 
+// Papi.generateMarkdown();
+
 api.auth.set({jwt: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNTRmMGRiNzMwOGFmYTEyYjUzNjIwNTg4In0.CvXGDKAJYZkoH3nnEirtlGlwRzErv1ANOJ-dVkUAnjo#_login_post'});
 
 nock(api.options.host)
