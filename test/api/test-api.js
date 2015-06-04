@@ -89,6 +89,8 @@ describe('Hubs Resource', function () {
     api.$resource('hubs').all().then((res) => {
       res.should.not.be.empty;
       res[0].should.instanceOf(models.Hub);
+      should(res[0].$newRecord).not.equal(true);
+
       should.exist(res.nextPage);
 
       done();
@@ -101,6 +103,7 @@ describe('Hubs Resource', function () {
     api.$resource('hubs').find(mock.hubs[0].id).then((res) => {
       res.should.instanceOf(models.Hub);
       res.id.should.equal(mock.hubs[0].id);
+      should(res.$newRecord).not.equal(true);
 
       done();
     }).catch((err) => {
@@ -320,6 +323,7 @@ describe('Collections', function() {
     var model = collection.build({ name: 'Hello' });
     model.should.be.instanceOf(models.Hub);
     model.name.should.equal('Hello');
+    should(model.$newRecord).equal(true);
 
     done();
   });
