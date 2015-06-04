@@ -240,6 +240,7 @@ api.$resource('hubs').find(123).then(function(hub) {
 
 Below outlines the schema of all the RESTful resources, their routes, associated model, and child resources.
 
+
 ###Account
 
 **`accounts`**
@@ -258,6 +259,11 @@ Below outlines the schema of all the RESTful resources, their routes, associated
 - `PUT` /accounts/:id
 - `DELETE` /accounts/:id
 
+
+
+*Member Actions*
+
+- `POST` /accounts/:id/become
 
 
 ###User
@@ -336,6 +342,8 @@ See [Hub](#hub) `hubs`
 *Member Actions*
 
 - `POST` /hubs/:id/upgrade
+- `POST` /hubs/:id/accept_invite
+- `POST` /hubs/:id/reject_invite
 
 
 ###App
@@ -359,8 +367,15 @@ See [Hub](#hub) `hubs`
 - `PUT` /hubs/:hubId/apps/:id
 - `DELETE` /hubs/:hubId/apps/:id
 
+*Collection Actions*
+
+- `GET` /hubs/current
 
 
+*Member Actions*
+
+- `GET` /hubs/:hubId/apps/:id/build
+- `GET` /hubs/:hubId/apps/:id/status
 
 
 ###Style
@@ -400,6 +415,14 @@ See [Hub](#hub) `hubs`
 - `GET` /hubs/:hubId/analytics/:id
 - `PUT` /hubs/:hubId/analytics/:id
 - `DELETE` /hubs/:hubId/analytics/:id
+
+*Collection Actions*
+
+- `GET` /hubs/summary
+- `GET` /hubs/visitors
+- `GET` /hubs/pageviews
+- `GET` /hubs/duration
+
 
 
 
@@ -464,6 +487,16 @@ See [Hub](#hub) `hubs`
 - `PUT` /hubs/:hubId/invites/:id
 - `DELETE` /hubs/:hubId/invites/:id
 
+*Collection Actions*
+
+- `POST` /hubs/bulk_invite
+
+
+*Member Actions*
+
+- `POST` /hubs/:hubId/invites/:id/resend
+- `POST` /hubs/:hubId/invites/:id/accept
+- `POST` /hubs/:hubId/invites/:id/reject
 
 
 ###Recommendation
@@ -504,6 +537,14 @@ See [Hub](#hub) `hubs`
 - `PUT` /hubs/:hubId/users/:id
 - `DELETE` /hubs/:hubId/users/:id
 
+*Collection Actions*
+
+- `POST` /hubs/grant_access
+
+
+*Member Actions*
+
+- `DELETE` /hubs/:hubId/users/:id/revoke_access
 
 
 ###Collection
@@ -523,6 +564,11 @@ See [Hub](#hub) `hubs`
 - `GET` /hubs/:hubId/collections/:id
 - `PUT` /hubs/:hubId/collections/:id
 - `DELETE` /hubs/:hubId/collections/:id
+
+*Collection Actions*
+
+- `PUT` /hubs/reorder
+
 
 
 
@@ -640,6 +686,11 @@ See [Hub](#hub) `hubs`
 
 
 
+*Member Actions*
+
+- `PUT` /hubs/:hubId/drafts/:id/publish
+
+
 ###CodeRevision
 
 **`code_revisions`**
@@ -657,6 +708,11 @@ See [Hub](#hub) `hubs`
 - `PUT` /code_revisions/:id
 - `DELETE` /code_revisions/:id
 
+
+
+*Member Actions*
+
+- `GET` /code_revisions/:id/fetch_repo
 
 
 ###Hub
@@ -681,4 +737,43 @@ See [Hub](#hub) `hubs`
 
 
 
+###Model
+
+**`signup`**
+
+
+
+#####REST Endpoints
+
+- `GET` /signup
+- `POST` /signup
+- `GET` /signup/:id
+- `PUT` /signup/:id
+- `DELETE` /signup/:id
+
+
+
+*Member Actions*
+
+- `GET` /signup/:id/account_uid_available
+- `GET` /signup/:id/account_email_available
+
+
+###User
+
+**`users`**
+
+
+
+#####REST Endpoints
+
+- `GET` /users
+- `POST` /users
+- `GET` /users/:id
+- `PUT` /users/:id
+- `DELETE` /users/:id
+
+*Collection Actions*
+
+- `GET` /users/roles
 
