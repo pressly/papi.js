@@ -309,6 +309,7 @@ See [Hub](#hub) `hubs`
 #####Children
 
 - [App](#app) `hubs.apps`
+- [Model](#model) `hubs.analytics`
 - [Feed](#feed) `hubs.feeds`
 - [Invite](#invite) `hubs.invites`
 - [Recommendation](#recommendation) `hubs.recommendations`
@@ -379,6 +380,26 @@ See [Hub](#hub) `hubs`
 
 
 
+###Model
+
+**`hubs.analytics`**
+
+#####Parent
+
+- [Hub](#hub) `hubs`
+
+
+
+#####REST Endpoints
+
+- `GET` /hubs
+- `POST` /hubs
+- `GET` /hubs/:hubId/analytics/:id
+- `PUT` /hubs/:hubId/analytics/:id
+- `DELETE` /hubs/:hubId/analytics/:id
+
+
+
 ###Feed
 
 **`hubs.feeds`**
@@ -389,7 +410,7 @@ See [Hub](#hub) `hubs`
 
 #####Children
 
-- [Asset](#asset) `hubs.feeds.assets`
+- [FeedAsset](#feedasset) `hubs.feeds.assets`
 
 
 #####REST Endpoints
@@ -402,7 +423,7 @@ See [Hub](#hub) `hubs`
 
 
 
-###Asset
+###FeedAsset
 
 **`hubs.feeds.assets`**
 
@@ -532,7 +553,7 @@ See [Hub](#hub) `hubs`
 
 #####Children
 
-- [Model](#model) `hubs.assets.likes`
+- [Like](#like) `hubs.assets.likes`
 - [Comment](#comment) `hubs.assets.comments`
 
 
@@ -554,7 +575,7 @@ See [Hub](#hub) `hubs`
 - `PUT` /hubs/:hubId/stream/:id/unlock
 
 
-###Model
+###Like
 
 **`hubs.assets.likes`**
 
@@ -652,5 +673,3 @@ See [Hub](#hub) `hubs`
 - `GET` /code_revisions/:code_revisionId/hubs/:id
 - `PUT` /code_revisions/:code_revisionId/hubs/:id
 - `DELETE` /code_revisions/:code_revisionId/hubs/:id
-
-
