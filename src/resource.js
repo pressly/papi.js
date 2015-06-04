@@ -395,7 +395,7 @@ export default class Resource {
       },
 
       at: (idx) => {
-        return collection[0];
+        return collection[idx];
       },
 
       where: (params) => {
@@ -415,7 +415,7 @@ export default class Resource {
       build: (data = {}) => {
         var resource = new Resource(this.api, this.key, this);
 
-        var model = resource.hydrateModel(item);
+        var model = resource.hydrateModel(data);
 
         return model;
       },
@@ -438,21 +438,22 @@ export default class Resource {
         return model;
       },
 
-      remove: () => {
+      remove: (arg) => {
         // Remove multiples
-        if (_.isArray(arguments[0])) {
-          _.each(model, (item) => {
-            collection.remove(item);
+        if (_.isArray(arg)) {
+          var models = arg;
+          _.each(models, (model) => {
+            collection.remove(model);
           })
 
-          return arguments[0];
+          return models;
         }
 
         var idx;
-        if (_.isNumber(arguments[0])) {
-          idx = arguments[0];
-        } else if (arguments[0] instanceof this.model) {
-          idx = collection.indexOf(arguments[0]);
+        if (_.isNumber(arg)) {
+          idx = arg;
+        } else if (arg instanceof this.model) {
+          idx = collection.indexOf(arg);
         }
 
         if (idx >= 0 && idx < collection.length) {

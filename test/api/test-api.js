@@ -8,7 +8,7 @@ import * as models from '../../src/models';
 
 const api = new Papi();
 
-Papi.generateMarkdown();
+//Papi.generateMarkdown();
 
 api.auth.set({jwt: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNTRmMGRiNzMwOGFmYTEyYjUzNjIwNTg4In0.CvXGDKAJYZkoH3nnEirtlGlwRzErv1ANOJ-dVkUAnjo#_login_post'});
 
@@ -79,6 +79,9 @@ nock(api.options.host)
   .get(`/hubs/${mock.hubs[0].id}/stream?slug=some-slug`).times(3).reply(200, mock.assets[0])
 
   .get(`/hubs/${mock.hubs[0].id}/stream/${mock.assets[0].id}/comments`).reply(200, mock.comments)
+
+  /** Collection **************************************************************/
+  .get(`/hubs`).reply(200, mock.hubs)
 ;
 
 describe('Hubs Resource', function () {
@@ -301,4 +304,92 @@ describe('Stream Assets Resource', function() {
       done(err);
     });
   });
+});
+
+describe('Collections', function() {
+  var collection;
+
+  before(function(done) {
+    api.$resource('hubs').all().then((res) => {
+      collection = res;
+      done();
+    });
+  });
+
+  it('should build a new model', function(done) {
+    var model = collection.build({ name: 'Hello' });
+    model.should.be.instanceOf(models.Hub);
+    model.name.should.equal('Hello');
+
+    done();
+  });
+
+  it('should add a new model', function(done) {
+    collection.length.should.equal(mock.hubs.length);
+    var model = collection.build({ name: 'Hello' });
+
+    collection.add(model);
+    collection.length.should.equal(mock.hubs.length + 1);
+
+    done();
+  });
+
+  it('should remove a model', function(done) {
+    var model = collection.last();
+
+    collection.remove(model);
+    collection.length.should.equal(mock.hubs.length);
+
+    done();
+  });
+
+  it('should add a new model at an index', function(done) {
+    collection.length.should.equal(mock.hubs.length);
+    var model = collection.build({ name: 'Hello' });
+
+    collection.add(model, 3);
+    collection.length.should.equal(mock.hubs.length + 1);
+    collection.at(3).should.equal(model);
+
+    done();
+  });
+
+  it('should remove a model at an index', function(done) {
+    var model = collection.remove(3);
+    model.name.should.equal('Hello');
+    collection.length.should.equal(mock.hubs.length);
+
+    done();
+  });
+
+  it('should reposition a model in a collection', function(done) {
+    var model = collection.add({name: 'Hello'});
+
+    collection.reposition(mock.hubs.length, 0);
+    collection.at(0).should.equal(model);
+    collection.reposition(0, 1);
+    collection.at(1).should.equal(model);
+    collection.reposition(1, mock.hubs.length);
+    collection.at(mock.hubs.length).should.equal(model);
+
+    collection.length.should.equal(mock.hubs.length + 1);
+
+    done();
+  });
+
+  it('should find a model by id', function(done) {
+    var model = collection.find(mock.hubs[0].id);
+    model.name.should.equal('My First Hub');
+
+    done();
+  });
+
+
+  it('should find a model where params match', function(done) {
+    var model = collection.findWhere({name: 'Hello'});
+    model.name.should.equal('Hello');
+
+    done();
+  });
+
 });

@@ -1427,8 +1427,7 @@ var Resource = (function () {
   }, {
     key: 'hydrateCollection',
     value: function hydrateCollection(data) {
-      var _this5 = this,
-          _arguments = arguments;
+      var _this5 = this;
 
       var collection = _lodash2['default'].map(data, function (item) {
         // Models in a collection need a new resource created
@@ -1493,7 +1492,7 @@ var Resource = (function () {
         },
 
         at: function at(idx) {
-          return collection[0];
+          return collection[idx];
         },
 
         where: function where(params) {
@@ -1515,7 +1514,7 @@ var Resource = (function () {
 
           var resource = new Resource(_this5.api, _this5.key, _this5);
 
-          var model = resource.hydrateModel(item);
+          var model = resource.hydrateModel(data);
 
           return model;
         },
@@ -1541,21 +1540,22 @@ var Resource = (function () {
           return model;
         },
 
-        remove: function remove() {
+        remove: function remove(arg) {
           // Remove multiples
-          if (_lodash2['default'].isArray(_arguments[0])) {
-            _lodash2['default'].each(model, function (item) {
-              collection.remove(item);
+          if (_lodash2['default'].isArray(arg)) {
+            var models = arg;
+            _lodash2['default'].each(models, function (model) {
+              collection.remove(model);
             });
 
-            return _arguments[0];
+            return models;
           }
 
           var idx;
-          if (_lodash2['default'].isNumber(_arguments[0])) {
-            idx = _arguments[0];
-          } else if (_arguments[0] instanceof _this5.model) {
-            idx = collection.indexOf(_arguments[0]);
+          if (_lodash2['default'].isNumber(arg)) {
+            idx = arg;
+          } else if (arg instanceof _this5.model) {
+            idx = collection.indexOf(arg);
           }
 
           if (idx >= 0 && idx < collection.length) {
