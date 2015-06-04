@@ -158,6 +158,8 @@ applyResourcing(Papi);
 
 Papi
   .resource('accounts').open()
+    .post('become', { on: 'member' })
+
     .resource('users')
     .resource('hubs', { linkTo: 'hubs'})
   .close()
@@ -165,26 +167,46 @@ Papi
   .resource('hubs').open()
     .post('upgrade',  { on: 'member' })
     .get('search',    { on: 'collection' })
+    .post('accept_invite', { on: 'member'})
+    .post('reject_invite', { on: 'member'})
+
 
     .resource('apps').open()
-      .get('current', { path: '/current' })
+      .get('current', { path: '/current', on: 'collection' })
+      .get('build',   { path: '/build_app', on: 'member' })
+      .get('status',  { on: 'member' })
 
       .resource('styles')
     .close()
 
-    .resource('analytics')
+    .resource('analytics').open()
+      .get('summary',   { on: 'collection'})
+      .get('visitors',  { on: 'collection'})
+      .get('pageviews', { on: 'collection'})
+      .get('duration',  { on: 'collection'})
+    .close()
 
     .resource('feeds').open()
       .resource('assets', { modelName: 'FeedAsset' })
     .close()
 
-    .resource('invites')
+    .resource('invites').open()
+      .post('bulk_invite',  { on: 'collection' })
+      .post('resend',       { on: 'member' })
+      .post('accept',       { on: 'member' })
+      .post('reject',       { on: 'member' })
+    .close()
 
     .resource('recommendations')
 
-    .resource('users')
+    .resource('users').open()
+      .post('grant_access',     { on: 'collection' })
+      .delete('revoke_access',  { on: 'member' })
+    .close()
 
-    .resource('collections')
+    .resource('collections').open()
+      .put('reorder', { on: 'collection'})
+    .close()
 
     .resource('tags')
 
@@ -200,13 +222,27 @@ Papi
       .resource('comments')
     .close()
 
-    .resource('drafts')
+    .resource('drafts').open()
+      .put('publish', { on: 'member' })
+    .close()
   .close()
 
   .resource('code_revisions').open()
+    .get('fetch_repo', { on: 'member' })
+
     // This resource links to the root hubs resource
     .resource('hubs', { linkTo: 'hubs' })
   .close()
+
+  .resource('signup').open()
+    .get('account_uid_available',   { on: 'member' })
+    .get('account_email_available', { on: 'member' })
+  .close()
+
+  .resource('users').open()
+    .get('roles', { on: 'collection' })
+  .close()
+;
 
 
 Papi.generateMarkdown = () => {
