@@ -377,6 +377,15 @@ var Resource = (function () {
       this.links = parseHTTPLinks(res.headers.link);
     }
   }, {
+    key: 'sync',
+    value: function sync(data) {
+      // Set route params based on data from the model
+      // This is important step to take if the model queried from an all, queryParams, or action
+      if (data[this.route.paramName]) {
+        this.route.params[this.route.paramName] = data[this.route.paramName];
+      }
+    }
+  }, {
     key: 'hydrateModel',
     value: function hydrateModel(data) {
       var _this4 = this;
@@ -389,11 +398,7 @@ var Resource = (function () {
         model.$newRecord = false;
       }
 
-      // Set route params based on data from the model
-      // This is important step to take if the model queried from an all, queryParams, or action
-      if (data[this.route.paramName]) {
-        this.route.params[this.route.paramName] = data[this.route.paramName];
-      }
+      this.sync(data);
 
       // Set a reference to the resource on the model
       model.$resource = function (name) {

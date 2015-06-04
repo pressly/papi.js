@@ -17,7 +17,8 @@ export default class Model {
     var method = this.$newRecord ? 'post' : 'put';
 
     return this.$resource().request({ method: method, data: this }).then((res) => {
-      delete this.$newRecord;
+      this.$newRecord = false;
+      this.$resource().sync(res);
 
       return _.extend(this, res);
     });

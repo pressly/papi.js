@@ -40,7 +40,8 @@ var Model = (function () {
       var method = this.$newRecord ? 'post' : 'put';
 
       return this.$resource().request({ method: method, data: this }).then(function (res) {
-        delete _this.$newRecord;
+        _this.$newRecord = false;
+        _this.$resource().sync(res);
 
         return _lodash2['default'].extend(_this, res);
       });

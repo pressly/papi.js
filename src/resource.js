@@ -320,6 +320,14 @@ export default class Resource {
     this.links = parseHTTPLinks(res.headers.link);
   }
 
+  sync(data) {
+    // Set route params based on data from the model
+    // This is important step to take if the model queried from an all, queryParams, or action
+    if (data[this.route.paramName]) {
+      this.route.params[this.route.paramName] = data[this.route.paramName];
+    }
+  }
+
   hydrateModel(data, options = {}) {
     var model = new this.model(data);
 
@@ -327,11 +335,7 @@ export default class Resource {
       model.$newRecord = false;
     }
 
-    // Set route params based on data from the model
-    // This is important step to take if the model queried from an all, queryParams, or action
-    if (data[this.route.paramName]) {
-      this.route.params[this.route.paramName] = data[this.route.paramName];
-    }
+    this.sync(data);
 
     // Set a reference to the resource on the model
     model.$resource = (name) => {
