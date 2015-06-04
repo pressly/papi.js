@@ -260,7 +260,6 @@ Below outlines the schema of all the RESTful resources, their routes, associated
 
 
 
-
 ###User
 
 **`accounts.users`**
@@ -281,7 +280,6 @@ Below outlines the schema of all the RESTful resources, their routes, associated
 
 
 
-
 ###Hub
 
 **`accounts.hubs`**
@@ -292,6 +290,8 @@ Below outlines the schema of all the RESTful resources, their routes, associated
 
 
 
+See [Hub](#hub) `hubs`
+
 #####REST Endpoints
 
 - `GET` /accounts
@@ -299,7 +299,6 @@ Below outlines the schema of all the RESTful resources, their routes, associated
 - `GET` /accounts/:accountId/hubs/:id
 - `PUT` /accounts/:accountId/hubs/:id
 - `DELETE` /accounts/:accountId/hubs/:id
-
 
 
 
@@ -331,10 +330,7 @@ Below outlines the schema of all the RESTful resources, their routes, associated
 *Additional Actions*
 
 - `POST` /hubs/:id/upgrade
-
 - `GET` /hubs/:id/search
-
-
 
 
 ###App
@@ -363,8 +359,6 @@ Below outlines the schema of all the RESTful resources, their routes, associated
 - `GET` /hubs/:hubId/apps/:id/current
 
 
-
-
 ###Style
 
 **`hubs.apps.styles`**
@@ -382,7 +376,6 @@ Below outlines the schema of all the RESTful resources, their routes, associated
 - `GET` /hubs/:hubId/apps/:appId/styles/:id
 - `PUT` /hubs/:hubId/apps/:appId/styles/:id
 - `DELETE` /hubs/:hubId/apps/:appId/styles/:id
-
 
 
 
@@ -409,7 +402,6 @@ Below outlines the schema of all the RESTful resources, their routes, associated
 
 
 
-
 ###Asset
 
 **`hubs.feeds.assets`**
@@ -427,7 +419,6 @@ Below outlines the schema of all the RESTful resources, their routes, associated
 - `GET` /hubs/:hubId/feeds/:feedId/assets/:id
 - `PUT` /hubs/:hubId/feeds/:feedId/assets/:id
 - `DELETE` /hubs/:hubId/feeds/:feedId/assets/:id
-
 
 
 
@@ -451,7 +442,6 @@ Below outlines the schema of all the RESTful resources, their routes, associated
 
 
 
-
 ###Recommendation
 
 **`hubs.recommendations`**
@@ -469,7 +459,6 @@ Below outlines the schema of all the RESTful resources, their routes, associated
 - `GET` /hubs/:hubId/recommendations/:id
 - `PUT` /hubs/:hubId/recommendations/:id
 - `DELETE` /hubs/:hubId/recommendations/:id
-
 
 
 
@@ -493,7 +482,6 @@ Below outlines the schema of all the RESTful resources, their routes, associated
 
 
 
-
 ###Collection
 
 **`hubs.collections`**
@@ -514,7 +502,6 @@ Below outlines the schema of all the RESTful resources, their routes, associated
 
 
 
-
 ###Tag
 
 **`hubs.tags`**
@@ -532,7 +519,6 @@ Below outlines the schema of all the RESTful resources, their routes, associated
 - `GET` /hubs/:hubId/tags/:id
 - `PUT` /hubs/:hubId/tags/:id
 - `DELETE` /hubs/:hubId/tags/:id
-
 
 
 
@@ -561,18 +547,11 @@ Below outlines the schema of all the RESTful resources, their routes, associated
 *Additional Actions*
 
 - `PUT` /hubs/:hubId/stream/:id/feature
-
 - `PUT` /hubs/:hubId/stream/:id/unfeature
-
 - `PUT` /hubs/:hubId/stream/:id/hide
-
 - `PUT` /hubs/:hubId/stream/:id/unhide
-
 - `PUT` /hubs/:hubId/stream/:id/lock
-
 - `PUT` /hubs/:hubId/stream/:id/unlock
-
-
 
 
 ###Model
@@ -592,7 +571,6 @@ Below outlines the schema of all the RESTful resources, their routes, associated
 - `GET` /hubs/:hubId/stream/:assetId/likes/:id
 - `PUT` /hubs/:hubId/stream/:assetId/likes/:id
 - `DELETE` /hubs/:hubId/stream/:assetId/likes/:id
-
 
 
 
@@ -616,7 +594,6 @@ Below outlines the schema of all the RESTful resources, their routes, associated
 
 
 
-
 ###Draft
 
 **`hubs.drafts`**
@@ -634,7 +611,6 @@ Below outlines the schema of all the RESTful resources, their routes, associated
 - `GET` /hubs/:hubId/drafts/:id
 - `PUT` /hubs/:hubId/drafts/:id
 - `DELETE` /hubs/:hubId/drafts/:id
-
 
 
 
@@ -657,7 +633,6 @@ Below outlines the schema of all the RESTful resources, their routes, associated
 
 
 
-
 ###Hub
 
 **`code_revisions.hubs`**
@@ -667,6 +642,8 @@ Below outlines the schema of all the RESTful resources, their routes, associated
 - [CodeRevision](#coderevision) `code_revisions`
 
 
+
+See [Hub](#hub) `hubs`
 
 #####REST Endpoints
 

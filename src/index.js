@@ -160,7 +160,7 @@ applyResourcing(Papi);
 Papi
   .resource('accounts').open()
     .resource('users')
-    .resource('hubs')
+    .resource('hubs', { linkTo: 'hubs'})
   .close()
 
   .resource('hubs').open()
@@ -229,6 +229,11 @@ Papi.generateMarkdown = () => {
 
     markdown += '\n\n';
 
+    if (def.linkTo) {
+      let linkTo = Papi.resourceDefinitions[def.linkTo];
+      markdown += `See [${linkTo.model.name}](#${linkTo.model.name.toLowerCase()}) \`${linkTo.key}\`\n\n`;
+    }
+
     let pathRoot = def.route.path.replace(/\/:.+$/, '');
 
     markdown += '#####REST Endpoints\n\n';
@@ -243,11 +248,11 @@ Papi.generateMarkdown = () => {
       markdown += "*Additional Actions*\n\n";
 
       _.each(def.actions, (action) => {
-        markdown += `- \`${action.method.toUpperCase()}\` ${def.route.path}/${action.name}\n\n`
+        markdown += `- \`${action.method.toUpperCase()}\` ${def.route.path}/${action.name}\n`
       });
     }
-
-    markdown += "\n\n\n";
+    
+    markdown += "\n\n";
   });
 
   console.log(Papi.resourceDefinitions);

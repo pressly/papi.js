@@ -104,6 +104,10 @@ export function applyResourcing(klass) {
         resource.model = options.model || models[classify(name)] || models.Base;
         resource.actions = [];
 
+        if (options.linkTo) {
+          resource.linkTo = options.linkTo;
+        }
+
         this.current = bucket[name] = klass.resourceDefinitions[resource.key] = resource;
 
         return this;
