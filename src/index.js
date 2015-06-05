@@ -92,6 +92,12 @@ export default class Papi {
   request(method, path, options = {}) {
     return new Promise((resolve, reject) => {
       var url = /^(https?:)?\/\//.test(path) ? path : this.options.host + path;
+
+      //Doesn't allow the delete keyword because it is reserved
+      if (method == 'delete') {
+        method = 'del';
+      }
+
       var req = request[method](url);
       req.set('Content-Type', 'application/json');
 
@@ -169,7 +175,6 @@ Papi
     .get('search',    { on: 'collection' })
     .post('accept_invite', { on: 'member'})
     .post('reject_invite', { on: 'member'})
-
 
     .resource('apps').open()
       .get('current', { path: '/current', on: 'collection' })
