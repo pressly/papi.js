@@ -9,14 +9,14 @@ export default class Model {
     this.$newRecord = true;
   }
 
-  $delete() {
-    return this.$resource().request({ method: 'delete' });
+  $delete(params) {
+    return this.$resource().request({ method: 'delete', query: params });
   }
 
-  $save() {
+  $save(params) {
     var method = this.$newRecord ? 'post' : 'put';
 
-    return this.$resource().request({ method: method, data: this }).then((res) => {
+    return this.$resource().request({ method: method, data: this, query: params }).then((res) => {
       this.$newRecord = false;
       this.$resource().sync(res);
 

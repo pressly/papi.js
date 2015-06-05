@@ -29,17 +29,17 @@ var Model = (function () {
 
   _createClass(Model, [{
     key: '$delete',
-    value: function $delete() {
-      return this.$resource().request({ method: 'delete' });
+    value: function $delete(params) {
+      return this.$resource().request({ method: 'delete', query: params });
     }
   }, {
     key: '$save',
-    value: function $save() {
+    value: function $save(params) {
       var _this = this;
 
       var method = this.$newRecord ? 'post' : 'put';
 
-      return this.$resource().request({ method: method, data: this }).then(function (res) {
+      return this.$resource().request({ method: method, data: this, query: params }).then(function (res) {
         _this.$newRecord = false;
         _this.$resource().sync(res);
 

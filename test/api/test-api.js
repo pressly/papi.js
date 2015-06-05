@@ -5,6 +5,7 @@ import * as mock from './mocks';
 import nock from 'nock';
 import should from 'should';
 import * as models from '../../src/models';
+import _ from 'lodash';
 
 const api = new Papi();
 
@@ -82,16 +83,21 @@ nock(api.options.host)
 
   /** Collection **************************************************************/
   .get(`/hubs`).reply(200, mock.hubs)
+
+  .delete(`/hubs/${mock.hubs[0].id}`).reply(200, mock.hubs[0])
+
+  .post(`/hubs`).reply(200, { name: 'Hello', id: 1234 })
+
 ;
 
 describe('Hubs Resource', function () {
   it("all should return an array", function (done) {
-    api.$resource('hubs').all().then((res) => {
+    api.$resource('hubs').$all().then((res) => {
       res.should.not.be.empty;
       res[0].should.instanceOf(models.Hub);
       should(res[0].$newRecord).not.equal(true);
 
-      should.exist(res.nextPage);
+      should.exist(res.$nextPage);
 
       done();
     }).catch((err) => {
@@ -100,7 +106,7 @@ describe('Hubs Resource', function () {
   });
 
   it('find should return one item', function (done) {
-    api.$resource('hubs').find(mock.hubs[0].id).then((res) => {
+    api.$resource('hubs').$find(mock.hubs[0].id).then((res) => {
       res.should.instanceOf(models.Hub);
       res.id.should.equal(mock.hubs[0].id);
       should(res.$newRecord).not.equal(true);
@@ -112,7 +118,7 @@ describe('Hubs Resource', function () {
   });
 
   it('$resource with prepared params then find should return one item', function (done) {
-    api.$resource('hubs', { id: mock.hubs[0].id }).find().then((res) => {
+    api.$resource('hubs', { id: mock.hubs[0].id }).$find().then((res) => {
       res.should.instanceOf(models.Hub);
       res.id.should.equal(mock.hubs[0].id);
 
@@ -123,7 +129,7 @@ describe('Hubs Resource', function () {
   });
 
   it('all with limit should return the correct number of results', function (done) {
-    api.$resource('hubs').limit(3).all().then((res) => {
+    api.$resource('hubs').limit(3).$all().then((res) => {
       res.length.should.equal(3);
       res[0].should.instanceOf(models.Hub);
 
@@ -134,7 +140,7 @@ describe('Hubs Resource', function () {
   });
 
   it('all with query should send query params', function (done) {
-    api.$resource('hubs').query({summaries: true, b: 2}).all().then((res) => {
+    api.$resource('hubs').query({summaries: true, b: 2}).$all().then((res) => {
       done();
     }).catch((err) => {
       done(err);
@@ -142,7 +148,7 @@ describe('Hubs Resource', function () {
   });
 
   it('can update', function (done) {
-    api.$resource('hubs').find(mock.hubs[0].id).then((res) => {
+    api.$resource('hubs').$find(mock.hubs[0].id).then((res) => {
       res.$save().then(() => {
         done();
       }).catch((err) => {
@@ -156,7 +162,7 @@ describe('Hubs Resource', function () {
 
 describe('Apps Resource', function() {
   it('all should return an array', function(done) {
-    api.$resource('hubs.apps').all({hubId: mock.hubs[0].id}).then((res) => {
+    api.$resource('hubs.apps').$all({hubId: mock.hubs[0].id}).then((res) => {
       res.should.not.be.empty;
       res[0].should.instanceOf(models.App);
 
@@ -167,7 +173,7 @@ describe('Apps Resource', function() {
   });
 
   it('find should return one item', function(done) {
-    api.$resource('hubs.apps').find({hubId: mock.hubs[0].id, id: mock.apps[0].id}).then((res) => {
+    api.$resource('hubs.apps').$find({hubId: mock.hubs[0].id, id: mock.apps[0].id}).then((res) => {
       res.should.instanceOf(models.App);
       res.id.should.equal(mock.apps[0].id);
 
@@ -178,7 +184,7 @@ describe('Apps Resource', function() {
   });
 
   it('$resource with prepared params then all should return an array', function(done) {
-    api.$resource('hubs.apps', { hubId: mock.hubs[0].id }).all().then((res) => {
+    api.$resource('hubs.apps', { hubId: mock.hubs[0].id }).$all().then((res) => {
       res.should.not.be.empty;
       res[0].should.instanceOf(models.App);
       res[0].id.should.equal(mock.apps[0].id);
@@ -190,11 +196,11 @@ describe('Apps Resource', function() {
   });
 
   it('should support access from the result model', function(done) {
-    api.$resource('hubs').find(mock.hubs[0].id).then(function(hub) {
+    api.$resource('hubs').$find(mock.hubs[0].id).then(function(hub) {
       hub.$resource().key.should.equal('hubs');
       hub.$resource().route.params.id.should.equal(mock.hubs[0].id);
 
-      hub.$resource('apps').all().then(function(apps) {
+      hub.$resource('apps').$all().then(function(apps) {
         hub.should.instanceOf(models.Hub);
         apps.should.not.be.empty;
         apps[0].should.instanceOf(models.App);
@@ -207,7 +213,7 @@ describe('Apps Resource', function() {
   });
 
   it('should support multiple params for find', function(done) {
-    api.$resource('hubs.apps').find({ hubId: mock.hubs[0].id, id: mock.apps[0].id }).then(function(app) {
+    api.$resource('hubs.apps').$find({ hubId: mock.hubs[0].id, id: mock.apps[0].id }).then(function(app) {
       app.should.be.instanceOf(models.App);
       done();
     }).catch((err) => {
@@ -216,7 +222,7 @@ describe('Apps Resource', function() {
   });
 
   it('should support accessing actions', function(done) {
-    api.$resource('hubs.apps', { hubId: mock.hubs[0].id }).current().then(function(app) {
+    api.$resource('hubs.apps', { hubId: mock.hubs[0].id }).$current().then(function(app) {
       app.should.be.instanceOf(models.App);
       done();
     }).catch((err) => {
@@ -227,7 +233,7 @@ describe('Apps Resource', function() {
 
 describe('Styles Resource', function() {
   it('all should return an array', function(done) {
-    api.$resource('hubs.apps.styles').all({hubId: mock.hubs[0].id, appId: mock.apps[0].id}).then((res) => {
+    api.$resource('hubs.apps.styles').$all({hubId: mock.hubs[0].id, appId: mock.apps[0].id}).then((res) => {
       res.should.not.be.empty;
       res[0].should.instanceOf(models.Style);
 
@@ -238,7 +244,7 @@ describe('Styles Resource', function() {
   });
 
   it('find should return one item', function(done) {
-    api.$resource('hubs.apps.styles').find({hubId: mock.hubs[0].id, appId: mock.apps[0].id, id: mock.styles[0].id}).then((res) => {
+    api.$resource('hubs.apps.styles').$find({hubId: mock.hubs[0].id, appId: mock.apps[0].id, id: mock.styles[0].id}).then((res) => {
       res.should.instanceOf(models.Style);
       res.id.should.equal(mock.styles[0].id);
 
@@ -249,9 +255,9 @@ describe('Styles Resource', function() {
   });
 
   it('should fetch styles in an inline fashion', function(done) {
-    api.$resource('hubs').all().then(function(hubs) {
-      api.$resource('hubs.apps').all({hubId: hubs[0].id}).then(function(apps) {
-         api.$resource('hubs.apps.styles').all({hubId: hubs[0].id, appId: apps[0].id}).then((res) => {
+    api.$resource('hubs').$all().then(function(hubs) {
+      api.$resource('hubs.apps').$all({hubId: hubs[0].id}).then(function(apps) {
+         api.$resource('hubs.apps.styles').$all({hubId: hubs[0].id, appId: apps[0].id}).then((res) => {
            res.should.not.be.empty;
            res[0].should.instanceOf(models.Style);
 
@@ -266,7 +272,7 @@ describe('Styles Resource', function() {
 
 describe('Stream Assets Resource', function() {
   it('should allow assets with custom routeSegment', function(done) {
-    api.$resource('hubs.assets', {hubId: mock.hubs[0].id}).all().then((res) => {
+    api.$resource('hubs.assets', {hubId: mock.hubs[0].id}).$all().then((res) => {
       done();
     }).catch((err) => {
       done(err);
@@ -274,7 +280,7 @@ describe('Stream Assets Resource', function() {
   });
 
   it('should find asset by slug', function(done) {
-    api.$resource('hubs.assets', { hubId: mock.hubs[0].id }).find({slug: "some-slug"}).then((res) => {
+    api.$resource('hubs.assets', { hubId: mock.hubs[0].id }).$find({slug: "some-slug"}).then((res) => {
       res.should.be.instanceOf(models.Asset);
 
       done();
@@ -284,7 +290,7 @@ describe('Stream Assets Resource', function() {
   });
 
   it('should find asset by slug with query set', function(done) {
-    api.$resource('hubs.assets', { hubId: mock.hubs[0].id }).query({slug: "some-slug"}).find().then((res) => {
+    api.$resource('hubs.assets', { hubId: mock.hubs[0].id }).query({slug: "some-slug"}).$find().then((res) => {
       res.should.be.instanceOf(models.Asset);
 
       done();
@@ -294,9 +300,9 @@ describe('Stream Assets Resource', function() {
   });
 
   it('should find asset by slug with query set and then find associated data with no query set', function(done) {
-    api.$resource('hubs.assets', { hubId: mock.hubs[0].id }).query({slug: "some-slug"}).find().then((res) => {
+    api.$resource('hubs.assets', { hubId: mock.hubs[0].id }).query({slug: "some-slug"}).$find().then((res) => {
       res.should.be.instanceOf(models.Asset);
-      res.$resource('comments').all().then((res) => {
+      res.$resource('comments').$all().then((res) => {
         res[0].should.be.instanceOf(models.Comment);
 
         done();
@@ -313,14 +319,14 @@ describe('Collections', function() {
   var collection;
 
   before(function(done) {
-    api.$resource('hubs').all().then((res) => {
+    api.$resource('hubs').$all().then((res) => {
       collection = res;
       done();
     });
   });
 
   it('should create a new model', function(done) {
-    var model = collection.create({ name: 'Hello' });
+    var model = collection.$create({ name: 'Hello' });
     model.should.be.instanceOf(models.Hub);
     model.name.should.equal('Hello');
     should(model.$newRecord).equal(true);
@@ -330,18 +336,18 @@ describe('Collections', function() {
 
   it('should add a new model', function(done) {
     collection.length.should.equal(mock.hubs.length);
-    var model = collection.create({ name: 'Hello' });
+    var model = collection.$create({ name: 'Hello' });
 
-    collection.add(model);
+    collection.$add(model);
     collection.length.should.equal(mock.hubs.length + 1);
 
     done();
   });
 
   it('should remove a model', function(done) {
-    var model = collection.last();
+    var model = _.last(collection);
 
-    collection.remove(model);
+    collection.$remove(model);
     collection.length.should.equal(mock.hubs.length);
 
     done();
@@ -349,9 +355,8 @@ describe('Collections', function() {
 
   it('should add a new model at an index', function(done) {
     collection.length.should.equal(mock.hubs.length);
-    var model = collection.create({ name: 'Hello' });
-
-    collection.add(model, 3);
+    var model = collection.$create({ name: 'Hello' });
+    collection.$add(model, 3);
     collection.length.should.equal(mock.hubs.length + 1);
     collection[3].should.equal(model);
 
@@ -359,7 +364,7 @@ describe('Collections', function() {
   });
 
   it('should remove a model at an index', function(done) {
-    var model = collection.remove(3);
+    var model = collection.$remove(3);
     model.name.should.equal('Hello');
     collection.length.should.equal(mock.hubs.length);
 
@@ -367,13 +372,13 @@ describe('Collections', function() {
   });
 
   it('should reposition a model in a collection', function(done) {
-    var model = collection.add({name: 'Hello'});
+    var model = collection.$add({name: 'Hello'});
 
-    collection.reposition(mock.hubs.length, 0);
+    collection.$reposition(mock.hubs.length, 0);
     collection[0].should.equal(model);
-    collection.reposition(0, 1);
+    collection.$reposition(0, 1);
     collection[1].should.equal(model);
-    collection.reposition(1, mock.hubs.length);
+    collection.$reposition(1, mock.hubs.length);
     collection[mock.hubs.length].should.equal(model);
 
     collection.length.should.equal(mock.hubs.length + 1);
@@ -382,7 +387,7 @@ describe('Collections', function() {
   });
 
   it('should find a model by id', function(done) {
-    var model = collection.find(mock.hubs[0].id);
+    var model = collection.$find(mock.hubs[0].id);
     model.name.should.equal('My First Hub');
 
     done();
@@ -390,10 +395,35 @@ describe('Collections', function() {
 
 
   it('should find a model where params match', function(done) {
-    var model = collection.findWhere({name: 'Hello'});
+    var model = collection.$findWhere({name: 'Hello'});
     model.name.should.equal('Hello');
 
     done();
+  });
+
+  it('should delete a model', function(done) {
+    var model = collection.$find(mock.hubs[0].id);
+
+    collection.$delete(model).then((res) => {
+      collection.length.should.equal(mock.hubs.length);
+
+      done();
+    }).catch((err) => {
+      done(err);
+    });
+  });
+
+  it('should properly save a created model', function(done) {
+    var model = collection.$create({name: 'Hello'});
+    model.$save().then(function() {
+      model.name.should.equal('Hello');
+      model.id.should.equal(1234);
+      model.$resource().route.params.id.should.equal(1234);
+
+      done();
+    }).catch((err) => {
+      done(err);
+    });
   });
 
 });

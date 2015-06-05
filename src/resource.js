@@ -223,7 +223,7 @@ export default class Resource {
     };
 
     _.each(def.actions, (action) => {
-      this[action.name] = (options = {}) => {
+      this['$' + action.name] = (options = {}) => {
         return this.request(_.extend({ method: action.method, path: action.options.path || `/${action.name}`}, options)).then((res) => {
           return this.hydrateModel(res);
         });
@@ -283,18 +283,15 @@ export default class Resource {
     return this;
   }
 
-  get(params) {
-    var resource = new Resource(this.api, this.key, this, true).query(params);
-    var path = resource.buildRoute();
+  $get(params) {
+    var resource = new Resource(this.api, this.key, this, true).includeParams(params);
 
-    return this.api.request('get', path, { query: resource.route.queryParams }).then((res) => {
-      var model = resource.hydrateModel(res.body);
-
-      return model;
+    return resource.request().then((res) => {
+      return resource.hydrateModel(res);
     });
   }
 
-  find(params) {
+  $find(params) {
     if (params && !_.isObject(params)) {
       params = { id: params };
     }
@@ -306,7 +303,7 @@ export default class Resource {
     });
   }
 
-  all(params) {
+  $all(params) {
     var resource = new Resource(this.api, this.key, this, true).includeParams(params);
 
     return resource.request().then((res) => {
@@ -359,78 +356,68 @@ export default class Resource {
       return model;
     });
 
+
+    var getPage = (page, options = {}) => {
+      if (this.links.hasOwnProperty(page)) {
+        return this.api.request('get', this.links[page]).then((res) => {
+          if (options.append || options.prepend) {
+            this.setResponse(res);
+
+            var method = options.append ? 'push' : 'unshift';
+
+            _.each(res.body, (item) => {
+              collection[method](this.hydrateModel(item));
+            });
+
+            return collection;
+          } else {
+            // XXX Not implemented yet.
+            // Should create a new resource and hydrate
+            return [];
+          }
+        });
+      }
+    }
+
     var methods = {
       $resource: () => {
         return this;
       },
 
-      getPage: (page, options = {}) => {
-        if (this.links[page]) {
-          return this.api.request('get', this.links[page]).then((res) => {
-            if (options.append || options.prepend) {
-              this.setResponse(res);
-
-              var method = options.append ? 'push' : 'unshift';
-
-              _.each(res.body, (item) => {
-                collection[method](this.hydrateModel(item));
-              });
-
-              return collection;
-            } else {
-              // XXX Not implemented yet.
-              // Should create a new resource and hydrate
-              return [];
-            }
-          });
-        }
+      $nextPage: (options = {}) => {
+        return getPage('next', options);
       },
 
-      nextPage: (options = {}) => {
-        return collection.getPage('next', options);
+      $prevPage: (options = {}) => {
+        return getPage('prev', options);
       },
 
-      prevPage: (options = {}) => {
-        return collection.getPage('prev', options);
+      $hasPage: (name) => {
+        return this.links.hasOwnProperty(name);
       },
 
-      hasPage: (name) => {
-        return !!this.links[name];
-      },
-
-      first: () => {
-        return _.first(collection);
-      },
-
-      last: () => {
-        return _.last(collection);
-      },
-
-      find: (id) => {
+      $find: (id) => {
         return _.detect(collection, (item) => {
           return item.id == id;
         });
       },
 
-      findWhere: (params) => {
+      $findWhere: (params) => {
         return _.findWhere(collection, params);
       },
 
-      where: (params) => {
+      $where: (params) => {
         return _.where(collection, params);
       },
 
-      create: (data = {}) => {
+      $create: (data = {}) => {
         var resource = new Resource(this.api, this.key, this);
-
-        var model = resource.hydrateModel(data, { newRecord: true });
-
-        return model;
+        return resource.hydrateModel(data, { newRecord: true });
       },
 
-      add: (model = {}, idx, applySorting = false) => {
+      $add: (model = {}, idx, applySorting = false) => {
         if (typeof model == 'object' && !(model instanceof this.model)) {
-          model = collection.create(model);
+          model = collection.$create(model);
         }
 
         if (_.isNumber(idx)) {
@@ -440,18 +427,18 @@ export default class Resource {
         }
 
         if (applySorting) {
-          collection.sort();
+          collection.$sort();
         }
 
         return model;
       },
 
-      remove: (arg) => {
+      $remove: (arg) => {
         // Remove multiples
         if (_.isArray(arg)) {
           var models = arg;
           _.each(models, (model) => {
-            collection.remove(model);
+            collection.$remove(model);
           })
 
           return models;
@@ -469,17 +456,17 @@ export default class Resource {
         }
       },
 
-      reposition: (fromIdx, toIdx) => {
+      $reposition: (fromIdx, toIdx) => {
         if (fromIdx != toIdx && (fromIdx >= 0 && fromIdx < collection.length) && (toIdx >= 0 && toIdx < collection.length)) {
-          var model = collection.remove(fromIdx);
+          var model = collection.$remove(fromIdx);
 
           if (model) {
-            return collection.add(model, toIdx, false);
+            return collection.$add(model, toIdx, false);
           }
         }
       },
 
-      sort: () => {},
+      $sort: () => {},
 
       // save: () => {
       //   var promises = [];
@@ -494,10 +481,10 @@ export default class Resource {
 
       // update: () => {},
 
-      delete: (model, params = {}) => {
+      $delete: (model, params = {}) => {
         if (model instanceof this.model) {
-          model.delete(params).then(() => {
-            return collection.remove(model);
+          return model.$delete(params).then(() => {
+            return collection.$remove(model);
           });
         }
       }

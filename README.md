@@ -186,19 +186,19 @@ resource.timeout(20000);
 
 Requesting data is done by the `all` and `find` methods on a Resource.
 
-##### all(`*params`)
+##### $all(`*params`)
 - **params** (optional) | Object | ex. `{ hubId: 123 }`
 params will override anything set in the resource.
 
 Returns a `Promise` which resolves an Array of result models.
 
 ```javascript
-resource.all().then(function(hubs) {
+resource.$all().then(function(hubs) {
   ...
 });
 ```
 
-##### find(`id` or `params`)
+##### $find(`id` or `params`)
 - **id** (optional) | Integer | ex `123`
 - **params** (optional) | Object | ex. `{ hubId: 123, id: 1 }`
 params will override anything set in the resource.
@@ -206,7 +206,7 @@ params will override anything set in the resource.
 returns a `Promise` which resolves a result model.
 
 ```javascript
-resource.find(123).then(function(hub) {
+resource.$find(123).then(function(hub) {
   ...
 });
 ```
@@ -217,8 +217,8 @@ Result models are extended with the resource that generated it so you can
 access `$resource` to generate child resources.
 
 ```javascript
-api.$resource('hubs').find(123).then(function(hub) {
-  hub.$resource('apps').all().then(function(apps) {
+api.$resource('hubs').$find(123).then(function(hub) {
+  hub.$resource('apps').$all().then(function(apps) {
     ..
   });
 });
@@ -229,8 +229,8 @@ Notice that when you chain queries you specify the child name `hubs` rather than
 This is equivalent to:
 
 ```javascript
-api.$resource('hubs').find(123).then(function(hub) {
-  api.$resource('hubs.apps', { hubId: hub.id }).all().then(function(apps) {
+api.$resource('hubs').$find(123).then(function(hub) {
+  api.$resource('hubs.apps', { hubId: hub.id }).$all().then(function(apps) {
     ..
   });
 });
@@ -776,4 +776,3 @@ See [Hub](#hub) `hubs`
 *Collection Actions*
 
 - `GET` /users/roles
-

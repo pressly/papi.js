@@ -127,6 +127,12 @@ var Papi = (function () {
 
       return new _bluebird2['default'](function (resolve, reject) {
         var url = /^(https?:)?\/\//.test(path) ? path : _this2.options.host + path;
+
+        // Doesn't allow the delete keyword because it is reserved
+        if (method == 'delete') {
+          method = 'del';
+        }
+
         var req = _superagent2['default'][method](url);
         req.set('Content-Type', 'application/json');
 

@@ -261,7 +261,7 @@ var Resource = (function () {
     };
 
     _lodash2['default'].each(def.actions, function (action) {
-      _this[action.name] = function () {
+      _this['$' + action.name] = function () {
         var options = arguments[0] === undefined ? {} : arguments[0];
 
         return _this.request(_lodash2['default'].extend({ method: action.method, path: action.options.path || '/' + action.name }, options)).then(function (res) {
@@ -336,20 +336,17 @@ var Resource = (function () {
       return this;
     }
   }, {
-    key: 'get',
-    value: function get(params) {
-      var resource = new Resource(this.api, this.key, this, true).query(params);
-      var path = resource.buildRoute();
+    key: '$get',
+    value: function $get(params) {
+      var resource = new Resource(this.api, this.key, this, true).includeParams(params);
 
-      return this.api.request('get', path, { query: resource.route.queryParams }).then(function (res) {
-        var model = resource.hydrateModel(res.body);
-
-        return model;
+      return resource.request().then(function (res) {
+        return resource.hydrateModel(res);
       });
     }
   }, {
-    key: 'find',
-    value: function find(params) {
+    key: '$find',
+    value: function $find(params) {
       if (params && !_lodash2['default'].isObject(params)) {
         params = { id: params };
       }
@@ -361,8 +358,8 @@ var Resource = (function () {
       });
     }
   }, {
-    key: 'all',
-    value: function all(params) {
+    key: '$all',
+    value: function $all(params) {
       var resource = new Resource(this.api, this.key, this, true).includeParams(params);
 
       return resource.request().then(function (res) {
@@ -425,89 +422,78 @@ var Resource = (function () {
         return model;
       });
 
+      var getPage = function getPage(page) {
+        var options = arguments[1] === undefined ? {} : arguments[1];
+
+        if (_this5.links.hasOwnProperty(page)) {
+          return _this5.api.request('get', _this5.links[page]).then(function (res) {
+            if (options.append || options.prepend) {
+              _this5.setResponse(res);
+
+              var method = options.append ? 'push' : 'unshift';
+
+              _lodash2['default'].each(res.body, function (item) {
+                collection[method](_this5.hydrateModel(item));
+              });
+
+              return collection;
+            } else {
+              // XXX Not implemented yet.
+              // Should create a new resource and hydrate
+              return [];
+            }
+          });
+        }
+      };
+
       var methods = {
         $resource: function $resource() {
           return _this5;
         },
 
-        getPage: function getPage(page) {
-          var options = arguments[1] === undefined ? {} : arguments[1];
-
-          if (_this5.links[page]) {
-            return _this5.api.request('get', _this5.links[page]).then(function (res) {
-              if (options.append || options.prepend) {
-                _this5.setResponse(res);
-
-                var method = options.append ? 'push' : 'unshift';
-
-                _lodash2['default'].each(res.body, function (item) {
-                  collection[method](_this5.hydrateModel(item));
-                });
-
-                return collection;
-              } else {
-                // XXX Not implemented yet.
-                // Should create a new resource and hydrate
-                return [];
-              }
-            });
-          }
-        },
-
-        nextPage: function nextPage() {
+        $nextPage: function $nextPage() {
           var options = arguments[0] === undefined ? {} : arguments[0];
 
-          return collection.getPage('next', options);
+          return getPage('next', options);
         },
 
-        prevPage: function prevPage() {
+        $prevPage: function $prevPage() {
           var options = arguments[0] === undefined ? {} : arguments[0];
 
-          return collection.getPage('prev', options);
+          return getPage('prev', options);
         },
 
-        hasPage: function hasPage(name) {
-          return !!_this5.links[name];
+        $hasPage: function $hasPage(name) {
+          return _this5.links.hasOwnProperty(name);
         },
 
-        first: function first() {
-          return _lodash2['default'].first(collection);
-        },
-
-        last: function last() {
-          return _lodash2['default'].last(collection);
-        },
-
-        find: function find(id) {
+        $find: function $find(id) {
           return _lodash2['default'].detect(collection, function (item) {
             return item.id == id;
           });
         },
 
-        findWhere: function findWhere(params) {
+        $findWhere: function $findWhere(params) {
           return _lodash2['default'].findWhere(collection, params);
         },
 
-        where: function where(params) {
+        $where: function $where(params) {
           return _lodash2['default'].where(collection, params);
         },
 
-        create: function create() {
+        $create: function $create() {
           var data = arguments[0] === undefined ? {} : arguments[0];
 
           var resource = new Resource(_this5.api, _this5.key, _this5);
-
-          var model = resource.hydrateModel(data, { newRecord: true });
-
-          return model;
+          return resource.hydrateModel(data, { newRecord: true });
         },
 
-        add: function add(_x9, idx) {
+        $add: function $add(_x9, idx) {
           var model = arguments[0] === undefined ? {} : arguments[0];
           var applySorting = arguments[2] === undefined ? false : arguments[2];
 
           if (typeof model == 'object' && !(model instanceof _this5.model)) {
-            model = collection.create(model);
+            model = collection.$create(model);
           }
 
           if (_lodash2['default'].isNumber(idx)) {
@@ -517,18 +503,18 @@ var Resource = (function () {
           }
 
           if (applySorting) {
-            collection.sort();
+            collection.$sort();
           }
 
           return model;
         },
 
-        remove: function remove(arg) {
+        $remove: function $remove(arg) {
           // Remove multiples
           if (_lodash2['default'].isArray(arg)) {
             var models = arg;
             _lodash2['default'].each(models, function (model) {
-              collection.remove(model);
+              collection.$remove(model);
             });
 
             return models;
@@ -546,17 +532,17 @@ var Resource = (function () {
           }
         },
 
-        reposition: function reposition(fromIdx, toIdx) {
+        $reposition: function $reposition(fromIdx, toIdx) {
           if (fromIdx != toIdx && (fromIdx >= 0 && fromIdx < collection.length) && (toIdx >= 0 && toIdx < collection.length)) {
-            var model = collection.remove(fromIdx);
+            var model = collection.$remove(fromIdx);
 
             if (model) {
-              return collection.add(model, toIdx, false);
+              return collection.$add(model, toIdx, false);
             }
           }
         },
 
-        sort: function sort() {},
+        $sort: function $sort() {},
 
         // save: () => {
         //   var promises = [];
@@ -571,12 +557,12 @@ var Resource = (function () {
 
         // update: () => {},
 
-        'delete': function _delete(model) {
+        $delete: function $delete(model) {
           var params = arguments[1] === undefined ? {} : arguments[1];
 
           if (model instanceof _this5.model) {
-            model['delete'](params).then(function () {
-              return collection.remove(model);
+            return model.$delete(params).then(function () {
+              return collection.$remove(model);
             });
           }
         }

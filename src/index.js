@@ -93,7 +93,7 @@ export default class Papi {
     return new Promise((resolve, reject) => {
       var url = /^(https?:)?\/\//.test(path) ? path : this.options.host + path;
 
-      //Doesn't allow the delete keyword because it is reserved
+      // Doesn't allow the delete keyword because it is reserved
       if (method == 'delete') {
         method = 'del';
       }
