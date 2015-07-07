@@ -1,6 +1,6 @@
 {
   "name": "papi",
-  "version": "0.1.10",
+  "version": "0.1.11",
   "description": "Javascript HTTP/REST client for the Pressly API",
   "author": "Peter Kieltyka <peter@pressly.com>",
   "main": "./dist/index.js",
@@ -19,7 +19,7 @@
     "babel-runtime": "^5.4.7",
     "bluebird": "^2.9.26",
     "lodash": "^3.9.1",
-    "superagent": "1.2.0"
+    "superagent": "git+ssh://git@github.com:alinz/superagent.git#patched-content-type"
   },
   "devDependencies": {
     "babel": "^5.2.17",
