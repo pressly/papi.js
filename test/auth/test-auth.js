@@ -9,12 +9,12 @@ const api = new Papi();
 
 // interceptors
 nock(api.options.host)
-.post('/login', { email: 'incorrect-email', password: 'incorrect-password', }).reply(401)
-.post('/login', { email: mock.session.email, password: mock.session.password }).times(3).reply(200, mock.session);
+.post('/auth/login', { email: 'incorrect-email', password: 'incorrect-password', }).reply(401)
+.post('/auth/login', { email: mock.session.email, password: mock.session.password }).times(3).reply(200, mock.session);
 
 nock(api.options.host)
-.get('/auth/logout').reply(200)
-.get('/auth/session').times(2).reply(function() {
+.delete('/session').reply(200)
+.get('/session').times(2).reply(function() {
   if (api.auth.session) {
     return [200, mock.session];
   }

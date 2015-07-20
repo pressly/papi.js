@@ -16,7 +16,7 @@ export default class Papi {
       session: null,
 
       get: () => {
-        return this.request('get', '/auth/session').then((res) => {
+        return this.request('get', '/session').then((res) => {
           return this.auth.set(res.body);
         });
       },
@@ -42,13 +42,13 @@ export default class Papi {
       },
 
       login: (email, password) => {
-        return this.request('post', '/login', { data: { email, password } }).then((res) => {
+        return this.request('post', '/auth/login', { data: { email, password } }).then((res) => {
           return this.auth.set(res.body);
         });
       },
 
       logout: () => {
-        return this.request('get', '/auth/logout').then((res) => {
+        return this.request('delete', '/session').then((res) => {
           this.auth.session = null;
 
           return res;
