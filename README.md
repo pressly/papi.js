@@ -198,6 +198,18 @@ resource.$all().then(function(hubs) {
 });
 ```
 
+##### $get(`params`)
+- **params** (optional) | Object | ex. `{ slug: 'some-article-slug' }`
+params will override anything set in the resource.
+
+returns a `Promise` which resolves a result model.
+
+```javascript
+resource.$get({ slug: 'some-article-slug' }).then(function(hub) {
+  ...
+});
+```
+
 ##### $find(`id` or `params`)
 - **id** (optional) | Integer | ex `123`
 - **params** (optional) | Object | ex. `{ hubId: 123, id: 1 }`
@@ -235,6 +247,49 @@ api.$resource('hubs').$find(123).then(function(hub) {
   });
 });
 ```
+
+## Working with Models and Collections
+
+### Models
+
+Result models have methods to facilitate saving, deleting, updating, etc.
+
+```javascript
+api.$resource('hubs').$find(123).then(function(hub) {
+  hub.name = "My First Hub";
+
+  hub.$save().then(() => {
+
+  });
+});
+```
+
+### Collections
+
+Collections are Arrays of Models which are extended with helper functions.
+
+Collections are produced by the `Resource::$all` method.
+
+```javascript
+var collection;
+api.$resource('hubs').$all().then(function(hubs) {
+  collection = hubs.findWhere({ name: "My First Hub"});
+  ..
+});
+```
+
+##### $find(`id`)
+- **id** (optional) | Integer | ex `123`
+
+returns a `Model`.
+
+```javascript
+api.$resource('hubs').$all().then(function(hubs) {
+  var model = hubs.findWhere({ name: "My First Hub"});
+  ..
+});
+```
+
 
 ## API Schema
 
