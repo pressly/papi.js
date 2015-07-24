@@ -46,7 +46,7 @@ var Papi = (function () {
       session: null,
 
       get: function get() {
-        return _this.request('get', '/auth/session').then(function (res) {
+        return _this.request('get', '/session').then(function (res) {
           return _this.auth.set(res.body);
         });
       },
@@ -72,13 +72,13 @@ var Papi = (function () {
       },
 
       login: function login(email, password) {
-        return _this.request('post', '/login', { data: { email: email, password: password } }).then(function (res) {
+        return _this.request('post', '/auth/login', { data: { email: email, password: password } }).then(function (res) {
           return _this.auth.set(res.body);
         });
       },
 
       logout: function logout() {
-        return _this.request('get', '/auth/logout').then(function (res) {
+        return _this.request('delete', '/session').then(function (res) {
           _this.auth.session = null;
 
           return res;
