@@ -150,6 +150,8 @@ var Papi = (function () {
           req.set('Authorization', 'Bearer ' + _this2.auth.session.jwt);
         }
 
+        req.set('Accept', 'application/vnd.pressly.v0.12+json');
+
         // Query params to be added to the url
         if (options.query) {
           req.query(options.query);

@@ -151,6 +151,8 @@ var Papi = (function () {
           req.set('Authorization', 'Bearer ' + _this2.auth.session.jwt);
         }
 
+        req.set('Accept', 'application/vnd.pressly.v0.12+json');
+
         // Query params to be added to the url
         if (options.query) {
           req.query(options.query);
@@ -19928,7 +19930,10 @@ function Response(req, options) {
   // getAllResponseHeaders sometimes falsely returns "" for CORS requests, but
   // getResponseHeader still works. so we get content-type even if getting
   // other headers fails.
-  this.header['content-type'] = this.xhr.getResponseHeader('content-type');
+  var tryAnotherContentType = this.xhr.getResponseHeader('content-type');
+  if (tryAnotherContentType && tryAnotherContentType.length > 0) {
+    this.header['content-type'] = tryAnotherContentType;
+  }
   this.setHeaderProperties(this.header);
   this.body = this.req.method != 'HEAD'
     ? this.parseBody(this.text ? this.text : this.xhr.response)
