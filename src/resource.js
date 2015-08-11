@@ -311,6 +311,11 @@ export default class Resource {
     });
   }
 
+  $create(data = {}) {
+    var resource = new Resource(this.api, this.key, this);
+    return resource.hydrateModel(data, { newRecord: true });
+  }
+
   setResponse(res) {
     this.status = res.status;
     this.headers = res.headers;
