@@ -19,7 +19,7 @@
     "babel-runtime": "^5.4.7",
     "bluebird": "^2.9.26",
     "lodash": "^3.9.1",
-    "superagent": "git+ssh://git@github.com:alinz/superagent.git#patched-content-type",
+    "superagent": "git+ssh://git@github.com:alinz/superagent.git#patched-content-type-1.3.0",
     "xdomain": "^0.7.3"
   },
   "devDependencies": {
