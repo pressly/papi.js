@@ -1442,6 +1442,14 @@ var Resource = (function () {
       });
     }
   }, {
+    key: '$create',
+    value: function $create() {
+      var data = arguments[0] === undefined ? {} : arguments[0];
+
+      var resource = new Resource(this.api, this.key, this);
+      return resource.hydrateModel(data, { newRecord: true });
+    }
+  }, {
     key: 'setResponse',
     value: function setResponse(res) {
       this.status = res.status;
@@ -1563,7 +1571,7 @@ var Resource = (function () {
           return resource.hydrateModel(data, { newRecord: true });
         },
 
-        $add: function $add(_x9, idx) {
+        $add: function $add(_x10, idx) {
           var model = arguments[0] === undefined ? {} : arguments[0];
           var applySorting = arguments[2] === undefined ? false : arguments[2];
 
