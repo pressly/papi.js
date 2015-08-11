@@ -239,8 +239,10 @@ Papi
       .put('publish', { on: 'member' })
     .close()
   .close()
-  
+
   .resource('invites').open()
+    .get('incoming',      { on: 'collection' })
+    .get('outgoing',      { on: 'collection' })
     .post('bulk_invite',  { on: 'collection' })
     .post('resend',       { on: 'member' })
     .post('accept',       { on: 'member', routeSegment: '/invites/:hash' })
