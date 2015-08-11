@@ -175,6 +175,7 @@ Papi
   .resource('organizations').open()
     .resource('users')
     .resource('hubs', { linkTo: 'hubs'})
+    .resource('invites')
   .close()
 
   .resource('hubs').open()
@@ -205,8 +206,8 @@ Papi
     .resource('invites').open()
       .post('bulk_invite',  { on: 'collection' })
       .post('resend',       { on: 'member' })
-      .post('accept',       { on: 'member' })
-      .post('reject',       { on: 'member' })
+      .post('accept',       { on: 'member', routeSegment: '/invites/:hash' })
+      .post('reject',       { on: 'member', routeSegment: '/invites/:hash' })
     .close()
 
     .resource('recommendations')
@@ -237,6 +238,13 @@ Papi
     .resource('drafts').open()
       .put('publish', { on: 'member' })
     .close()
+  .close()
+  
+  .resource('invites').open()
+    .post('bulk_invite',  { on: 'collection' })
+    .post('resend',       { on: 'member' })
+    .post('accept',       { on: 'member', routeSegment: '/invites/:hash' })
+    .post('reject',       { on: 'member', routeSegment: '/invites/:hash' })
   .close()
 
   .resource('code_revisions').open()
