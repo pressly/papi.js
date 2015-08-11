@@ -172,6 +172,11 @@ Papi
     .resource('hubs', { linkTo: 'hubs'})
   .close()
 
+  .resource('organizations').open()
+    .resource('users')
+    .resource('hubs', { linkTo: 'hubs'})
+  .close()
+
   .resource('hubs').open()
     .post('upgrade',  { on: 'member' })
     .get('search',    { on: 'collection' })

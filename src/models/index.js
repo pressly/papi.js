@@ -1,6 +1,7 @@
 export { default as Base }            from '../model';
 
 export { default as Account }         from './account';
+export { default as Organization }    from './organization';
 export { default as App }             from './app';
 export { default as Asset }           from './asset';
 export { default as CodeRevision }    from './code-revision';
