@@ -16,6 +16,10 @@ var _account = require('./account');
 
 exports.Account = _interopRequire(_account);
 
+var _organization = require('./organization');
+
+exports.Organization = _interopRequire(_organization);
+
 var _app = require('./app');
 
 exports.App = _interopRequire(_app);
