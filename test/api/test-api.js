@@ -88,6 +88,9 @@ nock(api.options.host)
 
   .post(`/hubs`).reply(200, { name: 'Hello', id: 1234 })
 
+  .get(`/invites/incoming`).reply(200, { name: 'Hello', id: 1234 })
+
+
   /** Organization Resource Requests ***************************************************/
 
   // all
@@ -474,6 +477,15 @@ describe('Collections', function() {
     }).catch((err) => {
       done(err);
     });
+  });
+
+  it('should have a collection action', function(done) {
+    var resource = api.$resource('invites')
+    resource.$incoming().then(function() {
+
+    })
+
+    done();
   });
 
 });
