@@ -88,6 +88,17 @@ nock(api.options.host)
 
   .post(`/hubs`).reply(200, { name: 'Hello', id: 1234 })
 
+  /** Organization Resource Requests ***************************************************/
+
+  // all
+  .get('/organizations').reply(200, mock.organizations)
+
+  // find
+  .get(`/organizations/${mock.organizations[0].id}`).reply(200, mock.organizations[0])
+
+  // $resource with prepared params then find()
+  .get(`/organizations/${mock.organizations[0].id}`).reply(200, mock.organizations[0])
+
 ;
 
 describe('Hubs Resource', function () {
@@ -154,6 +165,45 @@ describe('Hubs Resource', function () {
       }).catch((err) => {
         done(err);
       });
+    }).catch((err) => {
+      done(err);
+    });
+  });
+});
+
+describe('Organizations Resource', function () {
+  it("all should return an array", function (done) {
+    api.$resource('organizations').$all().then((res) => {
+      res.should.not.be.empty;
+      res[0].should.instanceOf(models.Organization);
+      should(res[0].$newRecord).not.equal(true);
+
+      should.exist(res.$nextPage);
+
+      done();
+    }).catch((err) => {
+      done(err);
+    });
+  });
+
+  it('find should return one item', function (done) {
+    api.$resource('organizations').$find(mock.organizations[0].id).then((res) => {
+      res.should.instanceOf(models.Organization);
+      res.id.should.equal(mock.organizations[0].id);
+      should(res.$newRecord).not.equal(true);
+
+      done();
+    }).catch((err) => {
+      done(err);
+    });
+  });
+
+  it('$resource with prepared params then find should return one item', function (done) {
+    api.$resource('organizations', { id: mock.organizations[0].id }).$find().then((res) => {
+      res.should.instanceOf(models.Organization);
+      res.id.should.equal(mock.organizations[0].id);
+
+      done();
     }).catch((err) => {
       done(err);
     });

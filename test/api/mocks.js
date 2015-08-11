@@ -373,3 +373,4 @@ slug: "marketing"
 }
 }
 ];
+export const organizations = [ { id: 1, username: "pressly", name: "pressly", description: "", avatar_url: "", created_at: "2015-05-25T16:21:22Z", updated_at: "2015-07-23T14:21:26Z", type: "organization", role: "owner" } ]
