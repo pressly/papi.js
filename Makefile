@@ -11,11 +11,11 @@ build: install
 
 rebuild: clean build
 
-test: install
+test:
 	@npm run test
 
-test-server: install
+test-server:
 	@NOCK_OFF=true npm run test
 
-test-watch: install
+test-watch:
 	@npm run test-watch
