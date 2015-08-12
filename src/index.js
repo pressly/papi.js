@@ -3,10 +3,12 @@
 import _ from 'lodash';
 import request from 'superagent';
 import Promise from 'bluebird';
-import Resource, { applyResourcing } from './resource';
+import ResourceSchema from './resource-schema';
 
-export default class Papi {
+export default class Papi extends ResourceSchema {
   constructor(options = {}) {
+    super(...arguments);
+
     this.options = options;
     this.options.host = (options.host || 'https://beta-api.pressly.com');
 
@@ -55,38 +57,6 @@ export default class Papi {
         });
       }
     }
-  }
-
-  /*
-
-    Resource selector
-
-    $resource();
-    $resource(key);
-    $resource(key, params);
-    $resource(name, parentResource);
-    $resource(name, params, parentResource);
-  */
-  $resource() {
-    var key = arguments[0];
-
-    if (typeof key == 'undefined') {
-      throw new Error("Papi::$resource: key is undefined");
-    }
-
-    var name = _.last(key.split('.'));
-    var params = (_.isObject(arguments[1]) && !(arguments[1] instanceof Resource)) ? arguments[1] : undefined;
-    var parentResource = arguments[2] || (!params && arguments[1]) || undefined;
-
-    if (parentResource) {
-      if (parentResource.children.indexOf(name) == -1) {
-        throw new Error("Papi::$resource: key not found in parent resource.");
-      }
-
-      key = parentResource.key + '.' + name;
-    }
-
-    return new Papi.resourceClasses[key](this, parentResource).includeParams(params);
   }
 
   request(method, path, options = {}) {
@@ -164,8 +134,6 @@ export default class Papi {
     }
   }
 }
-
-applyResourcing(Papi);
 
 Papi
   .resource('accounts').open()
@@ -268,76 +236,3 @@ Papi
     .get('roles', { on: 'collection' })
   .close()
 ;
-
-Papi.generateMarkdown = () => {
-  let markdown = "";
-
-  _.each(Papi.resourceClasses, (resourceClass) => {
-    var def = resourceClass.definition;
-
-    markdown += `###${def.model.name}\n\n`;
-    markdown += `**\`${def.key}\`**\n\n`;
-
-    if (def.parent) {
-      markdown += '#####Parent\n\n';
-      markdown += `- [${def.parent.model.name}](#${def.parent.model.name.toLowerCase()}) \`${def.parent.key}\`\n\n`;
-    }
-
-    if (!_.isEmpty(def.children)) {
-      markdown += '#####Children\n\n';
-      _.each(def.children, (child) => {
-        markdown += `- [${child.model.name}](#${child.model.name.toLowerCase()}) \`${child.key}\`\n`;
-      });
-    }
-
-    markdown += '\n\n';
-
-    if (def.linkTo) {
-      let linkTo = Papi.resourceDefinitions[def.linkTo];
-      markdown += `See [${linkTo.model.name}](#${linkTo.model.name.toLowerCase()}) \`${linkTo.key}\`\n\n`;
-    }
-
-    let pathRoot = def.route.path.replace(/\/:.+$/, '');
-
-    markdown += '#####REST Endpoints\n\n';
-
-    markdown += `- \`GET\` ${pathRoot}\n`;
-    markdown += `- \`POST\` ${pathRoot}\n`;
-    markdown += `- \`GET\` ${def.route.path}\n`;
-    markdown += `- \`PUT\` ${def.route.path}\n`;
-    markdown += `- \`DELETE\` ${def.route.path}\n\n`;
-
-    if (!_.isEmpty(def.actions)) {
-      let memberActions = _.select(def.actions, (action) => {
-        return action.options.on == 'member';
-      });
-
-      let collectionActions = _.select(def.actions, (action) => {
-        return action.options.on == 'collection';
-      });
-
-
-      if (!_.isEmpty(collectionActions)) {
-        markdown += "*Collection Actions*\n\n";
-
-        _.each(collectionActions, (action) => {
-          markdown += `- \`${action.method.toUpperCase()}\` ${pathRoot}/${action.name}\n`
-        });
-      }
-
-      markdown += "\n\n";
-
-      if (!_.isEmpty(memberActions)) {
-        markdown += "*Member Actions*\n\n";
-
-        _.each(memberActions, (action) => {
-          markdown += `- \`${action.method.toUpperCase()}\` ${def.route.path}/${action.name}\n`
-        });
-      }
-    }
-
-    markdown += "\n\n";
-  });
-
-  console.log(markdown);
-};
