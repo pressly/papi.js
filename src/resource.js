@@ -88,7 +88,7 @@ var buildKey = function(resource, name) {
 }
 
 export function applyResourcing(klass) {
-  klass.resourceDefinitions = {};
+  klass.resourceClasses = {};
 
   var pointer = function (bucket, parentPointer) {
     return {
@@ -97,18 +97,31 @@ export function applyResourcing(klass) {
       resource: function (name, options) {
         options = (options || {});
         var parent = parentPointer ? parentPointer.current : null
-        var resource = { name: name, parent: parent, children: {}, options: options };
+
+        var def = { name: name, parent: parent, children: {}, options: options };
 
         if (options.linkTo) {
-          resource.linkTo = options.linkTo;
+          def.linkTo = options.linkTo;
         }
 
-        resource.key = buildKey(resource);
-        resource.route = buildRoute(resource);
-        resource.model = options.model || models[options.modelName] || models[classify(name)] || models.Base;
-        resource.actions = [];
+        def.key = buildKey(def);
+        def.route = buildRoute(def);
+        def.actions = [];
+        def.modelName = options.modelName || classify(name);
 
-        this.current = bucket[name] = klass.resourceDefinitions[resource.key] = resource;
+        this.current = bucket[name] = def;
+
+        // create a class for this specific resource and assign the definition
+        var resourceClass = class extends Resource {
+          constructor() {
+            super(...arguments);
+          }
+        }
+
+        resourceClass.definition = def;
+        resourceClass.modelClass = models[def.modelName] || models.Base;
+
+        klass.resourceClasses[def.key] = resourceClass;
 
         return this;
       },
@@ -124,6 +137,36 @@ export function applyResourcing(klass) {
       action: function(method, name, options) {
         if (parentPointer && parentPointer.current) {
           parentPointer.current.actions.push({ method, name, options });
+        }
+
+        if (options.on == 'collection') {
+          var resourceClass = klass.resourceClasses[parentPointer.current.key];
+
+          if (!resourceClass.prototype.hasOwnProperty('$' + name)) {
+            //console.log(`- adding collection action to ${parentPointer.current.key}:`, method, name);
+
+            resourceClass.prototype['$' + name] = function(data = {}) {
+              return this.request(_.extend({ method: method, path: options.path || `/${name}`}, data)).then((res) => {
+                if (_.isArray(res)) {
+                  return this.hydrateCollection(res);
+                } else {
+                  return this.hydrateModel(res);
+                }
+              });
+            };
+          }
+        } else if (options.on == 'member') {
+          var modelClass = klass.resourceClasses[parentPointer.current.key].modelClass;
+
+          if (!modelClass.prototype.hasOwnProperty('$' + name)) {
+            //console.log(`- adding member action to ${parentPointer.current.key}:`, method, name);
+
+            modelClass.prototype['$' + name] = function(data = {}) {
+              return this.$resource().request(_.extend({ method: method, path: options.path || `/${name}`}, data)).then((res) => {
+                return this.$resource().hydrateModel(res);
+              });
+            }
+          }
         }
 
         return this;
@@ -174,12 +217,7 @@ var parseHTTPLinks = function(linksString) {
 
 export default class Resource {
   constructor(api, key, parentResource, inherit = false) {
-    var def = api.constructor.resourceDefinitions[key];
-
-    if (!inherit && def.linkTo) {
-      def = api.constructor.resourceDefinitions[def.linkTo];
-    }
-
+    var def = this.constructor.definition;
     if (typeof def == 'undefined') {
       throw new Error("Resource: Must supply a proper definition");
     }
@@ -190,7 +228,6 @@ export default class Resource {
 
     this.name = def.name;
     this.key = def.key;
-    this.model = def.model;
 
     this.children = _.map(def.children, function(child, name) { return name; }) || [];
 
@@ -221,14 +258,6 @@ export default class Resource {
     this.parent = function() {
       return parentResource || (def.parent && this.api.$resource(def.parent.key)) || null;
     };
-
-    _.each(def.actions, (action) => {
-      this['$' + action.name] = (options = {}) => {
-        return this.request(_.extend({ method: action.method, path: action.options.path || `/${action.name}`}, options)).then((res) => {
-          return this.hydrateModel(res);
-        });
-      }
-    });
   }
 
   request(options = {}) {
@@ -284,7 +313,7 @@ export default class Resource {
   }
 
   $get(params) {
-    var resource = new Resource(this.api, this.key, this, true).includeParams(params);
+    var resource = new this.constructor(this.api, this.key, this, true).includeParams(params);
 
     return resource.request().then((res) => {
       return resource.hydrateModel(res);
@@ -296,7 +325,7 @@ export default class Resource {
       params = { id: params };
     }
 
-    var resource = new Resource(this.api, this.key, this, true).includeParams(params);
+    var resource = new this.constructor(this.api, this.key, this, true).includeParams(params);
 
     return resource.request().then((res) => {
       return resource.hydrateModel(res);
@@ -304,7 +333,7 @@ export default class Resource {
   }
 
   $all(params) {
-    var resource = new Resource(this.api, this.key, this, true).includeParams(params);
+    var resource = new this.constructor(this.api, this.key, this, true).includeParams(params);
 
     return resource.request().then((res) => {
       return resource.hydrateCollection(res);
@@ -312,7 +341,7 @@ export default class Resource {
   }
 
   $create(data = {}) {
-    var resource = new Resource(this.api, this.key, this);
+    var resource = new this.constructor(this.api, this.key, this);
     return resource.hydrateModel(data, { newRecord: true });
   }
 
@@ -331,7 +360,7 @@ export default class Resource {
   }
 
   hydrateModel(data, options = {}) {
-    var model = new this.model(data);
+    var model = new this.constructor.modelClass(data);
 
     if (!options.newRecord) {
       model.$newRecord = false;
@@ -354,7 +383,7 @@ export default class Resource {
   hydrateCollection(data) {
     var collection = _.map(data, (item) => {
       // Models in a collection need a new resource created
-      var resource = new Resource(this.api, this.key, this);
+      var resource = new this.constructor(this.api, this.key, this);
 
       var model = resource.hydrateModel(item);
 
@@ -416,12 +445,12 @@ export default class Resource {
       },
 
       $create: (data = {}) => {
-        var resource = new Resource(this.api, this.key, this);
+        var resource = new this.constructor(this.api, this.key, this);
         return resource.hydrateModel(data, { newRecord: true });
       },
 
       $add: (model = {}, idx, applySorting = false) => {
-        if (typeof model == 'object' && !(model instanceof this.model)) {
+        if (typeof model == 'object' && !(model instanceof this.constructor.modelClass)) {
           model = collection.$create(model);
         }
 
@@ -452,7 +481,7 @@ export default class Resource {
         var idx;
         if (_.isNumber(arg)) {
           idx = arg;
-        } else if (arg instanceof this.model) {
+        } else if (arg instanceof this.constructor.modelClass) {
           idx = collection.indexOf(arg);
         }
 
@@ -487,7 +516,7 @@ export default class Resource {
       // update: () => {},
 
       $delete: (model, params = {}) => {
-        if (model instanceof this.model) {
+        if (model instanceof this.constructor.modelClass) {
           return model.$delete(params).then(() => {
             return collection.$remove(model);
           });

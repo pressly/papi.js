@@ -88,7 +88,9 @@ nock(api.options.host)
 
   .post(`/hubs`).reply(200, { name: 'Hello', id: 1234 })
 
-  .get(`/invites/incoming`).reply(200, { name: 'Hello', id: 1234 })
+  .get(`/invites/incoming`).times(2).reply(200, mock.invites)
+
+  .post(`/invites/${mock.invites[0].id}/accept`).reply(200)
 
 
   /** Organization Resource Requests ***************************************************/
@@ -480,12 +482,24 @@ describe('Collections', function() {
   });
 
   it('should have a collection action', function(done) {
-    var resource = api.$resource('invites')
-    resource.$incoming().then(function() {
-
+    api.$resource('invites').$incoming().then(function() {
+      done();
+    }).catch((err) => {
+      done(err);
     })
-
-    done();
   });
 
+  it('should have a member action', function(done) {
+    api.$resource('invites').$incoming().then(function(res) {
+      var invite = res[0];
+      invite.should.be.instanceOf(models.Invite);
+      invite.$accept().then(function(res) {
+        done()
+      }).catch((err) => {
+        done(err);
+      });
+    }).catch((err) => {
+      done(err);
+    })
+  });
 });

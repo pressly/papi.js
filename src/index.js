@@ -86,7 +86,8 @@ export default class Papi {
       key = parentResource.key + '.' + name;
     }
 
-    return new Resource(this, key, parentResource).includeParams(params);
+    //return new Resource(this, key, parentResource).includeParams(params);
+    return new this.constructor.resourceClasses[key](this, key, parentResource).includeParams(params);
   }
 
   request(method, path, options = {}) {
@@ -99,6 +100,7 @@ export default class Papi {
       }
 
       var req = request[method](url);
+
       req.set('Content-Type', 'application/json');
 
       if (options.timeout || this.options.timeout) {
@@ -126,6 +128,8 @@ export default class Papi {
       if (options.data) {
         req.send(options.data);
       }
+
+      //console.log(req.url)
 
       req.end((err, res) => {
         setTimeout(() => {
@@ -179,8 +183,8 @@ Papi
   .close()
 
   .resource('hubs').open()
-    .post('upgrade',  { on: 'member' })
     .get('search',    { on: 'collection' })
+    .post('upgrade',  { on: 'member' })
     .post('accept_invite', { on: 'member'})
     .post('reject_invite', { on: 'member'})
 
@@ -266,11 +270,12 @@ Papi
   .close()
 ;
 
-
 Papi.generateMarkdown = () => {
   let markdown = "";
 
-  _.each(Papi.resourceDefinitions, (def) => {
+  _.each(Papi.resourceClasses, (resourceClass) => {
+    var def = resourceClass.definition;
+
     markdown += `###${def.model.name}\n\n`;
     markdown += `**\`${def.key}\`**\n\n`;
 
