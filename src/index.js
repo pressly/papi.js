@@ -86,8 +86,7 @@ export default class Papi {
       key = parentResource.key + '.' + name;
     }
 
-    //return new Resource(this, key, parentResource).includeParams(params);
-    return new this.constructor.resourceClasses[key](this, key, parentResource).includeParams(params);
+    return new Papi.resourceClasses[key](this, parentResource).includeParams(params);
   }
 
   request(method, path, options = {}) {

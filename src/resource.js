@@ -216,7 +216,7 @@ var parseHTTPLinks = function(linksString) {
 };
 
 export default class Resource {
-  constructor(api, key, parentResource, inherit = false) {
+  constructor(api, parentResource, inherit = false) {
     var def = this.constructor.definition;
     if (typeof def == 'undefined') {
       throw new Error("Resource: Must supply a proper definition");
@@ -313,7 +313,7 @@ export default class Resource {
   }
 
   $get(params) {
-    var resource = new this.constructor(this.api, this.key, this, true).includeParams(params);
+    var resource = new this.constructor(this.api, this, true).includeParams(params);
 
     return resource.request().then((res) => {
       return resource.hydrateModel(res);
@@ -325,7 +325,7 @@ export default class Resource {
       params = { id: params };
     }
 
-    var resource = new this.constructor(this.api, this.key, this, true).includeParams(params);
+    var resource = new this.constructor(this.api, this, true).includeParams(params);
 
     return resource.request().then((res) => {
       return resource.hydrateModel(res);
@@ -333,7 +333,7 @@ export default class Resource {
   }
 
   $all(params) {
-    var resource = new this.constructor(this.api, this.key, this, true).includeParams(params);
+    var resource = new this.constructor(this.api, this, true).includeParams(params);
 
     return resource.request().then((res) => {
       return resource.hydrateCollection(res);
@@ -341,7 +341,7 @@ export default class Resource {
   }
 
   $create(data = {}) {
-    var resource = new this.constructor(this.api, this.key, this);
+    var resource = new this.constructor(this.api, this);
     return resource.hydrateModel(data, { newRecord: true });
   }
 
@@ -383,7 +383,7 @@ export default class Resource {
   hydrateCollection(data) {
     var collection = _.map(data, (item) => {
       // Models in a collection need a new resource created
-      var resource = new this.constructor(this.api, this.key, this);
+      var resource = new this.constructor(this.api, this);
 
       var model = resource.hydrateModel(item);
 
@@ -445,7 +445,7 @@ export default class Resource {
       },
 
       $create: (data = {}) => {
-        var resource = new this.constructor(this.api, this.key, this);
+        var resource = new this.constructor(this.api, this);
         return resource.hydrateModel(data, { newRecord: true });
       },
 
