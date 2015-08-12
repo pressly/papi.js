@@ -150,13 +150,13 @@ Papi
   .close()
 
   .resource('hubs').open()
-    .get('search',    { on: 'collection' })
+    .get('search',    { on: 'resource' })
     .post('upgrade',  { on: 'member' })
     .post('accept_invite', { on: 'member'})
     .post('reject_invite', { on: 'member'})
 
     .resource('apps').open()
-      .get('current', { path: '/current', on: 'collection' })
+      .get('current', { path: '/current', on: 'resource' })
       .get('build',   { path: '/build_app', on: 'member' })
       .get('status',  { on: 'member' })
 
@@ -164,10 +164,10 @@ Papi
     .close()
 
     .resource('analytics').open()
-      .get('summary',   { on: 'collection'})
-      .get('visitors',  { on: 'collection'})
-      .get('pageviews', { on: 'collection'})
-      .get('duration',  { on: 'collection'})
+      .get('summary',   { on: 'resource'})
+      .get('visitors',  { on: 'resource'})
+      .get('pageviews', { on: 'resource'})
+      .get('duration',  { on: 'resource'})
     .close()
 
     .resource('feeds').open()
@@ -175,7 +175,7 @@ Papi
     .close()
 
     .resource('invites').open()
-      .post('bulk_invite',  { on: 'collection' })
+      .post('bulk_invite',  { on: 'resource' })
       .post('resend',       { on: 'member' })
       .post('accept',       { on: 'member', routeSegment: '/invites/:hash' })
       .post('reject',       { on: 'member', routeSegment: '/invites/:hash' })
@@ -184,12 +184,12 @@ Papi
     .resource('recommendations')
 
     .resource('users').open()
-      .post('grant_access',     { on: 'collection' })
+      .post('grant_access',     { on: 'resource' })
       .delete('revoke_access',  { on: 'member' })
     .close()
 
     .resource('collections').open()
-      .put('reorder', { on: 'collection'})
+      .put('reorder', { on: 'resource'})
     .close()
 
     .resource('tags')
@@ -212,9 +212,9 @@ Papi
   .close()
 
   .resource('invites').open()
-    .get('incoming',      { on: 'collection' })
-    .get('outgoing',      { on: 'collection' })
-    .post('bulk_invite',  { on: 'collection' })
+    .get('incoming',      { on: 'resource' })
+    .get('outgoing',      { on: 'resource' })
+    .post('bulk_invite',  { on: 'resource' })
     .post('resend',       { on: 'member' })
     .post('accept',       { on: 'member', routeSegment: '/invites/:hash' })
     .post('reject',       { on: 'member', routeSegment: '/invites/:hash' })
@@ -233,6 +233,6 @@ Papi
   .close()
 
   .resource('users').open()
-    .get('roles', { on: 'collection' })
+    .get('roles', { on: 'resource' })
   .close()
 ;

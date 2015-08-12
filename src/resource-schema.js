@@ -116,7 +116,7 @@ var pointer = function (bucket, parentPointer) {
         parentPointer.current.actions.push({ method, name, options });
       }
 
-      if (options.on == 'collection') {
+      if (options.on == 'resource') {
         var resourceClass = ResourceSchema.resourceClasses[parentPointer.current.key];
 
         if (!resourceClass.prototype.hasOwnProperty('$' + name)) {
