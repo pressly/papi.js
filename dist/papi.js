@@ -1,6 +1,10 @@
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.Papi = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 'use strict';
 
+var _inherits = require('babel-runtime/helpers/inherits')['default'];
+
+var _get = require('babel-runtime/helpers/get')['default'];
+
 var _createClass = require('babel-runtime/helpers/create-class')['default'];
 
 var _classCallCheck = require('babel-runtime/helpers/class-call-check')['default'];
@@ -25,17 +29,19 @@ var _bluebird = require('bluebird');
 
 var _bluebird2 = _interopRequireDefault(_bluebird);
 
-var _resource = require('./resource');
+var _resourceSchema = require('./resource-schema');
 
-var _resource2 = _interopRequireDefault(_resource);
+var _resourceSchema2 = _interopRequireDefault(_resourceSchema);
 
-var Papi = (function () {
+var Papi = (function (_ResourceSchema) {
   function Papi() {
     var _this = this;
 
     var options = arguments[0] === undefined ? {} : arguments[0];
 
     _classCallCheck(this, Papi);
+
+    _get(Object.getPrototypeOf(Papi.prototype), 'constructor', this).apply(this, arguments);
 
     this.options = options;
     this.options.host = options.host || 'https://beta-api.pressly.com';
@@ -87,39 +93,9 @@ var Papi = (function () {
     };
   }
 
+  _inherits(Papi, _ResourceSchema);
+
   _createClass(Papi, [{
-    key: '$resource',
-
-    /*
-       Resource selector
-       $resource();
-      $resource(key);
-      $resource(key, params);
-      $resource(name, parentResource);
-      $resource(name, params, parentResource);
-    */
-    value: function $resource() {
-      var key = arguments[0];
-
-      if (typeof key == 'undefined') {
-        throw new Error('Papi::$resource: key is undefined');
-      }
-
-      var name = _lodash2['default'].last(key.split('.'));
-      var params = _lodash2['default'].isObject(arguments[1]) && !(arguments[1] instanceof _resource2['default']) ? arguments[1] : undefined;
-      var parentResource = arguments[2] || !params && arguments[1] || undefined;
-
-      if (parentResource) {
-        if (parentResource.children.indexOf(name) == -1) {
-          throw new Error('Papi::$resource: key not found in parent resource.');
-        }
-
-        key = parentResource.key + '.' + name;
-      }
-
-      return new _resource2['default'](this, key, parentResource).includeParams(params);
-    }
-  }, {
     key: 'request',
     value: function request(method, path) {
       var _this2 = this;
@@ -135,6 +111,7 @@ var Papi = (function () {
         }
 
         var req = _superagent2['default'][method](url);
+
         req.set('Content-Type', 'application/json');
 
         if (options.timeout || _this2.options.timeout) {
@@ -162,6 +139,8 @@ var Papi = (function () {
         if (options.data) {
           req.send(options.data);
         }
+
+        //console.log(req.url)
 
         req.end(function (err, res) {
           setTimeout(function () {
@@ -204,88 +183,16 @@ var Papi = (function () {
   }]);
 
   return Papi;
-})();
+})(_resourceSchema2['default']);
 
 exports['default'] = Papi;
 
-(0, _resource.applyResourcing)(Papi);
-
-Papi.resource('accounts').open().post('become', { on: 'member' }).resource('users').resource('hubs', { linkTo: 'hubs' }).close().resource('organizations').open().resource('users').resource('hubs', { linkTo: 'hubs' }).resource('invites').close().resource('hubs').open().post('upgrade', { on: 'member' }).get('search', { on: 'collection' }).post('accept_invite', { on: 'member' }).post('reject_invite', { on: 'member' }).resource('apps').open().get('current', { path: '/current', on: 'collection' }).get('build', { path: '/build_app', on: 'member' }).get('status', { on: 'member' }).resource('styles').close().resource('analytics').open().get('summary', { on: 'collection' }).get('visitors', { on: 'collection' }).get('pageviews', { on: 'collection' }).get('duration', { on: 'collection' }).close().resource('feeds').open().resource('assets', { modelName: 'FeedAsset' }).close().resource('invites').open().post('bulk_invite', { on: 'collection' }).post('resend', { on: 'member' }).post('accept', { on: 'member', routeSegment: '/invites/:hash' }).post('reject', { on: 'member', routeSegment: '/invites/:hash' }).close().resource('recommendations').resource('users').open().post('grant_access', { on: 'collection' })['delete']('revoke_access', { on: 'member' }).close().resource('collections').open().put('reorder', { on: 'collection' }).close().resource('tags').resource('assets', { routeSegment: '/stream/:id' }).open().put('feature', { on: 'member' }).put('unfeature', { on: 'member' }).put('hide', { on: 'member' }).put('unhide', { on: 'member' }).put('lock', { on: 'member' }).put('unlock', { on: 'member' }).resource('likes').resource('comments').close().resource('drafts').open().put('publish', { on: 'member' }).close().close().resource('invites').open().get('incoming', { on: 'collection' }).get('outgoing', { on: 'collection' }).post('bulk_invite', { on: 'collection' }).post('resend', { on: 'member' }).post('accept', { on: 'member', routeSegment: '/invites/:hash' }).post('reject', { on: 'member', routeSegment: '/invites/:hash' }).close().resource('code_revisions').open().get('fetch_repo', { on: 'member' })
+Papi.defineSchema().resource('accounts').open().post('become', { on: 'member' }).resource('users').resource('hubs', { linkTo: 'hubs' }).close().resource('organizations').open().resource('users').resource('hubs', { linkTo: 'hubs' }).resource('invites').close().resource('hubs').open().get('search', { on: 'resource' }).post('upgrade', { on: 'member' }).post('accept_invite', { on: 'member' }).post('reject_invite', { on: 'member' }).resource('apps').open().get('current', { on: 'resource', path: '/current' }).get('build', { on: 'member', path: '/build_app' }).get('status', { on: 'member' }).resource('styles').close().resource('analytics').open().get('summary', { on: 'resource' }).get('visitors', { on: 'resource' }).get('pageviews', { on: 'resource' }).get('duration', { on: 'resource' }).close().resource('feeds').open().resource('assets', { modelName: 'FeedAsset' }).close().resource('invites').open().post('bulk_invite', { on: 'resource' }).post('resend', { on: 'member' }).post('accept', { on: 'member', routeSegment: '/invites/:hash' }).post('reject', { on: 'member', routeSegment: '/invites/:hash' }).close().resource('recommendations').resource('users').open().post('grant_access', { on: 'resource' })['delete']('revoke_access', { on: 'member' }).close().resource('collections').open().put('reorder', { on: 'resource' }).close().resource('tags').resource('assets', { routeSegment: '/stream/:id' }).open().put('feature', { on: 'member' }).put('unfeature', { on: 'member' }).put('hide', { on: 'member' }).put('unhide', { on: 'member' }).put('lock', { on: 'member' }).put('unlock', { on: 'member' }).resource('likes').resource('comments').close().resource('drafts').open().put('publish', { on: 'member' }).close().close().resource('invites').open().get('incoming', { on: 'resource' }).get('outgoing', { on: 'resource' }).post('bulk_invite', { on: 'resource' }).post('resend', { on: 'member' }).post('accept', { on: 'member', key: 'hash' }).post('reject', { on: 'member', key: 'hash' }).close().resource('code_revisions').open().get('fetch_repo', { on: 'member' })
 
 // This resource links to the root hubs resource
-.resource('hubs', { linkTo: 'hubs' }).close().resource('signup').open().get('account_uid_available', { on: 'member' }).get('account_email_available', { on: 'member' }).close().resource('users').open().get('roles', { on: 'collection' }).close();
-
-Papi.generateMarkdown = function () {
-  var markdown = '';
-
-  _lodash2['default'].each(Papi.resourceDefinitions, function (def) {
-    markdown += '###' + def.model.name + '\n\n';
-    markdown += '**`' + def.key + '`**\n\n';
-
-    if (def.parent) {
-      markdown += '#####Parent\n\n';
-      markdown += '- [' + def.parent.model.name + '](#' + def.parent.model.name.toLowerCase() + ') `' + def.parent.key + '`\n\n';
-    }
-
-    if (!_lodash2['default'].isEmpty(def.children)) {
-      markdown += '#####Children\n\n';
-      _lodash2['default'].each(def.children, function (child) {
-        markdown += '- [' + child.model.name + '](#' + child.model.name.toLowerCase() + ') `' + child.key + '`\n';
-      });
-    }
-
-    markdown += '\n\n';
-
-    if (def.linkTo) {
-      var linkTo = Papi.resourceDefinitions[def.linkTo];
-      markdown += 'See [' + linkTo.model.name + '](#' + linkTo.model.name.toLowerCase() + ') `' + linkTo.key + '`\n\n';
-    }
-
-    var pathRoot = def.route.path.replace(/\/:.+$/, '');
-
-    markdown += '#####REST Endpoints\n\n';
-
-    markdown += '- `GET` ' + pathRoot + '\n';
-    markdown += '- `POST` ' + pathRoot + '\n';
-    markdown += '- `GET` ' + def.route.path + '\n';
-    markdown += '- `PUT` ' + def.route.path + '\n';
-    markdown += '- `DELETE` ' + def.route.path + '\n\n';
-
-    if (!_lodash2['default'].isEmpty(def.actions)) {
-      var memberActions = _lodash2['default'].select(def.actions, function (action) {
-        return action.options.on == 'member';
-      });
-
-      var collectionActions = _lodash2['default'].select(def.actions, function (action) {
-        return action.options.on == 'collection';
-      });
-
-      if (!_lodash2['default'].isEmpty(collectionActions)) {
-        markdown += '*Collection Actions*\n\n';
-
-        _lodash2['default'].each(collectionActions, function (action) {
-          markdown += '- `' + action.method.toUpperCase() + '` ' + pathRoot + '/' + action.name + '\n';
-        });
-      }
-
-      markdown += '\n\n';
-
-      if (!_lodash2['default'].isEmpty(memberActions)) {
-        markdown += '*Member Actions*\n\n';
-
-        _lodash2['default'].each(memberActions, function (action) {
-          markdown += '- `' + action.method.toUpperCase() + '` ' + def.route.path + '/' + action.name + '\n';
-        });
-      }
-    }
-
-    markdown += '\n\n';
-  });
-
-  console.log(markdown);
-};
+.resource('hubs', { linkTo: 'hubs' }).close().resource('signup').open().get('account_uid_available', { on: 'member' }).get('account_email_available', { on: 'member' }).close().resource('users').open().get('roles', { on: 'resource' }).close();
 module.exports = exports['default'];
-},{"./resource":21,"babel-runtime/core-js/object/define-property":25,"babel-runtime/helpers/class-call-check":26,"babel-runtime/helpers/create-class":27,"babel-runtime/helpers/interop-require-default":29,"bluebird":54,"lodash":56,"superagent":57}],2:[function(require,module,exports){
+},{"./resource-schema":21,"babel-runtime/core-js/object/define-property":26,"babel-runtime/helpers/class-call-check":28,"babel-runtime/helpers/create-class":29,"babel-runtime/helpers/get":30,"babel-runtime/helpers/inherits":31,"babel-runtime/helpers/interop-require-default":32,"bluebird":59,"lodash":61,"superagent":62}],2:[function(require,module,exports){
 'use strict';
 
 var _createClass = require('babel-runtime/helpers/create-class')['default'];
@@ -341,7 +248,7 @@ var Model = (function () {
 
 exports['default'] = Model;
 module.exports = exports['default'];
-},{"babel-runtime/core-js/object/define-property":25,"babel-runtime/helpers/class-call-check":26,"babel-runtime/helpers/create-class":27,"babel-runtime/helpers/interop-require-default":29,"lodash":56}],3:[function(require,module,exports){
+},{"babel-runtime/core-js/object/define-property":26,"babel-runtime/helpers/class-call-check":28,"babel-runtime/helpers/create-class":29,"babel-runtime/helpers/interop-require-default":32,"lodash":61}],3:[function(require,module,exports){
 'use strict';
 
 var _inherits = require('babel-runtime/helpers/inherits')['default'];
@@ -376,7 +283,7 @@ var Account = (function (_Model) {
 
 exports['default'] = Account;
 module.exports = exports['default'];
-},{"../model":2,"babel-runtime/core-js/object/define-property":25,"babel-runtime/helpers/class-call-check":26,"babel-runtime/helpers/inherits":28,"babel-runtime/helpers/interop-require-default":29}],4:[function(require,module,exports){
+},{"../model":2,"babel-runtime/core-js/object/define-property":26,"babel-runtime/helpers/class-call-check":28,"babel-runtime/helpers/inherits":31,"babel-runtime/helpers/interop-require-default":32}],4:[function(require,module,exports){
 'use strict';
 
 var _inherits = require('babel-runtime/helpers/inherits')['default'];
@@ -411,7 +318,7 @@ var App = (function (_Model) {
 
 exports['default'] = App;
 module.exports = exports['default'];
-},{"../model":2,"babel-runtime/core-js/object/define-property":25,"babel-runtime/helpers/class-call-check":26,"babel-runtime/helpers/inherits":28,"babel-runtime/helpers/interop-require-default":29}],5:[function(require,module,exports){
+},{"../model":2,"babel-runtime/core-js/object/define-property":26,"babel-runtime/helpers/class-call-check":28,"babel-runtime/helpers/inherits":31,"babel-runtime/helpers/interop-require-default":32}],5:[function(require,module,exports){
 'use strict';
 
 var _inherits = require('babel-runtime/helpers/inherits')['default'];
@@ -491,7 +398,7 @@ var Asset = (function (_Model) {
 
 exports['default'] = Asset;
 module.exports = exports['default'];
-},{"../model":2,"babel-runtime/core-js/object/define-property":25,"babel-runtime/helpers/class-call-check":26,"babel-runtime/helpers/create-class":27,"babel-runtime/helpers/inherits":28,"babel-runtime/helpers/interop-require-default":29,"lodash":56}],6:[function(require,module,exports){
+},{"../model":2,"babel-runtime/core-js/object/define-property":26,"babel-runtime/helpers/class-call-check":28,"babel-runtime/helpers/create-class":29,"babel-runtime/helpers/inherits":31,"babel-runtime/helpers/interop-require-default":32,"lodash":61}],6:[function(require,module,exports){
 'use strict';
 
 var _inherits = require('babel-runtime/helpers/inherits')['default'];
@@ -526,7 +433,7 @@ var CodeRevision = (function (_Model) {
 
 exports['default'] = CodeRevision;
 module.exports = exports['default'];
-},{"../model":2,"babel-runtime/core-js/object/define-property":25,"babel-runtime/helpers/class-call-check":26,"babel-runtime/helpers/inherits":28,"babel-runtime/helpers/interop-require-default":29}],7:[function(require,module,exports){
+},{"../model":2,"babel-runtime/core-js/object/define-property":26,"babel-runtime/helpers/class-call-check":28,"babel-runtime/helpers/inherits":31,"babel-runtime/helpers/interop-require-default":32}],7:[function(require,module,exports){
 'use strict';
 
 var _inherits = require('babel-runtime/helpers/inherits')['default'];
@@ -561,7 +468,7 @@ var Collection = (function (_Model) {
 
 exports['default'] = Collection;
 module.exports = exports['default'];
-},{"../model":2,"babel-runtime/core-js/object/define-property":25,"babel-runtime/helpers/class-call-check":26,"babel-runtime/helpers/inherits":28,"babel-runtime/helpers/interop-require-default":29}],8:[function(require,module,exports){
+},{"../model":2,"babel-runtime/core-js/object/define-property":26,"babel-runtime/helpers/class-call-check":28,"babel-runtime/helpers/inherits":31,"babel-runtime/helpers/interop-require-default":32}],8:[function(require,module,exports){
 'use strict';
 
 var _inherits = require('babel-runtime/helpers/inherits')['default'];
@@ -596,7 +503,7 @@ var Comment = (function (_Model) {
 
 exports['default'] = Comment;
 module.exports = exports['default'];
-},{"../model":2,"babel-runtime/core-js/object/define-property":25,"babel-runtime/helpers/class-call-check":26,"babel-runtime/helpers/inherits":28,"babel-runtime/helpers/interop-require-default":29}],9:[function(require,module,exports){
+},{"../model":2,"babel-runtime/core-js/object/define-property":26,"babel-runtime/helpers/class-call-check":28,"babel-runtime/helpers/inherits":31,"babel-runtime/helpers/interop-require-default":32}],9:[function(require,module,exports){
 'use strict';
 
 var _inherits = require('babel-runtime/helpers/inherits')['default'];
@@ -631,7 +538,7 @@ var Draft = (function (_Model) {
 
 exports['default'] = Draft;
 module.exports = exports['default'];
-},{"../model":2,"babel-runtime/core-js/object/define-property":25,"babel-runtime/helpers/class-call-check":26,"babel-runtime/helpers/inherits":28,"babel-runtime/helpers/interop-require-default":29}],10:[function(require,module,exports){
+},{"../model":2,"babel-runtime/core-js/object/define-property":26,"babel-runtime/helpers/class-call-check":28,"babel-runtime/helpers/inherits":31,"babel-runtime/helpers/interop-require-default":32}],10:[function(require,module,exports){
 'use strict';
 
 var _inherits = require('babel-runtime/helpers/inherits')['default'];
@@ -666,7 +573,7 @@ var FeedAsset = (function (_Model) {
 
 exports['default'] = FeedAsset;
 module.exports = exports['default'];
-},{"../model":2,"babel-runtime/core-js/object/define-property":25,"babel-runtime/helpers/class-call-check":26,"babel-runtime/helpers/inherits":28,"babel-runtime/helpers/interop-require-default":29}],11:[function(require,module,exports){
+},{"../model":2,"babel-runtime/core-js/object/define-property":26,"babel-runtime/helpers/class-call-check":28,"babel-runtime/helpers/inherits":31,"babel-runtime/helpers/interop-require-default":32}],11:[function(require,module,exports){
 'use strict';
 
 var _inherits = require('babel-runtime/helpers/inherits')['default'];
@@ -701,7 +608,7 @@ var Feed = (function (_Model) {
 
 exports['default'] = Feed;
 module.exports = exports['default'];
-},{"../model":2,"babel-runtime/core-js/object/define-property":25,"babel-runtime/helpers/class-call-check":26,"babel-runtime/helpers/inherits":28,"babel-runtime/helpers/interop-require-default":29}],12:[function(require,module,exports){
+},{"../model":2,"babel-runtime/core-js/object/define-property":26,"babel-runtime/helpers/class-call-check":28,"babel-runtime/helpers/inherits":31,"babel-runtime/helpers/interop-require-default":32}],12:[function(require,module,exports){
 'use strict';
 
 var _inherits = require('babel-runtime/helpers/inherits')['default'];
@@ -736,7 +643,7 @@ var Hub = (function (_Model) {
 
 exports['default'] = Hub;
 module.exports = exports['default'];
-},{"../model":2,"babel-runtime/core-js/object/define-property":25,"babel-runtime/helpers/class-call-check":26,"babel-runtime/helpers/inherits":28,"babel-runtime/helpers/interop-require-default":29}],13:[function(require,module,exports){
+},{"../model":2,"babel-runtime/core-js/object/define-property":26,"babel-runtime/helpers/class-call-check":28,"babel-runtime/helpers/inherits":31,"babel-runtime/helpers/interop-require-default":32}],13:[function(require,module,exports){
 'use strict';
 
 var _Object$defineProperty = require('babel-runtime/core-js/object/define-property')['default'];
@@ -818,7 +725,7 @@ exports.Tag = _interopRequire(_tag);
 var _user = require('./user');
 
 exports.User = _interopRequire(_user);
-},{"../model":2,"./account":3,"./app":4,"./asset":5,"./code-revision":6,"./collection":7,"./comment":8,"./draft":9,"./feed":11,"./feed-asset":10,"./hub":12,"./invite":14,"./like":15,"./organization":16,"./recommendation":17,"./style":18,"./tag":19,"./user":20,"babel-runtime/core-js/object/define-property":25,"babel-runtime/helpers/interop-require":31}],14:[function(require,module,exports){
+},{"../model":2,"./account":3,"./app":4,"./asset":5,"./code-revision":6,"./collection":7,"./comment":8,"./draft":9,"./feed":11,"./feed-asset":10,"./hub":12,"./invite":14,"./like":15,"./organization":16,"./recommendation":17,"./style":18,"./tag":19,"./user":20,"babel-runtime/core-js/object/define-property":26,"babel-runtime/helpers/interop-require":34}],14:[function(require,module,exports){
 'use strict';
 
 var _inherits = require('babel-runtime/helpers/inherits')['default'];
@@ -853,7 +760,7 @@ var Invite = (function (_Model) {
 
 exports['default'] = Invite;
 module.exports = exports['default'];
-},{"../model":2,"babel-runtime/core-js/object/define-property":25,"babel-runtime/helpers/class-call-check":26,"babel-runtime/helpers/inherits":28,"babel-runtime/helpers/interop-require-default":29}],15:[function(require,module,exports){
+},{"../model":2,"babel-runtime/core-js/object/define-property":26,"babel-runtime/helpers/class-call-check":28,"babel-runtime/helpers/inherits":31,"babel-runtime/helpers/interop-require-default":32}],15:[function(require,module,exports){
 'use strict';
 
 var _inherits = require('babel-runtime/helpers/inherits')['default'];
@@ -888,7 +795,7 @@ var Like = (function (_Model) {
 
 exports['default'] = Like;
 module.exports = exports['default'];
-},{"../model":2,"babel-runtime/core-js/object/define-property":25,"babel-runtime/helpers/class-call-check":26,"babel-runtime/helpers/inherits":28,"babel-runtime/helpers/interop-require-default":29}],16:[function(require,module,exports){
+},{"../model":2,"babel-runtime/core-js/object/define-property":26,"babel-runtime/helpers/class-call-check":28,"babel-runtime/helpers/inherits":31,"babel-runtime/helpers/interop-require-default":32}],16:[function(require,module,exports){
 'use strict';
 
 var _inherits = require('babel-runtime/helpers/inherits')['default'];
@@ -923,7 +830,7 @@ var Organization = (function (_Model) {
 
 exports['default'] = Organization;
 module.exports = exports['default'];
-},{"../model":2,"babel-runtime/core-js/object/define-property":25,"babel-runtime/helpers/class-call-check":26,"babel-runtime/helpers/inherits":28,"babel-runtime/helpers/interop-require-default":29}],17:[function(require,module,exports){
+},{"../model":2,"babel-runtime/core-js/object/define-property":26,"babel-runtime/helpers/class-call-check":28,"babel-runtime/helpers/inherits":31,"babel-runtime/helpers/interop-require-default":32}],17:[function(require,module,exports){
 'use strict';
 
 var _inherits = require('babel-runtime/helpers/inherits')['default'];
@@ -958,7 +865,7 @@ var Recommendation = (function (_Model) {
 
 exports['default'] = Recommendation;
 module.exports = exports['default'];
-},{"../model":2,"babel-runtime/core-js/object/define-property":25,"babel-runtime/helpers/class-call-check":26,"babel-runtime/helpers/inherits":28,"babel-runtime/helpers/interop-require-default":29}],18:[function(require,module,exports){
+},{"../model":2,"babel-runtime/core-js/object/define-property":26,"babel-runtime/helpers/class-call-check":28,"babel-runtime/helpers/inherits":31,"babel-runtime/helpers/interop-require-default":32}],18:[function(require,module,exports){
 'use strict';
 
 var _inherits = require('babel-runtime/helpers/inherits')['default'];
@@ -993,7 +900,7 @@ var Style = (function (_Model) {
 
 exports['default'] = Style;
 module.exports = exports['default'];
-},{"../model":2,"babel-runtime/core-js/object/define-property":25,"babel-runtime/helpers/class-call-check":26,"babel-runtime/helpers/inherits":28,"babel-runtime/helpers/interop-require-default":29}],19:[function(require,module,exports){
+},{"../model":2,"babel-runtime/core-js/object/define-property":26,"babel-runtime/helpers/class-call-check":28,"babel-runtime/helpers/inherits":31,"babel-runtime/helpers/interop-require-default":32}],19:[function(require,module,exports){
 'use strict';
 
 var _inherits = require('babel-runtime/helpers/inherits')['default'];
@@ -1028,7 +935,7 @@ var Tag = (function (_Model) {
 
 exports['default'] = Tag;
 module.exports = exports['default'];
-},{"../model":2,"babel-runtime/core-js/object/define-property":25,"babel-runtime/helpers/class-call-check":26,"babel-runtime/helpers/inherits":28,"babel-runtime/helpers/interop-require-default":29}],20:[function(require,module,exports){
+},{"../model":2,"babel-runtime/core-js/object/define-property":26,"babel-runtime/helpers/class-call-check":28,"babel-runtime/helpers/inherits":31,"babel-runtime/helpers/interop-require-default":32}],20:[function(require,module,exports){
 'use strict';
 
 var _inherits = require('babel-runtime/helpers/inherits')['default'];
@@ -1072,14 +979,16 @@ var User = (function (_Model) {
 
 exports['default'] = User;
 module.exports = exports['default'];
-},{"../model":2,"babel-runtime/core-js/object/define-property":25,"babel-runtime/helpers/class-call-check":26,"babel-runtime/helpers/create-class":27,"babel-runtime/helpers/inherits":28,"babel-runtime/helpers/interop-require-default":29}],21:[function(require,module,exports){
+},{"../model":2,"babel-runtime/core-js/object/define-property":26,"babel-runtime/helpers/class-call-check":28,"babel-runtime/helpers/create-class":29,"babel-runtime/helpers/inherits":31,"babel-runtime/helpers/interop-require-default":32}],21:[function(require,module,exports){
 'use strict';
 
 var _createClass = require('babel-runtime/helpers/create-class')['default'];
 
 var _classCallCheck = require('babel-runtime/helpers/class-call-check')['default'];
 
-var _slicedToArray = require('babel-runtime/helpers/sliced-to-array')['default'];
+var _inherits = require('babel-runtime/helpers/inherits')['default'];
+
+var _get = require('babel-runtime/helpers/get')['default'];
 
 var _Object$defineProperty = require('babel-runtime/core-js/object/define-property')['default'];
 
@@ -1091,45 +1000,27 @@ _Object$defineProperty(exports, '__esModule', {
   value: true
 });
 
-exports.applyResourcing = applyResourcing;
-
 var _lodash = require('lodash');
 
 var _lodash2 = _interopRequireDefault(_lodash);
+
+var _resource = require('./resource');
+
+var _resource2 = _interopRequireDefault(_resource);
 
 var _models = require('./models');
 
 var models = _interopRequireWildcard(_models);
 
-/** Utility tools *************************************************************/
-
-function deepClone(obj) {
-  return JSON.parse(JSON.stringify(obj));
-}
-
 function singularize(string) {
   return string.replace(/s$/, '');
 }
 
-function capitalize(string) {
-  return string.charAt(0).toUpperCase() + string.slice(1);
-}
-
-function decapitalize(string) {
-  return string.charAt(0).toLowerCase() + string.slice(1);
-}
-
-function pluralize(string) {
-  return string + 's';
-}
-
 function classify(string) {
   return singularize(_lodash2['default'].map(string.split('_'), function (s) {
-    return capitalize(s);
+    return _lodash2['default'].capitalize(s);
   }).join(''));
 }
-
-/** Api Helpers ***************************************************************/
 
 var buildRoute = function buildRoute(resource) {
   var current = resource;
@@ -1145,7 +1036,7 @@ var buildRoute = function buildRoute(resource) {
       var paramName = current.options.routeSegment ? parseRouteParams(current.options.routeSegment)[0] : current.options.paramName || 'id';
 
       if (current !== resource) {
-        paramName = singularize(current.name) + capitalize(paramName);
+        paramName = singularize(current.name) + _lodash2['default'].capitalize(paramName);
       }
 
       var routeSegment = current.options.routeSegment ? current.options.routeSegment.replace(/\/:[^\/]+$/, '/:' + paramName) : '/' + current.name + '/:' + paramName;
@@ -1185,8 +1076,55 @@ var buildKey = function buildKey(resource, name) {
   return segments.join('.');
 };
 
-function applyResourcing(klass) {
-  klass.resourceDefinitions = {};
+var ResourceSchema = (function () {
+  function ResourceSchema() {
+    _classCallCheck(this, ResourceSchema);
+  }
+
+  _createClass(ResourceSchema, [{
+    key: '$resource',
+
+    /*
+      Resource selector
+       $resource();
+      $resource(key);
+      $resource(key, params);
+      $resource(name, parentResource);
+      $resource(name, params, parentResource);
+    */
+    value: function $resource() {
+      var key = arguments[0];
+
+      if (typeof key == 'undefined') {
+        throw new Error('$resource: key is undefined');
+      }
+
+      var name = _lodash2['default'].last(key.split('.'));
+      var params = _lodash2['default'].isObject(arguments[1]) && !(arguments[1] instanceof _resource2['default']) ? arguments[1] : undefined;
+      var parentResource = arguments[2] || !params && arguments[1] || undefined;
+
+      if (parentResource) {
+        if (parentResource.children.indexOf(name) == -1) {
+          throw new Error('$resource: key not found in parent resource.');
+        }
+
+        key = parentResource.key + '.' + name;
+      }
+
+      return new this.constructor.resourceClasses[key](this, parentResource).includeParams(params);
+    }
+  }]);
+
+  return ResourceSchema;
+})();
+
+exports['default'] = ResourceSchema;
+;
+
+ResourceSchema.defineSchema = function () {
+  var API = this;
+
+  API.resourceClasses = {};
 
   var pointer = function pointer(bucket, parentPointer) {
     return {
@@ -1195,18 +1133,37 @@ function applyResourcing(klass) {
       resource: function resource(name, options) {
         options = options || {};
         var parent = parentPointer ? parentPointer.current : null;
-        var resource = { name: name, parent: parent, children: {}, options: options };
+
+        var def = { name: name, parent: parent, children: {}, options: options };
 
         if (options.linkTo) {
-          resource.linkTo = options.linkTo;
+          def.linkTo = options.linkTo;
         }
 
-        resource.key = buildKey(resource);
-        resource.route = buildRoute(resource);
-        resource.model = options.model || models[options.modelName] || models[classify(name)] || models.Base;
-        resource.actions = [];
+        def.key = buildKey(def);
+        def.route = buildRoute(def);
+        def.actions = [];
+        def.modelName = options.modelName || classify(name);
 
-        this.current = bucket[name] = klass.resourceDefinitions[resource.key] = resource;
+        this.current = bucket[name] = def;
+
+        // create a class for this specific resource and assign the definition
+        var resourceClass = (function (_Resource) {
+          var _class = function resourceClass() {
+            _classCallCheck(this, _class);
+
+            _get(Object.getPrototypeOf(_class.prototype), 'constructor', this).apply(this, arguments);
+          };
+
+          _inherits(_class, _Resource);
+
+          return _class;
+        })(_resource2['default']);
+
+        resourceClass.definition = def;
+        resourceClass.modelClass = models[def.modelName] || models.Base;
+
+        API.resourceClasses[def.key] = resourceClass;
 
         return this;
       },
@@ -1222,6 +1179,44 @@ function applyResourcing(klass) {
       action: function action(method, name, options) {
         if (parentPointer && parentPointer.current) {
           parentPointer.current.actions.push({ method: method, name: name, options: options });
+        }
+
+        if (options.on == 'resource') {
+          var resourceClass = API.resourceClasses[parentPointer.current.key];
+
+          if (!resourceClass.prototype.hasOwnProperty('$' + name)) {
+            //console.log(`- adding collection action to ${parentPointer.current.key}:`, method, name);
+
+            resourceClass.prototype['$' + name] = function () {
+              var _this = this;
+
+              var data = arguments[0] === undefined ? {} : arguments[0];
+
+              return this.request(_lodash2['default'].extend({ method: method, path: options.path || '/' + name }, data)).then(function (res) {
+                if (_lodash2['default'].isArray(res)) {
+                  return _this.hydrateCollection(res);
+                } else {
+                  return _this.hydrateModel(res);
+                }
+              });
+            };
+          }
+        } else if (options.on == 'member') {
+          var modelClass = API.resourceClasses[parentPointer.current.key].modelClass;
+
+          if (!modelClass.prototype.hasOwnProperty('$' + name)) {
+            //console.log(`- adding member action to ${parentPointer.current.key}:`, method, name);
+
+            modelClass.prototype['$' + name] = function () {
+              var _this2 = this;
+
+              var data = arguments[0] === undefined ? {} : arguments[0];
+
+              return this.$resource().request(_lodash2['default'].extend({ method: method, path: options.path || '/' + name }, data)).then(function (res) {
+                return _this2.$resource().hydrateModel(res);
+              });
+            };
+          }
         }
 
         return this;
@@ -1249,12 +1244,110 @@ function applyResourcing(klass) {
     };
   };
 
-  _lodash2['default'].extend(klass, pointer({}));
+  return _lodash2['default'].extend({}, pointer({}));
+};
+
+ResourceSchema.generateMarkdown = function () {
+  var API = this;
+  var markdown = '';
+
+  _lodash2['default'].each(API.resourceClasses, function (resourceClass) {
+    var def = resourceClass.definition;
+
+    markdown += '###' + def.modelName + '\n\n';
+    markdown += '**`' + def.key + '`**\n\n';
+
+    if (def.parent) {
+      markdown += '#####Parent\n\n';
+      markdown += '- [' + def.parent.modelName + '](#' + def.parent.modelName.toLowerCase() + ') `' + def.parent.key + '`\n\n';
+    }
+
+    if (!_lodash2['default'].isEmpty(def.children)) {
+      markdown += '#####Children\n\n';
+      _lodash2['default'].each(def.children, function (child) {
+        markdown += '- [' + child.modelName + '](#' + child.modelName.toLowerCase() + ') `' + child.key + '`\n';
+      });
+    }
+
+    markdown += '\n\n';
+
+    if (def.linkTo) {
+      var linkTo = API.resourceClasses[def.linkTo].definition;
+      markdown += 'See [' + linkTo.modelName + '](#' + linkTo.modelName.toLowerCase() + ') `' + linkTo.key + '`\n\n';
+    }
+
+    var pathRoot = def.route.path.replace(/\/:.+$/, '');
+
+    markdown += '#####REST Endpoints\n\n';
+
+    markdown += '- `GET` ' + pathRoot + '\n';
+    markdown += '- `POST` ' + pathRoot + '\n';
+    markdown += '- `GET` ' + def.route.path + '\n';
+    markdown += '- `PUT` ' + def.route.path + '\n';
+    markdown += '- `DELETE` ' + def.route.path + '\n\n';
+
+    if (!_lodash2['default'].isEmpty(def.actions)) {
+      var memberActions = _lodash2['default'].select(def.actions, function (action) {
+        return action.options.on == 'member';
+      });
+
+      var collectionActions = _lodash2['default'].select(def.actions, function (action) {
+        return action.options.on == 'collection';
+      });
+
+      if (!_lodash2['default'].isEmpty(collectionActions)) {
+        markdown += '*Collection Actions*\n\n';
+
+        _lodash2['default'].each(collectionActions, function (action) {
+          markdown += '- `' + action.method.toUpperCase() + '` ' + pathRoot + '/' + action.name + '\n';
+        });
+      }
+
+      markdown += '\n\n';
+
+      if (!_lodash2['default'].isEmpty(memberActions)) {
+        markdown += '*Member Actions*\n\n';
+
+        _lodash2['default'].each(memberActions, function (action) {
+          markdown += '- `' + action.method.toUpperCase() + '` ' + def.route.path + '/' + action.name + '\n';
+        });
+      }
+    }
+
+    markdown += '\n\n';
+  });
+
+  console.log(markdown);
+};
+module.exports = exports['default'];
+},{"./models":13,"./resource":22,"babel-runtime/core-js/object/define-property":26,"babel-runtime/helpers/class-call-check":28,"babel-runtime/helpers/create-class":29,"babel-runtime/helpers/get":30,"babel-runtime/helpers/inherits":31,"babel-runtime/helpers/interop-require-default":32,"babel-runtime/helpers/interop-require-wildcard":33,"lodash":61}],22:[function(require,module,exports){
+'use strict';
+
+var _createClass = require('babel-runtime/helpers/create-class')['default'];
+
+var _classCallCheck = require('babel-runtime/helpers/class-call-check')['default'];
+
+var _slicedToArray = require('babel-runtime/helpers/sliced-to-array')['default'];
+
+var _Object$defineProperty = require('babel-runtime/core-js/object/define-property')['default'];
+
+var _interopRequireDefault = require('babel-runtime/helpers/interop-require-default')['default'];
+
+_Object$defineProperty(exports, '__esModule', {
+  value: true
+});
+
+var _lodash = require('lodash');
+
+var _lodash2 = _interopRequireDefault(_lodash);
+
+function deepClone(obj) {
+  return JSON.parse(JSON.stringify(obj));
 }
 
-;
-
-/** Resource class ************************************************************/
+function singularize(string) {
+  return string.replace(/s$/, '');
+}
 
 var parseHTTPLinks = function parseHTTPLinks(linksString) {
   var links = {};
@@ -1278,19 +1371,14 @@ var parseHTTPLinks = function parseHTTPLinks(linksString) {
 };
 
 var Resource = (function () {
-  function Resource(api, key, parentResource) {
+  function Resource(api, parentResource) {
     var _this = this;
 
-    var inherit = arguments[3] === undefined ? false : arguments[3];
+    var inherit = arguments[2] === undefined ? false : arguments[2];
 
     _classCallCheck(this, Resource);
 
-    var def = api.constructor.resourceDefinitions[key];
-
-    if (!inherit && def.linkTo) {
-      def = api.constructor.resourceDefinitions[def.linkTo];
-    }
-
+    var def = this.constructor.definition;
     if (typeof def == 'undefined') {
       throw new Error('Resource: Must supply a proper definition');
     }
@@ -1301,7 +1389,6 @@ var Resource = (function () {
 
     this.name = def.name;
     this.key = def.key;
-    this.model = def.model;
 
     this.children = _lodash2['default'].map(def.children, function (child, name) {
       return name;
@@ -1334,19 +1421,16 @@ var Resource = (function () {
     this.parent = function () {
       return parentResource || def.parent && this.api.$resource(def.parent.key) || null;
     };
-
-    _lodash2['default'].each(def.actions, function (action) {
-      _this['$' + action.name] = function () {
-        var options = arguments[0] === undefined ? {} : arguments[0];
-
-        return _this.request(_lodash2['default'].extend({ method: action.method, path: action.options.path || '/' + action.name }, options)).then(function (res) {
-          return _this.hydrateModel(res);
-        });
-      };
-    });
   }
 
   _createClass(Resource, [{
+    key: 'createResource',
+    value: function createResource() {
+      var inherit = arguments[0] === undefined ? false : arguments[0];
+
+      return new this.constructor(this.api, this, inherit);
+    }
+  }, {
     key: 'request',
     value: function request() {
       var _this2 = this;
@@ -1413,7 +1497,7 @@ var Resource = (function () {
   }, {
     key: '$get',
     value: function $get(params) {
-      var resource = new Resource(this.api, this.key, this, true).includeParams(params);
+      var resource = this.createResource(true).includeParams(params);
 
       return resource.request().then(function (res) {
         return resource.hydrateModel(res);
@@ -1426,7 +1510,7 @@ var Resource = (function () {
         params = { id: params };
       }
 
-      var resource = new Resource(this.api, this.key, this, true).includeParams(params);
+      var resource = this.createResource(true).includeParams(params);
 
       return resource.request().then(function (res) {
         return resource.hydrateModel(res);
@@ -1435,7 +1519,7 @@ var Resource = (function () {
   }, {
     key: '$all',
     value: function $all(params) {
-      var resource = new Resource(this.api, this.key, this, true).includeParams(params);
+      var resource = this.createResource(true).includeParams(params);
 
       return resource.request().then(function (res) {
         return resource.hydrateCollection(res);
@@ -1446,7 +1530,7 @@ var Resource = (function () {
     value: function $create() {
       var data = arguments[0] === undefined ? {} : arguments[0];
 
-      var resource = new Resource(this.api, this.key, this);
+      var resource = this.createResource();
       return resource.hydrateModel(data, { newRecord: true });
     }
   }, {
@@ -1472,7 +1556,7 @@ var Resource = (function () {
 
       var options = arguments[1] === undefined ? {} : arguments[1];
 
-      var model = new this.model(data);
+      var model = new this.constructor.modelClass(data);
 
       if (!options.newRecord) {
         model.$newRecord = false;
@@ -1498,7 +1582,7 @@ var Resource = (function () {
 
       var collection = _lodash2['default'].map(data, function (item) {
         // Models in a collection need a new resource created
-        var resource = new Resource(_this5.api, _this5.key, _this5);
+        var resource = _this5.createResource();
 
         var model = resource.hydrateModel(item);
 
@@ -1567,7 +1651,7 @@ var Resource = (function () {
         $create: function $create() {
           var data = arguments[0] === undefined ? {} : arguments[0];
 
-          var resource = new Resource(_this5.api, _this5.key, _this5);
+          var resource = _this5.createResource();
           return resource.hydrateModel(data, { newRecord: true });
         },
 
@@ -1575,7 +1659,7 @@ var Resource = (function () {
           var model = arguments[0] === undefined ? {} : arguments[0];
           var applySorting = arguments[2] === undefined ? false : arguments[2];
 
-          if (typeof model == 'object' && !(model instanceof _this5.model)) {
+          if (typeof model == 'object' && !(model instanceof _this5.constructor.modelClass)) {
             model = collection.$create(model);
           }
 
@@ -1606,7 +1690,7 @@ var Resource = (function () {
           var idx;
           if (_lodash2['default'].isNumber(arg)) {
             idx = arg;
-          } else if (arg instanceof _this5.model) {
+          } else if (arg instanceof _this5.constructor.modelClass) {
             idx = collection.indexOf(arg);
           }
 
@@ -1627,23 +1711,10 @@ var Resource = (function () {
 
         $sort: function $sort() {},
 
-        // save: () => {
-        //   var promises = [];
-        //
-        //   for (var idx = 0; i < collection.length; i++) {
-        //     var item = collection.at(idx);
-        //     promises.push(item.save());
-        //   }
-        //
-        //   return Promise.all(promises);
-        // },
-
-        // update: () => {},
-
         $delete: function $delete(model) {
           var params = arguments[1] === undefined ? {} : arguments[1];
 
-          if (model instanceof _this5.model) {
+          if (model instanceof _this5.constructor.modelClass) {
             return model.$delete(params).then(function () {
               return collection.$remove(model);
             });
@@ -1661,15 +1732,18 @@ var Resource = (function () {
 })();
 
 exports['default'] = Resource;
-},{"./models":13,"babel-runtime/core-js/object/define-property":25,"babel-runtime/helpers/class-call-check":26,"babel-runtime/helpers/create-class":27,"babel-runtime/helpers/interop-require-default":29,"babel-runtime/helpers/interop-require-wildcard":30,"babel-runtime/helpers/sliced-to-array":32,"lodash":56}],22:[function(require,module,exports){
+module.exports = exports['default'];
+},{"babel-runtime/core-js/object/define-property":26,"babel-runtime/helpers/class-call-check":28,"babel-runtime/helpers/create-class":29,"babel-runtime/helpers/interop-require-default":32,"babel-runtime/helpers/sliced-to-array":35,"lodash":61}],23:[function(require,module,exports){
 module.exports = { "default": require("core-js/library/fn/get-iterator"), __esModule: true };
-},{"core-js/library/fn/get-iterator":33}],23:[function(require,module,exports){
+},{"core-js/library/fn/get-iterator":36}],24:[function(require,module,exports){
 module.exports = { "default": require("core-js/library/fn/is-iterable"), __esModule: true };
-},{"core-js/library/fn/is-iterable":34}],24:[function(require,module,exports){
+},{"core-js/library/fn/is-iterable":37}],25:[function(require,module,exports){
 module.exports = { "default": require("core-js/library/fn/object/create"), __esModule: true };
-},{"core-js/library/fn/object/create":35}],25:[function(require,module,exports){
+},{"core-js/library/fn/object/create":38}],26:[function(require,module,exports){
 module.exports = { "default": require("core-js/library/fn/object/define-property"), __esModule: true };
-},{"core-js/library/fn/object/define-property":36}],26:[function(require,module,exports){
+},{"core-js/library/fn/object/define-property":39}],27:[function(require,module,exports){
+module.exports = { "default": require("core-js/library/fn/object/get-own-property-descriptor"), __esModule: true };
+},{"core-js/library/fn/object/get-own-property-descriptor":40}],28:[function(require,module,exports){
 "use strict";
 
 exports["default"] = function (instance, Constructor) {
@@ -1679,7 +1753,7 @@ exports["default"] = function (instance, Constructor) {
 };
 
 exports.__esModule = true;
-},{}],27:[function(require,module,exports){
+},{}],29:[function(require,module,exports){
 "use strict";
 
 var _Object$defineProperty = require("babel-runtime/core-js/object/define-property")["default"];
@@ -1704,7 +1778,51 @@ exports["default"] = (function () {
 })();
 
 exports.__esModule = true;
-},{"babel-runtime/core-js/object/define-property":25}],28:[function(require,module,exports){
+},{"babel-runtime/core-js/object/define-property":26}],30:[function(require,module,exports){
+"use strict";
+
+var _Object$getOwnPropertyDescriptor = require("babel-runtime/core-js/object/get-own-property-descriptor")["default"];
+
+exports["default"] = function get(_x, _x2, _x3) {
+  var _again = true;
+
+  _function: while (_again) {
+    var object = _x,
+        property = _x2,
+        receiver = _x3;
+    desc = parent = getter = undefined;
+    _again = false;
+
+    var desc = _Object$getOwnPropertyDescriptor(object, property);
+
+    if (desc === undefined) {
+      var parent = Object.getPrototypeOf(object);
+
+      if (parent === null) {
+        return undefined;
+      } else {
+        _x = parent;
+        _x2 = property;
+        _x3 = receiver;
+        _again = true;
+        continue _function;
+      }
+    } else if ("value" in desc) {
+      return desc.value;
+    } else {
+      var getter = desc.get;
+
+      if (getter === undefined) {
+        return undefined;
+      }
+
+      return getter.call(receiver);
+    }
+  }
+};
+
+exports.__esModule = true;
+},{"babel-runtime/core-js/object/get-own-property-descriptor":27}],31:[function(require,module,exports){
 "use strict";
 
 var _Object$create = require("babel-runtime/core-js/object/create")["default"];
@@ -1726,7 +1844,7 @@ exports["default"] = function (subClass, superClass) {
 };
 
 exports.__esModule = true;
-},{"babel-runtime/core-js/object/create":24}],29:[function(require,module,exports){
+},{"babel-runtime/core-js/object/create":25}],32:[function(require,module,exports){
 "use strict";
 
 exports["default"] = function (obj) {
@@ -1736,7 +1854,7 @@ exports["default"] = function (obj) {
 };
 
 exports.__esModule = true;
-},{}],30:[function(require,module,exports){
+},{}],33:[function(require,module,exports){
 "use strict";
 
 exports["default"] = function (obj) {
@@ -1757,7 +1875,7 @@ exports["default"] = function (obj) {
 };
 
 exports.__esModule = true;
-},{}],31:[function(require,module,exports){
+},{}],34:[function(require,module,exports){
 "use strict";
 
 exports["default"] = function (obj) {
@@ -1765,7 +1883,7 @@ exports["default"] = function (obj) {
 };
 
 exports.__esModule = true;
-},{}],32:[function(require,module,exports){
+},{}],35:[function(require,module,exports){
 "use strict";
 
 var _isIterable = require("babel-runtime/core-js/is-iterable")["default"];
@@ -1805,27 +1923,33 @@ exports["default"] = function (arr, i) {
 };
 
 exports.__esModule = true;
-},{"babel-runtime/core-js/get-iterator":22,"babel-runtime/core-js/is-iterable":23}],33:[function(require,module,exports){
+},{"babel-runtime/core-js/get-iterator":23,"babel-runtime/core-js/is-iterable":24}],36:[function(require,module,exports){
 require('../modules/web.dom.iterable');
 require('../modules/es6.string.iterator');
 require('../modules/core.iter-helpers');
 module.exports = require('../modules/$').core.getIterator;
-},{"../modules/$":43,"../modules/core.iter-helpers":50,"../modules/es6.string.iterator":52,"../modules/web.dom.iterable":53}],34:[function(require,module,exports){
+},{"../modules/$":47,"../modules/core.iter-helpers":54,"../modules/es6.string.iterator":57,"../modules/web.dom.iterable":58}],37:[function(require,module,exports){
 require('../modules/web.dom.iterable');
 require('../modules/es6.string.iterator');
 require('../modules/core.iter-helpers');
 module.exports = require('../modules/$').core.isIterable;
-},{"../modules/$":43,"../modules/core.iter-helpers":50,"../modules/es6.string.iterator":52,"../modules/web.dom.iterable":53}],35:[function(require,module,exports){
+},{"../modules/$":47,"../modules/core.iter-helpers":54,"../modules/es6.string.iterator":57,"../modules/web.dom.iterable":58}],38:[function(require,module,exports){
 var $ = require('../../modules/$');
 module.exports = function create(P, D){
   return $.create(P, D);
 };
-},{"../../modules/$":43}],36:[function(require,module,exports){
+},{"../../modules/$":47}],39:[function(require,module,exports){
 var $ = require('../../modules/$');
 module.exports = function defineProperty(it, key, desc){
   return $.setDesc(it, key, desc);
 };
-},{"../../modules/$":43}],37:[function(require,module,exports){
+},{"../../modules/$":47}],40:[function(require,module,exports){
+var $ = require('../../modules/$');
+require('../../modules/es6.object.statics-accept-primitives');
+module.exports = function getOwnPropertyDescriptor(it, key){
+  return $.getDesc(it, key);
+};
+},{"../../modules/$":47,"../../modules/es6.object.statics-accept-primitives":56}],41:[function(require,module,exports){
 var $ = require('./$');
 function assert(condition, msg1, msg2){
   if(!condition)throw TypeError(msg2 ? msg1 + msg2 : msg1);
@@ -1844,7 +1968,7 @@ assert.inst = function(it, Constructor, name){
   return it;
 };
 module.exports = assert;
-},{"./$":43}],38:[function(require,module,exports){
+},{"./$":47}],42:[function(require,module,exports){
 var $        = require('./$')
   , TAG      = require('./$.wks')('toStringTag')
   , toString = {}.toString;
@@ -1860,7 +1984,7 @@ cof.set = function(it, tag, stat){
   if(it && !$.has(it = stat ? it : it.prototype, TAG))$.hide(it, TAG, tag);
 };
 module.exports = cof;
-},{"./$":43,"./$.wks":49}],39:[function(require,module,exports){
+},{"./$":47,"./$.wks":53}],43:[function(require,module,exports){
 var $          = require('./$')
   , global     = $.g
   , core       = $.core
@@ -1909,13 +2033,13 @@ function $def(type, name, source){
   }
 }
 module.exports = $def;
-},{"./$":43}],40:[function(require,module,exports){
+},{"./$":47}],44:[function(require,module,exports){
 module.exports = function($){
   $.FW   = false;
   $.path = $.core;
   return $;
 };
-},{}],41:[function(require,module,exports){
+},{}],45:[function(require,module,exports){
 var $def            = require('./$.def')
   , $redef          = require('./$.redef')
   , $               = require('./$')
@@ -1966,7 +2090,7 @@ module.exports = function(Base, NAME, Constructor, next, DEFAULT, IS_SET, FORCE)
     } else $def($def.P + $def.F * $iter.BUGGY, NAME, methods);
   }
 };
-},{"./$":43,"./$.cof":38,"./$.def":39,"./$.iter":42,"./$.redef":44,"./$.wks":49}],42:[function(require,module,exports){
+},{"./$":47,"./$.cof":42,"./$.def":43,"./$.iter":46,"./$.redef":48,"./$.wks":53}],46:[function(require,module,exports){
 'use strict';
 var $                 = require('./$')
   , cof               = require('./$.cof')
@@ -2008,7 +2132,7 @@ module.exports = {
     cof.set(Constructor, NAME + ' Iterator');
   }
 };
-},{"./$":43,"./$.assert":37,"./$.cof":38,"./$.shared":45,"./$.wks":49}],43:[function(require,module,exports){
+},{"./$":47,"./$.assert":41,"./$.cof":42,"./$.shared":49,"./$.wks":53}],47:[function(require,module,exports){
 'use strict';
 var global = typeof self != 'undefined' ? self : Function('return this')()
   , core   = {}
@@ -2105,16 +2229,16 @@ var $ = module.exports = require('./$.fw')({
 /* eslint-disable no-undef */
 if(typeof __e != 'undefined')__e = core;
 if(typeof __g != 'undefined')__g = global;
-},{"./$.fw":40}],44:[function(require,module,exports){
+},{"./$.fw":44}],48:[function(require,module,exports){
 module.exports = require('./$').hide;
-},{"./$":43}],45:[function(require,module,exports){
+},{"./$":47}],49:[function(require,module,exports){
 var $      = require('./$')
   , SHARED = '__core-js_shared__'
   , store  = $.g[SHARED] || $.hide($.g, SHARED, {})[SHARED];
 module.exports = function(key){
   return store[key] || (store[key] = {});
 };
-},{"./$":43}],46:[function(require,module,exports){
+},{"./$":47}],50:[function(require,module,exports){
 // true  -> String#at
 // false -> String#codePointAt
 var $ = require('./$');
@@ -2132,14 +2256,14 @@ module.exports = function(TO_STRING){
         : TO_STRING ? s.slice(i, i + 2) : (a - 0xd800 << 10) + (b - 0xdc00) + 0x10000;
   };
 };
-},{"./$":43}],47:[function(require,module,exports){
+},{"./$":47}],51:[function(require,module,exports){
 var sid = 0;
 function uid(key){
   return 'Symbol('.concat(key === undefined ? '' : key, ')_', (++sid + Math.random()).toString(36));
 }
 uid.safe = require('./$').g.Symbol || uid;
 module.exports = uid;
-},{"./$":43}],48:[function(require,module,exports){
+},{"./$":47}],52:[function(require,module,exports){
 // 22.1.3.31 Array.prototype[@@unscopables]
 var $           = require('./$')
   , UNSCOPABLES = require('./$.wks')('unscopables');
@@ -2147,19 +2271,19 @@ if($.FW && !(UNSCOPABLES in []))$.hide(Array.prototype, UNSCOPABLES, {});
 module.exports = function(key){
   if($.FW)[][UNSCOPABLES][key] = true;
 };
-},{"./$":43,"./$.wks":49}],49:[function(require,module,exports){
+},{"./$":47,"./$.wks":53}],53:[function(require,module,exports){
 var global = require('./$').g
   , store  = require('./$.shared')('wks');
 module.exports = function(name){
   return store[name] || (store[name] =
     global.Symbol && global.Symbol[name] || require('./$.uid').safe('Symbol.' + name));
 };
-},{"./$":43,"./$.shared":45,"./$.uid":47}],50:[function(require,module,exports){
+},{"./$":47,"./$.shared":49,"./$.uid":51}],54:[function(require,module,exports){
 var core  = require('./$').core
   , $iter = require('./$.iter');
 core.isIterable  = $iter.is;
 core.getIterator = $iter.get;
-},{"./$":43,"./$.iter":42}],51:[function(require,module,exports){
+},{"./$":47,"./$.iter":46}],55:[function(require,module,exports){
 var $          = require('./$')
   , setUnscope = require('./$.unscope')
   , ITER       = require('./$.uid').safe('iter')
@@ -2194,7 +2318,46 @@ Iterators.Arguments = Iterators.Array;
 setUnscope('keys');
 setUnscope('values');
 setUnscope('entries');
-},{"./$":43,"./$.iter":42,"./$.iter-define":41,"./$.uid":47,"./$.unscope":48}],52:[function(require,module,exports){
+},{"./$":47,"./$.iter":46,"./$.iter-define":45,"./$.uid":51,"./$.unscope":52}],56:[function(require,module,exports){
+var $        = require('./$')
+  , $def     = require('./$.def')
+  , isObject = $.isObject
+  , toObject = $.toObject;
+$.each.call(('freeze,seal,preventExtensions,isFrozen,isSealed,isExtensible,' +
+  'getOwnPropertyDescriptor,getPrototypeOf,keys,getOwnPropertyNames').split(',')
+, function(KEY, ID){
+  var fn     = ($.core.Object || {})[KEY] || Object[KEY]
+    , forced = 0
+    , method = {};
+  method[KEY] = ID == 0 ? function freeze(it){
+    return isObject(it) ? fn(it) : it;
+  } : ID == 1 ? function seal(it){
+    return isObject(it) ? fn(it) : it;
+  } : ID == 2 ? function preventExtensions(it){
+    return isObject(it) ? fn(it) : it;
+  } : ID == 3 ? function isFrozen(it){
+    return isObject(it) ? fn(it) : true;
+  } : ID == 4 ? function isSealed(it){
+    return isObject(it) ? fn(it) : true;
+  } : ID == 5 ? function isExtensible(it){
+    return isObject(it) ? fn(it) : false;
+  } : ID == 6 ? function getOwnPropertyDescriptor(it, key){
+    return fn(toObject(it), key);
+  } : ID == 7 ? function getPrototypeOf(it){
+    return fn(Object($.assertDefined(it)));
+  } : ID == 8 ? function keys(it){
+    return fn(toObject(it));
+  } : function getOwnPropertyNames(it){
+    return fn(toObject(it));
+  };
+  try {
+    fn('z');
+  } catch(e){
+    forced = 1;
+  }
+  $def($def.S + $def.F * forced, 'Object', method);
+});
+},{"./$":47,"./$.def":43}],57:[function(require,module,exports){
 var set   = require('./$').set
   , $at   = require('./$.string-at')(true)
   , ITER  = require('./$.uid').safe('iter')
@@ -2215,7 +2378,7 @@ require('./$.iter-define')(String, 'String', function(iterated){
   iter.i += point.length;
   return step(0, point);
 });
-},{"./$":43,"./$.iter":42,"./$.iter-define":41,"./$.string-at":46,"./$.uid":47}],53:[function(require,module,exports){
+},{"./$":47,"./$.iter":46,"./$.iter-define":45,"./$.string-at":50,"./$.uid":51}],58:[function(require,module,exports){
 require('./es6.array.iterator');
 var $           = require('./$')
   , Iterators   = require('./$.iter').Iterators
@@ -2230,7 +2393,7 @@ if($.FW){
   if(HTC && !(ITERATOR in HTCProto))$.hide(HTCProto, ITERATOR, ArrayValues);
 }
 Iterators.NodeList = Iterators.HTMLCollection = ArrayValues;
-},{"./$":43,"./$.iter":42,"./$.wks":49,"./es6.array.iterator":51}],54:[function(require,module,exports){
+},{"./$":47,"./$.iter":46,"./$.wks":53,"./es6.array.iterator":55}],59:[function(require,module,exports){
 (function (process,global){
 /* @preserve
  * The MIT License (MIT)
@@ -7338,7 +7501,7 @@ function isUndefined(arg) {
 },{}]},{},[4])(4)
 });                    ;if (typeof window !== 'undefined' && window !== null) {                               window.P = window.Promise;                                                     } else if (typeof self !== 'undefined' && self !== null) {                             self.P = self.Promise;                                                         }
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"_process":55}],55:[function(require,module,exports){
+},{"_process":60}],60:[function(require,module,exports){
 // shim for using process in browser
 
 var process = module.exports = {};
@@ -7430,7 +7593,7 @@ process.chdir = function (dir) {
 };
 process.umask = function() { return 0; };
 
-},{}],56:[function(require,module,exports){
+},{}],61:[function(require,module,exports){
 (function (global){
 /**
  * @license
@@ -19669,7 +19832,7 @@ process.umask = function() { return 0; };
 }.call(this));
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],57:[function(require,module,exports){
+},{}],62:[function(require,module,exports){
 /**
  * Module dependencies.
  */
@@ -20812,7 +20975,7 @@ request.put = function(url, data, fn){
 
 module.exports = request;
 
-},{"emitter":58,"reduce":59}],58:[function(require,module,exports){
+},{"emitter":63,"reduce":64}],63:[function(require,module,exports){
 
 /**
  * Expose `Emitter`.
@@ -20978,7 +21141,7 @@ Emitter.prototype.hasListeners = function(event){
   return !! this.listeners(event).length;
 };
 
-},{}],59:[function(require,module,exports){
+},{}],64:[function(require,module,exports){
 
 /**
  * Reduce `arr` with `fn`.

@@ -10,23 +10,13 @@ var _Object$defineProperty = require('babel-runtime/core-js/object/define-proper
 
 var _interopRequireDefault = require('babel-runtime/helpers/interop-require-default')['default'];
 
-var _interopRequireWildcard = require('babel-runtime/helpers/interop-require-wildcard')['default'];
-
 _Object$defineProperty(exports, '__esModule', {
   value: true
 });
 
-exports.applyResourcing = applyResourcing;
-
 var _lodash = require('lodash');
 
 var _lodash2 = _interopRequireDefault(_lodash);
-
-var _models = require('./models');
-
-var models = _interopRequireWildcard(_models);
-
-/** Utility tools *************************************************************/
 
 function deepClone(obj) {
   return JSON.parse(JSON.stringify(obj));
@@ -35,151 +25,6 @@ function deepClone(obj) {
 function singularize(string) {
   return string.replace(/s$/, '');
 }
-
-function capitalize(string) {
-  return string.charAt(0).toUpperCase() + string.slice(1);
-}
-
-function decapitalize(string) {
-  return string.charAt(0).toLowerCase() + string.slice(1);
-}
-
-function pluralize(string) {
-  return string + 's';
-}
-
-function classify(string) {
-  return singularize(_lodash2['default'].map(string.split('_'), function (s) {
-    return capitalize(s);
-  }).join(''));
-}
-
-/** Api Helpers ***************************************************************/
-
-var buildRoute = function buildRoute(resource) {
-  var current = resource;
-  var segments = [];
-
-  var path;
-
-  if (current.options.route) {
-    path = current.options.route;
-  } else {
-
-    while (current) {
-      var paramName = current.options.routeSegment ? parseRouteParams(current.options.routeSegment)[0] : current.options.paramName || 'id';
-
-      if (current !== resource) {
-        paramName = singularize(current.name) + capitalize(paramName);
-      }
-
-      var routeSegment = current.options.routeSegment ? current.options.routeSegment.replace(/\/:[^\/]+$/, '/:' + paramName) : '/' + current.name + '/:' + paramName;
-
-      segments.unshift(routeSegment);
-
-      current = current.parent;
-    }
-
-    path = segments.join('');
-  }
-
-  var params = {};
-  _lodash2['default'].each(parseRouteParams(path), function (paramName) {
-    params[paramName] = null;
-  });
-
-  return { path: path, segments: segments, segment: segments[segments.length - 1], params: params, paramName: resource.options.paramName || 'id' };
-};
-
-var reRouteParams = /:[^\/]+/gi;
-var parseRouteParams = function parseRouteParams(route) {
-  return _lodash2['default'].map(route.match(reRouteParams), function (param) {
-    return param.slice(1);
-  });
-};
-
-var buildKey = function buildKey(resource, name) {
-  var current = resource;
-  var segments = [];
-
-  while (current) {
-    segments.unshift(current.name);
-    current = current.parent;
-  }
-
-  return segments.join('.');
-};
-
-function applyResourcing(klass) {
-  klass.resourceDefinitions = {};
-
-  var pointer = function pointer(bucket, parentPointer) {
-    return {
-      current: null,
-
-      resource: function resource(name, options) {
-        options = options || {};
-        var parent = parentPointer ? parentPointer.current : null;
-        var resource = { name: name, parent: parent, children: {}, options: options };
-
-        if (options.linkTo) {
-          resource.linkTo = options.linkTo;
-        }
-
-        resource.key = buildKey(resource);
-        resource.route = buildRoute(resource);
-        resource.model = options.model || models[options.modelName] || models[classify(name)] || models.Base;
-        resource.actions = [];
-
-        this.current = bucket[name] = klass.resourceDefinitions[resource.key] = resource;
-
-        return this;
-      },
-
-      open: function open() {
-        return pointer(this.current.children, this);
-      },
-
-      close: function close() {
-        return parentPointer;
-      },
-
-      action: function action(method, name, options) {
-        if (parentPointer && parentPointer.current) {
-          parentPointer.current.actions.push({ method: method, name: name, options: options });
-        }
-
-        return this;
-      },
-
-      get: function get() {
-        return this.action.call(this, 'get', arguments[0], arguments[1]);
-      },
-
-      post: function post() {
-        return this.action.call(this, 'post', arguments[0], arguments[1]);
-      },
-
-      put: function put() {
-        return this.action.call(this, 'put', arguments[0], arguments[1]);
-      },
-
-      patch: function patch() {
-        return this.action.call(this, 'patch', arguments[0], arguments[1]);
-      },
-
-      'delete': function _delete() {
-        return this.action.call(this, 'delete', arguments[0], arguments[1]);
-      }
-    };
-  };
-
-  _lodash2['default'].extend(klass, pointer({}));
-}
-
-;
-
-/** Resource class ************************************************************/
 
 var parseHTTPLinks = function parseHTTPLinks(linksString) {
   var links = {};
@@ -203,19 +48,14 @@ var parseHTTPLinks = function parseHTTPLinks(linksString) {
 };
 
 var Resource = (function () {
-  function Resource(api, key, parentResource) {
+  function Resource(api, parentResource) {
     var _this = this;
 
-    var inherit = arguments[3] === undefined ? false : arguments[3];
+    var inherit = arguments[2] === undefined ? false : arguments[2];
 
     _classCallCheck(this, Resource);
 
-    var def = api.constructor.resourceDefinitions[key];
-
-    if (!inherit && def.linkTo) {
-      def = api.constructor.resourceDefinitions[def.linkTo];
-    }
-
+    var def = this.constructor.definition;
     if (typeof def == 'undefined') {
       throw new Error('Resource: Must supply a proper definition');
     }
@@ -226,7 +66,6 @@ var Resource = (function () {
 
     this.name = def.name;
     this.key = def.key;
-    this.model = def.model;
 
     this.children = _lodash2['default'].map(def.children, function (child, name) {
       return name;
@@ -259,19 +98,16 @@ var Resource = (function () {
     this.parent = function () {
       return parentResource || def.parent && this.api.$resource(def.parent.key) || null;
     };
-
-    _lodash2['default'].each(def.actions, function (action) {
-      _this['$' + action.name] = function () {
-        var options = arguments[0] === undefined ? {} : arguments[0];
-
-        return _this.request(_lodash2['default'].extend({ method: action.method, path: action.options.path || '/' + action.name }, options)).then(function (res) {
-          return _this.hydrateModel(res);
-        });
-      };
-    });
   }
 
   _createClass(Resource, [{
+    key: 'createResource',
+    value: function createResource() {
+      var inherit = arguments[0] === undefined ? false : arguments[0];
+
+      return new this.constructor(this.api, this, inherit);
+    }
+  }, {
     key: 'request',
     value: function request() {
       var _this2 = this;
@@ -338,7 +174,7 @@ var Resource = (function () {
   }, {
     key: '$get',
     value: function $get(params) {
-      var resource = new Resource(this.api, this.key, this, true).includeParams(params);
+      var resource = this.createResource(true).includeParams(params);
 
       return resource.request().then(function (res) {
         return resource.hydrateModel(res);
@@ -351,7 +187,7 @@ var Resource = (function () {
         params = { id: params };
       }
 
-      var resource = new Resource(this.api, this.key, this, true).includeParams(params);
+      var resource = this.createResource(true).includeParams(params);
 
       return resource.request().then(function (res) {
         return resource.hydrateModel(res);
@@ -360,7 +196,7 @@ var Resource = (function () {
   }, {
     key: '$all',
     value: function $all(params) {
-      var resource = new Resource(this.api, this.key, this, true).includeParams(params);
+      var resource = this.createResource(true).includeParams(params);
 
       return resource.request().then(function (res) {
         return resource.hydrateCollection(res);
@@ -371,7 +207,7 @@ var Resource = (function () {
     value: function $create() {
       var data = arguments[0] === undefined ? {} : arguments[0];
 
-      var resource = new Resource(this.api, this.key, this);
+      var resource = this.createResource();
       return resource.hydrateModel(data, { newRecord: true });
     }
   }, {
@@ -397,7 +233,7 @@ var Resource = (function () {
 
       var options = arguments[1] === undefined ? {} : arguments[1];
 
-      var model = new this.model(data);
+      var model = new this.constructor.modelClass(data);
 
       if (!options.newRecord) {
         model.$newRecord = false;
@@ -423,7 +259,7 @@ var Resource = (function () {
 
       var collection = _lodash2['default'].map(data, function (item) {
         // Models in a collection need a new resource created
-        var resource = new Resource(_this5.api, _this5.key, _this5);
+        var resource = _this5.createResource();
 
         var model = resource.hydrateModel(item);
 
@@ -492,7 +328,7 @@ var Resource = (function () {
         $create: function $create() {
           var data = arguments[0] === undefined ? {} : arguments[0];
 
-          var resource = new Resource(_this5.api, _this5.key, _this5);
+          var resource = _this5.createResource();
           return resource.hydrateModel(data, { newRecord: true });
         },
 
@@ -500,7 +336,7 @@ var Resource = (function () {
           var model = arguments[0] === undefined ? {} : arguments[0];
           var applySorting = arguments[2] === undefined ? false : arguments[2];
 
-          if (typeof model == 'object' && !(model instanceof _this5.model)) {
+          if (typeof model == 'object' && !(model instanceof _this5.constructor.modelClass)) {
             model = collection.$create(model);
           }
 
@@ -531,7 +367,7 @@ var Resource = (function () {
           var idx;
           if (_lodash2['default'].isNumber(arg)) {
             idx = arg;
-          } else if (arg instanceof _this5.model) {
+          } else if (arg instanceof _this5.constructor.modelClass) {
             idx = collection.indexOf(arg);
           }
 
@@ -552,23 +388,10 @@ var Resource = (function () {
 
         $sort: function $sort() {},
 
-        // save: () => {
-        //   var promises = [];
-        //
-        //   for (var idx = 0; i < collection.length; i++) {
-        //     var item = collection.at(idx);
-        //     promises.push(item.save());
-        //   }
-        //
-        //   return Promise.all(promises);
-        // },
-
-        // update: () => {},
-
         $delete: function $delete(model) {
           var params = arguments[1] === undefined ? {} : arguments[1];
 
-          if (model instanceof _this5.model) {
+          if (model instanceof _this5.constructor.modelClass) {
             return model.$delete(params).then(function () {
               return collection.$remove(model);
             });
@@ -586,3 +409,4 @@ var Resource = (function () {
 })();
 
 exports['default'] = Resource;
+module.exports = exports['default'];

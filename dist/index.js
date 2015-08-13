@@ -1,5 +1,9 @@
 'use strict';
 
+var _inherits = require('babel-runtime/helpers/inherits')['default'];
+
+var _get = require('babel-runtime/helpers/get')['default'];
+
 var _createClass = require('babel-runtime/helpers/create-class')['default'];
 
 var _classCallCheck = require('babel-runtime/helpers/class-call-check')['default'];
@@ -24,17 +28,19 @@ var _bluebird = require('bluebird');
 
 var _bluebird2 = _interopRequireDefault(_bluebird);
 
-var _resource = require('./resource');
+var _resourceSchema = require('./resource-schema');
 
-var _resource2 = _interopRequireDefault(_resource);
+var _resourceSchema2 = _interopRequireDefault(_resourceSchema);
 
-var Papi = (function () {
+var Papi = (function (_ResourceSchema) {
   function Papi() {
     var _this = this;
 
     var options = arguments[0] === undefined ? {} : arguments[0];
 
     _classCallCheck(this, Papi);
+
+    _get(Object.getPrototypeOf(Papi.prototype), 'constructor', this).apply(this, arguments);
 
     this.options = options;
     this.options.host = options.host || 'https://beta-api.pressly.com';
@@ -86,39 +92,9 @@ var Papi = (function () {
     };
   }
 
+  _inherits(Papi, _ResourceSchema);
+
   _createClass(Papi, [{
-    key: '$resource',
-
-    /*
-       Resource selector
-       $resource();
-      $resource(key);
-      $resource(key, params);
-      $resource(name, parentResource);
-      $resource(name, params, parentResource);
-    */
-    value: function $resource() {
-      var key = arguments[0];
-
-      if (typeof key == 'undefined') {
-        throw new Error('Papi::$resource: key is undefined');
-      }
-
-      var name = _lodash2['default'].last(key.split('.'));
-      var params = _lodash2['default'].isObject(arguments[1]) && !(arguments[1] instanceof _resource2['default']) ? arguments[1] : undefined;
-      var parentResource = arguments[2] || !params && arguments[1] || undefined;
-
-      if (parentResource) {
-        if (parentResource.children.indexOf(name) == -1) {
-          throw new Error('Papi::$resource: key not found in parent resource.');
-        }
-
-        key = parentResource.key + '.' + name;
-      }
-
-      return new _resource2['default'](this, key, parentResource).includeParams(params);
-    }
-  }, {
     key: 'request',
     value: function request(method, path) {
       var _this2 = this;
@@ -134,6 +110,7 @@ var Papi = (function () {
         }
 
         var req = _superagent2['default'][method](url);
+
         req.set('Content-Type', 'application/json');
 
         if (options.timeout || _this2.options.timeout) {
@@ -161,6 +138,8 @@ var Papi = (function () {
         if (options.data) {
           req.send(options.data);
         }
+
+        //console.log(req.url)
 
         req.end(function (err, res) {
           setTimeout(function () {
@@ -203,84 +182,12 @@ var Papi = (function () {
   }]);
 
   return Papi;
-})();
+})(_resourceSchema2['default']);
 
 exports['default'] = Papi;
 
-(0, _resource.applyResourcing)(Papi);
-
-Papi.resource('accounts').open().post('become', { on: 'member' }).resource('users').resource('hubs', { linkTo: 'hubs' }).close().resource('organizations').open().resource('users').resource('hubs', { linkTo: 'hubs' }).resource('invites').close().resource('hubs').open().post('upgrade', { on: 'member' }).get('search', { on: 'collection' }).post('accept_invite', { on: 'member' }).post('reject_invite', { on: 'member' }).resource('apps').open().get('current', { path: '/current', on: 'collection' }).get('build', { path: '/build_app', on: 'member' }).get('status', { on: 'member' }).resource('styles').close().resource('analytics').open().get('summary', { on: 'collection' }).get('visitors', { on: 'collection' }).get('pageviews', { on: 'collection' }).get('duration', { on: 'collection' }).close().resource('feeds').open().resource('assets', { modelName: 'FeedAsset' }).close().resource('invites').open().post('bulk_invite', { on: 'collection' }).post('resend', { on: 'member' }).post('accept', { on: 'member', routeSegment: '/invites/:hash' }).post('reject', { on: 'member', routeSegment: '/invites/:hash' }).close().resource('recommendations').resource('users').open().post('grant_access', { on: 'collection' })['delete']('revoke_access', { on: 'member' }).close().resource('collections').open().put('reorder', { on: 'collection' }).close().resource('tags').resource('assets', { routeSegment: '/stream/:id' }).open().put('feature', { on: 'member' }).put('unfeature', { on: 'member' }).put('hide', { on: 'member' }).put('unhide', { on: 'member' }).put('lock', { on: 'member' }).put('unlock', { on: 'member' }).resource('likes').resource('comments').close().resource('drafts').open().put('publish', { on: 'member' }).close().close().resource('invites').open().get('incoming', { on: 'collection' }).get('outgoing', { on: 'collection' }).post('bulk_invite', { on: 'collection' }).post('resend', { on: 'member' }).post('accept', { on: 'member', routeSegment: '/invites/:hash' }).post('reject', { on: 'member', routeSegment: '/invites/:hash' }).close().resource('code_revisions').open().get('fetch_repo', { on: 'member' })
+Papi.defineSchema().resource('accounts').open().post('become', { on: 'member' }).resource('users').resource('hubs', { linkTo: 'hubs' }).close().resource('organizations').open().resource('users').resource('hubs', { linkTo: 'hubs' }).resource('invites').close().resource('hubs').open().get('search', { on: 'resource' }).post('upgrade', { on: 'member' }).post('accept_invite', { on: 'member' }).post('reject_invite', { on: 'member' }).resource('apps').open().get('current', { on: 'resource', path: '/current' }).get('build', { on: 'member', path: '/build_app' }).get('status', { on: 'member' }).resource('styles').close().resource('analytics').open().get('summary', { on: 'resource' }).get('visitors', { on: 'resource' }).get('pageviews', { on: 'resource' }).get('duration', { on: 'resource' }).close().resource('feeds').open().resource('assets', { modelName: 'FeedAsset' }).close().resource('invites').open().post('bulk_invite', { on: 'resource' }).post('resend', { on: 'member' }).post('accept', { on: 'member', routeSegment: '/invites/:hash' }).post('reject', { on: 'member', routeSegment: '/invites/:hash' }).close().resource('recommendations').resource('users').open().post('grant_access', { on: 'resource' })['delete']('revoke_access', { on: 'member' }).close().resource('collections').open().put('reorder', { on: 'resource' }).close().resource('tags').resource('assets', { routeSegment: '/stream/:id' }).open().put('feature', { on: 'member' }).put('unfeature', { on: 'member' }).put('hide', { on: 'member' }).put('unhide', { on: 'member' }).put('lock', { on: 'member' }).put('unlock', { on: 'member' }).resource('likes').resource('comments').close().resource('drafts').open().put('publish', { on: 'member' }).close().close().resource('invites').open().get('incoming', { on: 'resource' }).get('outgoing', { on: 'resource' }).post('bulk_invite', { on: 'resource' }).post('resend', { on: 'member' }).post('accept', { on: 'member', key: 'hash' }).post('reject', { on: 'member', key: 'hash' }).close().resource('code_revisions').open().get('fetch_repo', { on: 'member' })
 
 // This resource links to the root hubs resource
-.resource('hubs', { linkTo: 'hubs' }).close().resource('signup').open().get('account_uid_available', { on: 'member' }).get('account_email_available', { on: 'member' }).close().resource('users').open().get('roles', { on: 'collection' }).close();
-
-Papi.generateMarkdown = function () {
-  var markdown = '';
-
-  _lodash2['default'].each(Papi.resourceDefinitions, function (def) {
-    markdown += '###' + def.model.name + '\n\n';
-    markdown += '**`' + def.key + '`**\n\n';
-
-    if (def.parent) {
-      markdown += '#####Parent\n\n';
-      markdown += '- [' + def.parent.model.name + '](#' + def.parent.model.name.toLowerCase() + ') `' + def.parent.key + '`\n\n';
-    }
-
-    if (!_lodash2['default'].isEmpty(def.children)) {
-      markdown += '#####Children\n\n';
-      _lodash2['default'].each(def.children, function (child) {
-        markdown += '- [' + child.model.name + '](#' + child.model.name.toLowerCase() + ') `' + child.key + '`\n';
-      });
-    }
-
-    markdown += '\n\n';
-
-    if (def.linkTo) {
-      var linkTo = Papi.resourceDefinitions[def.linkTo];
-      markdown += 'See [' + linkTo.model.name + '](#' + linkTo.model.name.toLowerCase() + ') `' + linkTo.key + '`\n\n';
-    }
-
-    var pathRoot = def.route.path.replace(/\/:.+$/, '');
-
-    markdown += '#####REST Endpoints\n\n';
-
-    markdown += '- `GET` ' + pathRoot + '\n';
-    markdown += '- `POST` ' + pathRoot + '\n';
-    markdown += '- `GET` ' + def.route.path + '\n';
-    markdown += '- `PUT` ' + def.route.path + '\n';
-    markdown += '- `DELETE` ' + def.route.path + '\n\n';
-
-    if (!_lodash2['default'].isEmpty(def.actions)) {
-      var memberActions = _lodash2['default'].select(def.actions, function (action) {
-        return action.options.on == 'member';
-      });
-
-      var collectionActions = _lodash2['default'].select(def.actions, function (action) {
-        return action.options.on == 'collection';
-      });
-
-      if (!_lodash2['default'].isEmpty(collectionActions)) {
-        markdown += '*Collection Actions*\n\n';
-
-        _lodash2['default'].each(collectionActions, function (action) {
-          markdown += '- `' + action.method.toUpperCase() + '` ' + pathRoot + '/' + action.name + '\n';
-        });
-      }
-
-      markdown += '\n\n';
-
-      if (!_lodash2['default'].isEmpty(memberActions)) {
-        markdown += '*Member Actions*\n\n';
-
-        _lodash2['default'].each(memberActions, function (action) {
-          markdown += '- `' + action.method.toUpperCase() + '` ' + def.route.path + '/' + action.name + '\n';
-        });
-      }
-    }
-
-    markdown += '\n\n';
-  });
-
-  console.log(markdown);
-};
+.resource('hubs', { linkTo: 'hubs' }).close().resource('signup').open().get('account_uid_available', { on: 'member' }).get('account_email_available', { on: 'member' }).close().resource('users').open().get('roles', { on: 'resource' }).close();
 module.exports = exports['default'];
