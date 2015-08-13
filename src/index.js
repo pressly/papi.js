@@ -156,8 +156,8 @@ Papi
     .post('reject_invite', { on: 'member'})
 
     .resource('apps').open()
-      .get('current', { path: '/current', on: 'resource' })
-      .get('build',   { path: '/build_app', on: 'member' })
+      .get('current', { on: 'resource', path: '/current' })
+      .get('build',   { on: 'member', path: '/build_app' })
       .get('status',  { on: 'member' })
 
       .resource('styles')
@@ -216,8 +216,8 @@ Papi
     .get('outgoing',      { on: 'resource' })
     .post('bulk_invite',  { on: 'resource' })
     .post('resend',       { on: 'member' })
-    .post('accept',       { on: 'member', routeSegment: '/invites/:hash' })
-    .post('reject',       { on: 'member', routeSegment: '/invites/:hash' })
+    .post('accept',       { on: 'member', key: 'hash' })
+    .post('reject',       { on: 'member', key: 'hash' })
   .close()
 
   .resource('code_revisions').open()
