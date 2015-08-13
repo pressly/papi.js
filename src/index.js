@@ -135,7 +135,7 @@ export default class Papi extends ResourceSchema {
   }
 }
 
-Papi
+Papi.defineSchema()
   .resource('accounts').open()
     .post('become', { on: 'member' })
 
