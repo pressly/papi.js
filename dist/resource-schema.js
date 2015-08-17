@@ -1,22 +1,14 @@
 'use strict';
 
-var _createClass = require('babel-runtime/helpers/create-class')['default'];
+exports.__esModule = true;
 
-var _classCallCheck = require('babel-runtime/helpers/class-call-check')['default'];
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj['default'] = obj; return newObj; } }
 
-var _inherits = require('babel-runtime/helpers/inherits')['default'];
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
-var _get = require('babel-runtime/helpers/get')['default'];
+function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var _Object$defineProperty = require('babel-runtime/core-js/object/define-property')['default'];
-
-var _interopRequireDefault = require('babel-runtime/helpers/interop-require-default')['default'];
-
-var _interopRequireWildcard = require('babel-runtime/helpers/interop-require-wildcard')['default'];
-
-_Object$defineProperty(exports, '__esModule', {
-  value: true
-});
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
 var _lodash = require('lodash');
 
@@ -35,7 +27,7 @@ function singularize(string) {
 }
 
 function classify(string) {
-  return singularize(_lodash2['default'].map(string.split('_'), function (s) {
+  return singularize(_lodash2['default'].map(string.split("_"), function (s) {
     return _lodash2['default'].capitalize(s);
   }).join(''));
 }
@@ -99,39 +91,36 @@ var ResourceSchema = (function () {
     _classCallCheck(this, ResourceSchema);
   }
 
-  _createClass(ResourceSchema, [{
-    key: '$resource',
+  /*
+    Resource selector
+     $resource();
+    $resource(key);
+    $resource(key, params);
+    $resource(name, parentResource);
+    $resource(name, params, parentResource);
+  */
 
-    /*
-      Resource selector
-       $resource();
-      $resource(key);
-      $resource(key, params);
-      $resource(name, parentResource);
-      $resource(name, params, parentResource);
-    */
-    value: function $resource() {
-      var key = arguments[0];
+  ResourceSchema.prototype.$resource = function $resource() {
+    var key = arguments[0];
 
-      if (typeof key == 'undefined') {
-        throw new Error('$resource: key is undefined');
-      }
-
-      var name = _lodash2['default'].last(key.split('.'));
-      var params = _lodash2['default'].isObject(arguments[1]) && !(arguments[1] instanceof _resource2['default']) ? arguments[1] : undefined;
-      var parentResource = arguments[2] || !params && arguments[1] || undefined;
-
-      if (parentResource) {
-        if (parentResource.children.indexOf(name) == -1) {
-          throw new Error('$resource: key not found in parent resource.');
-        }
-
-        key = parentResource.key + '.' + name;
-      }
-
-      return new this.constructor.resourceClasses[key](this, parentResource).includeParams(params);
+    if (typeof key == 'undefined') {
+      throw new Error("$resource: key is undefined");
     }
-  }]);
+
+    var name = _lodash2['default'].last(key.split('.'));
+    var params = _lodash2['default'].isObject(arguments[1]) && !(arguments[1] instanceof _resource2['default']) ? arguments[1] : undefined;
+    var parentResource = arguments[2] || !params && arguments[1] || undefined;
+
+    if (parentResource) {
+      if (parentResource.children.indexOf(name) == -1) {
+        throw new Error("$resource: key not found in parent resource.");
+      }
+
+      key = parentResource.key + '.' + name;
+    }
+
+    return new this.constructor.resourceClasses[key](this, parentResource).includeParams(params);
+  };
 
   return ResourceSchema;
 })();
@@ -167,15 +156,15 @@ ResourceSchema.defineSchema = function () {
 
         // create a class for this specific resource and assign the definition
         var resourceClass = (function (_Resource) {
-          var _class = function resourceClass() {
-            _classCallCheck(this, _class);
+          _inherits(resourceClass, _Resource);
 
-            _get(Object.getPrototypeOf(_class.prototype), 'constructor', this).apply(this, arguments);
-          };
+          function resourceClass() {
+            _classCallCheck(this, resourceClass);
 
-          _inherits(_class, _Resource);
+            _Resource.apply(this, arguments);
+          }
 
-          return _class;
+          return resourceClass;
         })(_resource2['default']);
 
         resourceClass.definition = def;
@@ -208,7 +197,7 @@ ResourceSchema.defineSchema = function () {
             resourceClass.prototype['$' + name] = function () {
               var _this = this;
 
-              var data = arguments[0] === undefined ? {} : arguments[0];
+              var data = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
 
               return this.request(_lodash2['default'].extend({ method: method, path: options.path || '/' + name }, data)).then(function (res) {
                 if (_lodash2['default'].isArray(res)) {
@@ -228,7 +217,7 @@ ResourceSchema.defineSchema = function () {
             modelClass.prototype['$' + name] = function () {
               var _this2 = this;
 
-              var data = arguments[0] === undefined ? {} : arguments[0];
+              var data = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
 
               return this.$resource().request(_lodash2['default'].extend({ method: method, path: options.path || '/' + name }, data)).then(function (res) {
                 return _this2.$resource().hydrateModel(res);
@@ -267,7 +256,7 @@ ResourceSchema.defineSchema = function () {
 
 ResourceSchema.generateMarkdown = function () {
   var API = this;
-  var markdown = '';
+  var markdown = "";
 
   _lodash2['default'].each(API.resourceClasses, function (resourceClass) {
     var def = resourceClass.definition;
@@ -314,17 +303,17 @@ ResourceSchema.generateMarkdown = function () {
       });
 
       if (!_lodash2['default'].isEmpty(collectionActions)) {
-        markdown += '*Collection Actions*\n\n';
+        markdown += "*Collection Actions*\n\n";
 
         _lodash2['default'].each(collectionActions, function (action) {
           markdown += '- `' + action.method.toUpperCase() + '` ' + pathRoot + '/' + action.name + '\n';
         });
       }
 
-      markdown += '\n\n';
+      markdown += "\n\n";
 
       if (!_lodash2['default'].isEmpty(memberActions)) {
-        markdown += '*Member Actions*\n\n';
+        markdown += "*Member Actions*\n\n";
 
         _lodash2['default'].each(memberActions, function (action) {
           markdown += '- `' + action.method.toUpperCase() + '` ' + def.route.path + '/' + action.name + '\n';
@@ -332,7 +321,7 @@ ResourceSchema.generateMarkdown = function () {
       }
     }
 
-    markdown += '\n\n';
+    markdown += "\n\n";
   });
 
   console.log(markdown);

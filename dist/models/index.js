@@ -1,12 +1,8 @@
 'use strict';
 
-var _Object$defineProperty = require('babel-runtime/core-js/object/define-property')['default'];
+exports.__esModule = true;
 
-var _interopRequire = require('babel-runtime/helpers/interop-require')['default'];
-
-_Object$defineProperty(exports, '__esModule', {
-  value: true
-});
+function _interopRequire(obj) { return obj && obj.__esModule ? obj['default'] : obj; }
 
 var _model = require('../model');
 

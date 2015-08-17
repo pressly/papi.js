@@ -1,40 +1,29 @@
 'use strict';
 
-var _inherits = require('babel-runtime/helpers/inherits')['default'];
+exports.__esModule = true;
 
-var _createClass = require('babel-runtime/helpers/create-class')['default'];
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
-var _classCallCheck = require('babel-runtime/helpers/class-call-check')['default'];
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
-var _Object$defineProperty = require('babel-runtime/core-js/object/define-property')['default'];
-
-var _interopRequireDefault = require('babel-runtime/helpers/interop-require-default')['default'];
-
-_Object$defineProperty(exports, '__esModule', {
-  value: true
-});
+function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 var _model = require('../model');
 
 var _model2 = _interopRequireDefault(_model);
 
 var User = (function (_Model) {
+  _inherits(User, _Model);
+
   function User() {
     _classCallCheck(this, User);
 
-    if (_Model != null) {
-      _Model.apply(this, arguments);
-    }
+    _Model.apply(this, arguments);
   }
 
-  _inherits(User, _Model);
-
-  _createClass(User, [{
-    key: 'hasAccess',
-    value: function hasAccess() {
-      return this.access.status === 0;
-    }
-  }]);
+  User.prototype.hasAccess = function hasAccess() {
+    return this.access.status === 0;
+  };
 
   return User;
 })(_model2['default']);

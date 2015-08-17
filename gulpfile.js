@@ -13,7 +13,8 @@ var gulp       = require('gulp')
 
 gulp.task('build:es6', function() {
   return gulp.src('src/**/*.js')
-    .pipe(babel({optional: ['runtime']}))
+    //.pipe(babel({loose: 'all', optional: ['runtime']}))
+    .pipe(babel({loose: 'all'}))
     .pipe(gulp.dest('build'));
 });
 
