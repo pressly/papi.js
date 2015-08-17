@@ -38,6 +38,9 @@ nock(api.options.host)
   .get(`/hubs/${mock.hubs[0].id}`).reply(200, mock.hubs[0])
   .put(`/hubs/${mock.hubs[0].id}`).reply(200, mock.hubs[0])
 
+  // creating
+  .post(`/hubs`).reply(200, mock.hubs[0])
+
   /** App Resource Requests ***************************************************/
 
   // all
@@ -165,12 +168,30 @@ describe('Hubs Resource', function () {
 
   it('can update', function (done) {
     api.$resource('hubs').$find(mock.hubs[0].id).then((res) => {
+      should(res.$newRecord).equal(false);
+
       res.$save().then(() => {
         done();
       }).catch((err) => {
         done(err);
       });
     }).catch((err) => {
+      done(err);
+    });
+  });
+
+  it('should create a new model', function(done) {
+    var model = api.$resource('hubs').$create({ name: 'Hello' });
+    model.should.be.instanceOf(models.Hub);
+    model.name.should.equal('Hello');
+    should(model.$newRecord).equal(true);
+
+    model.$save().then(function(res) {
+      should(model.$newRecord).equal(false);
+      model.should.be.instanceOf(models.Hub);
+
+      done();
+    }).catch(function(err) {
       done(err);
     });
   });
@@ -284,6 +305,8 @@ describe('Apps Resource', function() {
       done(err);
     });
   });
+
+
 });
 
 describe('Styles Resource', function() {
