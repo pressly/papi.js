@@ -77,7 +77,7 @@ export default class Papi extends ResourceSchema {
       }
 
       // Allow sending cookies from origin
-      if (typeof req.withCredentials == 'function') {
+      if (typeof req.withCredentials == 'function' && !window.xdomain) {
         req.withCredentials();
       }
 
@@ -133,6 +133,11 @@ export default class Papi extends ResourceSchema {
       this.callbacks.splice(idx, 1);
     }
   }
+}
+
+// <= IE10, does not support static method inheritance
+if (Papi.defineSchema == undefined) {
+  Papi.defineSchema = ResourceSchema.defineSchema;
 }
 
 Papi.defineSchema()
