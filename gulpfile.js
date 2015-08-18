@@ -1,39 +1,28 @@
-var gulp       = require('gulp')
-  , connect    = require('gulp-connect')
-  , babel      = require('gulp-babel')
-  , size       = require('gulp-size')
-  , uglify     = require('gulp-uglify')
-  , rename     = require('gulp-rename')
-  , browserify = require('browserify')
-  , source     = require('vinyl-source-stream')
-  , babelify   = require('babelify')
-;
-
-
+var gulp       = require('gulp');
+var connect    = require('gulp-connect');
 
 gulp.task('build:es6', function() {
   return gulp.src('src/**/*.js')
     //.pipe(babel({loose: 'all', optional: ['runtime']}))
-    .pipe(babel({loose: 'all'}))
+    .pipe(require('gulp-babel')({loose: 'all'}))
     .pipe(gulp.dest('build'));
 });
 
 gulp.task('build', ['build:es6'], function () {
-  return browserify({ entries: './build/index.js', standalone: 'Papi' })
-    //.transform(babelify)
+  return require('browserify')({ entries: './build/index.js', standalone: 'Papi' })
     .bundle()
-    .pipe(source('papi.js'))
+    .pipe(require('vinyl-source-stream')('papi.js'))
     .pipe(gulp.dest('build'))
     .pipe(connect.reload());
 });
 
 gulp.task('dist:minify', ['build'], function() {
   return gulp.src('build/papi.js')
-  .pipe(size({showFiles: true}))
-  .pipe(rename('papi.min.js'))
-  .pipe(uglify({mangle: true, preserveComments: 'some'}))
-  .pipe(size({showFiles: true}))
-  .pipe(size({showFiles: true, gzip: true}))
+  .pipe(require('gulp-size')({showFiles: true}))
+  .pipe(require('gulp-rename')('papi.min.js'))
+  .pipe(require('gulp-uglify')({mangle: true, preserveComments: 'some'}))
+  .pipe(require('gulp-size')({showFiles: true}))
+  .pipe(require('gulp-size')({showFiles: true, gzip: true}))
   .pipe(gulp.dest('dist'));
 });
 
