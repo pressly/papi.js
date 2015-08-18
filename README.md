@@ -9,25 +9,30 @@ Papi.js offers a Promise based abstraction for accessing the Pressly API.
 
 You can install through npm and require in your project with commonJS require.
 
+## Support
+
+Papi.js will work on all modern browsers. 
+
+#### Internet Explorer
+
+Papi.js uses CORS to make cross-origin requests. Only IE10+ have a proper implementation of CORS.
+
+###### XDomain
+
+Included is an XDomain distribution of Papi.js which will work on older browsers that do not properly support CORS (IE8 and IE9) located at `dist/papi.xdomain.js`. 
+
+
 ##### npm
 ```
 npm install papi
 ```
 
-## Support
-
-papi.js should work on all modern browsers. 
-
-#### Internet Explorer
-
-papi.js uses CORS to make cross-origin requests. Only IE10+ have a proper implementation of CORS.
-
-There is included a special distribution of papi.js that includes xdomain and es5 shims which allow IE8 and IE9 to work. `dist/papi.xdomain.js`
-
-
 ```javascript
 var Papi = require('papi');
 ```
+
+
+
 
 ##### Download Release
 
