@@ -5,12 +5,22 @@ import request from 'superagent';
 import Promise from 'bluebird';
 import ResourceSchema from './resource-schema';
 
+function hasXDomain() {
+  return typeof window !== 'undefined' && window.xdomain != null;
+}
+
 export default class Papi extends ResourceSchema {
   constructor(options = {}) {
     super(...arguments);
 
     this.options = options;
     this.options.host = (options.host || 'https://beta-api.pressly.com');
+
+    if (hasXDomain()) {
+      var slaves = {};
+      slaves[this.options.host] = '/proxy.html';
+      window.xdomain.slaves(slaves);
+    }
 
     this.callbacks = [];
 
@@ -77,7 +87,7 @@ export default class Papi extends ResourceSchema {
       }
 
       // Allow sending cookies from origin
-      if (typeof req.withCredentials == 'function' && !window.xdomain) {
+      if (typeof req.withCredentials == 'function' && !hasXDomain()) {
         req.withCredentials();
       }
 
