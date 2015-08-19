@@ -160,7 +160,7 @@ Papi.defineSchema()
 
   .resource('organizations').open()
     .resource('users')
-    .resource('hubs', { linkTo: 'hubs'})
+    .resource('hubs')
     .resource('invites')
   .close()
 
