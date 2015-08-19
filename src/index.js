@@ -249,5 +249,7 @@ Papi.defineSchema()
 
   .resource('users').open()
     .get('roles', { on: 'resource' })
+
+    .resource('hubs')
   .close()
 ;
