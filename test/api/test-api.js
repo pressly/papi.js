@@ -107,6 +107,30 @@ nock(api.options.host)
   // $resource with prepared params then find()
   .get(`/organizations/${mock.organizations[0].id}`).reply(200, mock.organizations[0])
 
+  /** User Resource Requests ***************************************************/
+
+  // all
+  .get('/users').reply(200, mock.users)
+
+  // find
+  .get(`/users/${mock.users[0].id}`).reply(200, mock.users[0])
+
+  // user hubs
+  .get(`/users/${mock.users[0].id}/hubs`).reply(200, mock.hubs)
+
+  // $resource with prepared params then find()
+  .get(`/users/${mock.users[0].id}`).reply(200, mock.users[0])
+
+  // all and limit
+  .get('/users?limit=3').reply(200, mock.users.slice(0, 3))
+
+  // all with query
+  .get('/users?summaries=true&b=2').reply(200)
+
+
+  // updating
+  .get(`/users/${mock.users[0].id}`).reply(200, mock.users[0])
+  .put(`/users/${mock.users[0].id}`).reply(200, mock.users[0])
 ;
 
 describe('Hubs Resource', function () {
@@ -230,6 +254,68 @@ describe('Organizations Resource', function () {
       res.id.should.equal(mock.organizations[0].id);
 
       done();
+    }).catch((err) => {
+      done(err);
+    });
+  });
+});
+
+describe('Users Resource', function () {
+  it("all should return an array", function (done) {
+    api.$resource('users').$all().then((res) => {
+      res.should.not.be.empty;
+      res[0].should.instanceOf(models.User);
+      should(res[0].$newRecord).not.equal(true);
+
+      should.exist(res.$nextPage);
+
+      done();
+    }).catch((err) => {
+      done(err);
+    });
+  });
+
+  it('find should return one item', function (done) {
+    api.$resource('users').$find(mock.users[0].id).then((res) => {
+      res.should.instanceOf(models.User);
+      res.id.should.equal(mock.users[0].id);
+      should(res.$newRecord).not.equal(true);
+
+      done();
+    }).catch((err) => {
+      done(err);
+    });
+  });
+
+  it("users.hubs should return an array of hubs", function (done) {
+    api.$resource('users.hubs', { userId: mock.users[0].id }).$all().then((res) => {
+      res.should.not.be.empty;
+      res[0].should.instanceOf(models.Hub);
+
+      done();
+    }).catch((err) => {
+      done(err);
+    });
+  });
+
+  it('$resource with prepared params then find should return one item', function (done) {
+    api.$resource('users', { id: mock.users[0].id }).$find().then((res) => {
+      res.should.instanceOf(models.User);
+      res.id.should.equal(mock.users[0].id);
+
+      done();
+    }).catch((err) => {
+      done(err);
+    });
+  });
+
+  it('can update', function (done) {
+    api.$resource('users').$find(mock.users[0].id).then((res) => {
+      res.$save().then(() => {
+        done();
+      }).catch((err) => {
+        done(err);
+      });
     }).catch((err) => {
       done(err);
     });
@@ -511,7 +597,6 @@ describe('Collections', function() {
       done(err);
     })
   });
-
   it('should have a member action', function(done) {
     api.$resource('invites').$incoming().then(function(res) {
       var invite = res[0];
