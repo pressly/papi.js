@@ -45,7 +45,7 @@ gulp.task('dist:minify', function() {
   return gulp.src('build/papi.js')
   .pipe(require('gulp-size')({showFiles: true}))
   .pipe(require('gulp-rename')('papi.min.js'))
-  .pipe(require('gulp-uglify')({mangle: true, preserveComments: 'some'}))
+  .pipe(require('gulp-uglify')({mangle: false, preserveComments: 'some'}))
   .pipe(require('gulp-size')({showFiles: true}))
   .pipe(require('gulp-size')({showFiles: true, gzip: true}))
   .pipe(gulp.dest('dist'));
@@ -57,7 +57,7 @@ gulp.task('dist:xdomain', function() {
   .pipe(gulp.dest('dist'))
   .pipe(require('gulp-size')({showFiles: true}))
   .pipe(require('gulp-rename')('papi.xdomain.min.js'))
-  .pipe(require('gulp-uglify')({mangle: true, preserveComments: 'some'}))
+  .pipe(require('gulp-uglify')({mangle: false, preserveComments: 'some'}))
   .pipe(require('gulp-size')({showFiles: true}))
   .pipe(require('gulp-size')({showFiles: true, gzip: true}))
   .pipe(gulp.dest('dist'));
