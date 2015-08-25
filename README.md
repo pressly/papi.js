@@ -15,6 +15,8 @@ Papi.js uses CORS to make cross-origin requests. Only IE10+ have a proper implem
 
 Included is an XDomain distribution of Papi.js which will work on older browsers that do not properly support CORS (IE8 and IE9) located at `dist/papi.xdomain.js`. 
 
+**NOTE** Because IE8 is ECMASCRIPT version 3 You will need to include es5-shim and es5-sham as well https://github.com/es-shims/es5-shim
+
 
 ## Install
 
