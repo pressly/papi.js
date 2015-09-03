@@ -164,6 +164,8 @@ Papi.defineSchema()
     .resource('invites')
   .close()
 
+  .resource('posts', { routeSegment: '/stream/posts/:id'})
+
   .resource('hubs').open()
     .get('search',    { on: 'resource' })
     .post('upgrade',  { on: 'member' })
