@@ -253,5 +253,6 @@ Papi.defineSchema()
     .get('roles', { on: 'resource' })
 
     .resource('hubs')
+    .resource('organizations')
   .close()
 ;
