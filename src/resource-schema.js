@@ -164,7 +164,7 @@ ResourceSchema.defineSchema = function() {
             //console.log(`- adding collection action to ${parentPointer.current.key}:`, method, name);
 
             resourceClass.prototype['$' + name] = function(data = {}) {
-              return this.request(_.extend({ method: method, path: options.path || `/${name}`}, data)).then((res) => {
+              return this.request(_.extend({ method: method, path: options.path || `/${name}`}, {data})).then((res) => {
                 if (_.isArray(res)) {
                   return this.hydrateCollection(res);
                 } else {
@@ -180,7 +180,7 @@ ResourceSchema.defineSchema = function() {
             //console.log(`- adding member action to ${parentPointer.current.key}:`, method, name);
 
             modelClass.prototype['$' + name] = function(data = {}) {
-              return this.$resource().request(_.extend({ method: method, path: options.path || `/${name}`}, data)).then((res) => {
+              return this.$resource().request(_.extend({ method: method, path: options.path || `/${name}`}, {data})).then((res) => {
                 return this.$resource().hydrateModel(res);
               });
             }

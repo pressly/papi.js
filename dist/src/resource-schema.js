@@ -199,7 +199,7 @@ ResourceSchema.defineSchema = function () {
 
               var data = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
 
-              return this.request(_lodash2['default'].extend({ method: method, path: options.path || '/' + name }, data)).then(function (res) {
+              return this.request(_lodash2['default'].extend({ method: method, path: options.path || '/' + name }, { data: data })).then(function (res) {
                 if (_lodash2['default'].isArray(res)) {
                   return _this.hydrateCollection(res);
                 } else {
@@ -219,7 +219,7 @@ ResourceSchema.defineSchema = function () {
 
               var data = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
 
-              return this.$resource().request(_lodash2['default'].extend({ method: method, path: options.path || '/' + name }, data)).then(function (res) {
+              return this.$resource().request(_lodash2['default'].extend({ method: method, path: options.path || '/' + name }, { data: data })).then(function (res) {
                 return _this2.$resource().hydrateModel(res);
               });
             };

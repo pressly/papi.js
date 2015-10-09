@@ -138,7 +138,11 @@ var Papi = (function (_ResourceSchema) {
 
       // Data to send (with get requests these are converted into query params)
       if (options.data) {
-        req.send(options.data);
+        if (method == 'get') {
+          req.query(options.data);
+        } else {
+          req.send(options.data);
+        }
       }
 
       //console.log(req.url)
