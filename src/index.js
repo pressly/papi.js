@@ -152,7 +152,8 @@ if (Papi.defineSchema == undefined) {
 
 Papi.defineSchema()
   .resource('accounts').open()
-    .post('become', { on: 'member' })
+    .get('available', { on: 'resource' })
+    .post('become',   { on: 'member' })
 
     .resource('users')
     .resource('hubs', { linkTo: 'hubs'})
