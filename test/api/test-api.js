@@ -154,6 +154,9 @@ describe('Hubs Resource', function () {
       res.id.should.equal(mock.hubs[0].id);
       should(res.$newRecord).not.equal(true);
 
+      // Ensure it is a model and has $attributes and $data
+      res.$data().uid.should.equal('my-first-hub')
+
       done();
     }).catch((err) => {
       done(err);

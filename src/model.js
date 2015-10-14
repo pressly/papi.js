@@ -23,4 +23,12 @@ export default class Model {
       return _.extend(this, res);
     });
   }
+
+  $attributes() {
+    return _.filter(_.difference(_.keys(this), _.functions(this)), (x) => { return x[0] != '$' });
+  }
+
+  $data() {
+    return _.pick(this, this.$attributes());
+  }
 }

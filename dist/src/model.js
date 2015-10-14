@@ -38,6 +38,16 @@ var Model = (function () {
     });
   };
 
+  Model.prototype.$attributes = function $attributes() {
+    return _lodash2['default'].filter(_lodash2['default'].difference(_lodash2['default'].keys(this), _lodash2['default'].functions(this)), function (x) {
+      return x[0] != '$';
+    });
+  };
+
+  Model.prototype.$data = function $data() {
+    return _lodash2['default'].pick(this, this.$attributes());
+  };
+
   return Model;
 })();
 
