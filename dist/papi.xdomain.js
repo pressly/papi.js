@@ -1235,8 +1235,12 @@ var Papi = (function (_ResourceSchema) {
       },
 
       login: function login(email, password) {
-        return _this.request('post', '/auth/login', { data: { email: email, password: password } }).then(function (res) {
-          return _this.auth.set(res.body);
+        return _this.request('post', '/auth/login', { data: { email: email, password: password } });
+      },
+
+      requestPasswordReset: function requestPasswordReset(email) {
+        return _this.request('post', '/auth/password_reset/send', { data: { email: email } }).then(function (res) {
+          return res.body;
         });
       },
 
@@ -2299,7 +2303,7 @@ ResourceSchema.generateMarkdown = function () {
     markdown += '\n\n';
 
     if (def.link) {
-      var link = API.resourceClasses[def.linkTo].definition;
+      var link = API.resourceClasses[def.link].definition;
       markdown += 'See [' + link.modelName + '](#' + link.modelName.toLowerCase() + ') `' + link.key + '`\n\n';
     }
 

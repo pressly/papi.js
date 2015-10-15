@@ -279,7 +279,7 @@ ResourceSchema.generateMarkdown = function () {
     markdown += '\n\n';
 
     if (def.link) {
-      var link = API.resourceClasses[def.linkTo].definition;
+      var link = API.resourceClasses[def.link].definition;
       markdown += 'See [' + link.modelName + '](#' + link.modelName.toLowerCase() + ') `' + link.key + '`\n\n';
     }
 

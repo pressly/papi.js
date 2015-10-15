@@ -54,8 +54,12 @@ export default class Papi extends ResourceSchema {
       },
 
       login: (email, password) => {
-        return this.request('post', '/auth/login', { data: { email, password } }).then((res) => {
-          return this.auth.set(res.body);
+        return this.request('post', '/auth/login', { data: { email, password } });
+      },
+
+      requestPasswordReset: (email) => {
+        return this.request('post', '/auth/password_reset/send', { data: {email} }).then((res) => {
+          return res.body;
         });
       },
 
