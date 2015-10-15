@@ -143,8 +143,8 @@ ResourceSchema.defineSchema = function () {
 
         var def = { name: name, parent: parent, children: {}, options: options };
 
-        if (options.linkTo) {
-          def.linkTo = options.linkTo;
+        if (options.link) {
+          def.link = options.link;
         }
 
         def.key = buildKey(def);
@@ -278,9 +278,9 @@ ResourceSchema.generateMarkdown = function () {
 
     markdown += '\n\n';
 
-    if (def.linkTo) {
-      var linkTo = API.resourceClasses[def.linkTo].definition;
-      markdown += 'See [' + linkTo.modelName + '](#' + linkTo.modelName.toLowerCase() + ') `' + linkTo.key + '`\n\n';
+    if (def.link) {
+      var link = API.resourceClasses[def.linkTo].definition;
+      markdown += 'See [' + link.modelName + '](#' + link.modelName.toLowerCase() + ') `' + link.key + '`\n\n';
     }
 
     var pathRoot = def.route.path.replace(/\/:.+$/, '');

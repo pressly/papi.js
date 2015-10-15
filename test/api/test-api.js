@@ -323,6 +323,22 @@ describe('Users Resource', function () {
       done(err);
     });
   });
+
+  // it('can search', function (done) {
+  //   api.$resource('users').$search({q: 'a'}).then((res) => {
+  //     console.log(res)
+  //   }).catch((err) => {
+  //     done(err);
+  //   });
+  // });
+
+  // it('can search', function (done) {
+  //   api.$resource('discover.users').$all({q: 'a'}).then((res) => {
+  //     console.log(res)
+  //   }).catch((err) => {
+  //     done(err);
+  //   });
+  // });
 });
 
 describe('Apps Resource', function() {

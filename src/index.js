@@ -160,7 +160,7 @@ Papi.defineSchema()
     .post('become',   { on: 'member' })
 
     .resource('users')
-    .resource('hubs', { linkTo: 'hubs'})
+    .resource('hubs', { link: 'hubs'})
   .close()
 
   .resource('organizations').open()
@@ -246,7 +246,7 @@ Papi.defineSchema()
     .get('fetch_repo', { on: 'member' })
 
     // This resource links to the root hubs resource
-    .resource('hubs', { linkTo: 'hubs' })
+    .resource('hubs', { link: 'hubs' })
   .close()
 
   .resource('signup').open()
@@ -259,5 +259,12 @@ Papi.defineSchema()
 
     .resource('hubs')
     .resource('organizations')
+  .close()
+
+  .resource('discover').open()
+    .resource('users',          { link: 'users'})
+    .resource('organizations',  { link: 'organizations' })
+    .resource('hubs',           { link: 'hubs' })
+    .resource('posts')
   .close()
 ;
