@@ -27,8 +27,17 @@ export default class Papi extends ResourceSchema {
     this.auth = {
       session: null,
 
+      setCsrfToken: (xhr) => {
+        if (xhr) {
+          this.auth.csrfToken = xhr.getResponseHeader('X-Set-Csrf-Token');
+        } else {
+          this.auth.csrfToken = null;
+        }
+      },
+
       get: () => {
         return this.request('get', '/session').then((res) => {
+          this.auth.setCsrfToken(res.xhr);
           return this.auth.set(res.body);
         });
       },
@@ -55,6 +64,7 @@ export default class Papi extends ResourceSchema {
 
       login: (email, password) => {
         return this.request('post', '/auth/login', { data: { email, password } }).then((res) => {
+          this.auth.setCsrfToken(res.xhr);
           return this.auth.set(res.body);
         });
       },
@@ -98,6 +108,11 @@ export default class Papi extends ResourceSchema {
       // Send Authorization header when we have a JSON Web Token set in the session
       if (this.auth.session && this.auth.session.jwt) {
         req.set('Authorization', 'Bearer ' + this.auth.session.jwt)
+      }
+
+      // Send CSRF token.
+      if (this.auth.csrfToken) {
+        req.set('X-Csrf-Token', this.auth.csrfToken);
       }
 
       req.set('Accept', 'application/vnd.pressly.v0.12+json')
