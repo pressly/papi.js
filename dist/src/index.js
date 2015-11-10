@@ -12,9 +12,9 @@ var _lodash = require('lodash');
 
 var _lodash2 = _interopRequireDefault(_lodash);
 
-var _superagent = require('superagent');
+var _axios = require('axios');
 
-var _superagent2 = _interopRequireDefault(_superagent);
+var _axios2 = _interopRequireDefault(_axios);
 
 var _bluebird = require('bluebird');
 
@@ -49,7 +49,8 @@ var Papi = (function (_ResourceSchema) {
       window.xdomain.slaves(slaves);
     }
 
-    this.callbacks = [];
+    this.requestMiddlewares = [];
+    this.responseMiddlewares = [];
 
     this.auth = {
       session: null,
@@ -110,82 +111,57 @@ var Papi = (function (_ResourceSchema) {
     return new _bluebird2['default'](function (resolve, reject) {
       var url = /^(https?:)?\/\//.test(path) ? path : _this2.options.host + path;
 
-      // Doesn't allow the delete keyword because it is reserved
-      if (method == 'delete') {
-        method = 'del';
-      }
-
-      var req = _superagent2['default'][method](url);
-
-      req.set('Content-Type', 'application/json');
-
-      if (options.timeout || _this2.options.timeout) {
-        req.timeout(options.timeout || _this2.options.timeout);
-      }
-
-      // Allow sending cookies from origin
-      if (typeof req.withCredentials == 'function' && !hasXDomain()) {
-        req.withCredentials();
-      }
+      var req = {
+        method: method,
+        url: url,
+        params: {},
+        headers: {
+          'Content-Type': 'applications/json',
+          'Accept': 'application/vnd.pressly.v0.12+json'
+        }
+      };
 
       // Send Authorization header when we have a JSON Web Token set in the session
       if (_this2.auth.session && _this2.auth.session.jwt) {
-        req.set('Authorization', 'Bearer ' + _this2.auth.session.jwt);
+        req.headers['Authorization'] = 'Bearer ' + _this2.auth.session.jwt;
       }
 
-      req.set('Accept', 'application/vnd.pressly.v0.12+json');
+      // Allow sending cookies from origin
+      if (!hasXDomain()) {
+        req.withCredentials = true;
+      }
 
       // Query params to be added to the url
       if (options.query) {
-        req.query(options.query);
+        _lodash2['default'].extend(req.params, options.query);
       }
 
       // Data to send (with get requests these are converted into query params)
       if (options.data) {
         if (method == 'get') {
-          req.query(options.data);
+          _lodash2['default'].extend(req.params, options.data);
         } else {
-          req.send(options.data);
+          req.data = options.data;
         }
       }
 
-      //console.log(req.url)
-
-      req.end(function (err, res) {
-        setTimeout(function () {
-          _lodash2['default'].each(_this2.callbacks, function (cb) {
-            cb(res);
-          });
-        });
-
-        if (err) {
-          return reject(err);
-        } else {
-          resolve(res);
-        }
+      _axios2['default'](req).then(function (res) {
+        res.body = res.data;
+        return resolve(res);
+      })['catch'](function (err) {
+        return reject(err);
       });
     });
   };
 
-  // Register callback to fire after each request finishes
-  // returns a deregister function.
+  // Register middlewares: before and after request
 
-  Papi.prototype.on = function on(callback) {
-    var _this3 = this;
-
-    this.callbacks.push(callback);
-
-    return function () {
-      _this3.off(callback);
-    };
+  Papi.prototype.before = function before(middleware) {
+    this.requestMiddlewares.push(middleware);
   };
 
-  Papi.prototype.off = function off(callback) {
-    var idx = this.callbacks.indexOf(callback);
-
-    if (idx >= 0) {
-      this.callbacks.splice(idx, 1);
-    }
+  Papi.prototype.after = function after(middleware) {
+    this.responseMiddlewares.push(middleware);
   };
 
   return Papi;
