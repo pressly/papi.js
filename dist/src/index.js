@@ -49,7 +49,8 @@ var Papi = (function (_ResourceSchema) {
       window.xdomain.slaves(slaves);
     }
 
-    this.callbacks = [];
+    this.requestMiddlewares = [];
+    this.responseMiddlewares = [];
 
     this.auth = {
       session: null,
@@ -116,6 +117,7 @@ var Papi = (function (_ResourceSchema) {
       }
 
       var req = _superagent2['default'][method](url);
+      var res = {};
 
       req.set('Content-Type', 'application/json');
 
@@ -149,43 +151,61 @@ var Papi = (function (_ResourceSchema) {
         }
       }
 
-      //console.log(req.url)
+      var beginRequest = function beginRequest() {
+        if (_this2.requestMiddlewares.length) {
+          var offset = 0;
+          var next = function next() {
+            var layer = _this2.requestMiddlewares[++offset] || endRequest;
+            req.next = next;
+            return layer(req, res, next, resolve, reject);
+          };
 
-      req.end(function (err, res) {
-        setTimeout(function () {
-          _lodash2['default'].each(_this2.callbacks, function (cb) {
-            cb(res);
-          });
-        });
-
-        if (err) {
-          return reject(err);
+          _this2.requestMiddlewares[0](req, res, next, resolve, reject);
         } else {
-          resolve(res);
+          endRequest();
         }
-      });
+      };
+
+      var endRequest = function endRequest() {
+        req.end(function (err, completedRes) {
+          if (err) {
+            return reject(err);
+          } else {
+            res = completedRes;
+            beginResponse();
+          }
+        });
+      };
+
+      var beginResponse = function beginResponse() {
+        if (_this2.responseMiddlewares.length) {
+          var offset = 0;
+          var next = function next() {
+            var layer = _this2.responseMiddlewares[++offset] || endResponse;
+            req.next = next;
+            return layer(req, res, next, resolve, reject);
+          };
+
+          _this2.responseMiddlewares[0](req, res, next, resolve, reject);
+        } else {
+          endResponse();
+        }
+      };
+
+      var endResponse = function endResponse() {
+        resolve(res);
+      };
+
+      beginRequest();
     });
   };
 
-  // Register callback to fire after each request finishes
-  // returns a deregister function.
-
-  Papi.prototype.on = function on(callback) {
-    var _this3 = this;
-
-    this.callbacks.push(callback);
-
-    return function () {
-      _this3.off(callback);
-    };
+  Papi.prototype.before = function before(middleware) {
+    this.requestMiddlewares.push(middleware);
   };
 
-  Papi.prototype.off = function off(callback) {
-    var idx = this.callbacks.indexOf(callback);
-
-    if (idx >= 0) {
-      this.callbacks.splice(idx, 1);
-    }
+  Papi.prototype.after = function after(middleware) {
+    this.responseMiddlewares.push(middleware);
   };
 
   return Papi;

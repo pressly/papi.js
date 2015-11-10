@@ -192,7 +192,10 @@ var Resource = (function () {
   Resource.prototype.setResponse = function setResponse(res) {
     this.status = res.status;
     this.headers = res.headers;
-    this.links = parseHTTPLinks(res.headers.link);
+
+    if (res.headers && res.headers.link) {
+      this.links = parseHTTPLinks(res.headers.link);
+    }
   };
 
   Resource.prototype.sync = function sync(data) {
