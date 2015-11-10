@@ -1,7 +1,7 @@
 'use strict';
 
 import _ from 'lodash';
-import request from 'superagent';
+import superagent from 'superagent';
 import Promise from 'bluebird';
 import ResourceSchema from './resource-schema';
 
@@ -22,7 +22,8 @@ export default class Papi extends ResourceSchema {
       window.xdomain.slaves(slaves);
     }
 
-    this.callbacks = [];
+    this.requestMiddlewares = [];
+    this.responseMiddlewares = [];
 
     this.auth = {
       session: null,
@@ -82,7 +83,8 @@ export default class Papi extends ResourceSchema {
         method = 'del';
       }
 
-      var req = request[method](url);
+      var req = superagent[method](url);
+      var res = {};
 
       req.set('Content-Type', 'application/json');
 
@@ -116,40 +118,61 @@ export default class Papi extends ResourceSchema {
         }
       }
 
-      //console.log(req.url)
+      var beginRequest = () => {
+        if (this.requestMiddlewares.length) {
+          var offset = 0;
+          var next = () => {
+            var layer = this.requestMiddlewares[++offset] || endRequest;
+            req.next = next;
+            return layer(req, res, next, resolve, reject);
+          };
 
-      req.end((err, res) => {
-        setTimeout(() => {
-          _.each(this.callbacks, (cb) => {
-            cb(res);
-          });
-        });
-
-        if (err) {
-          return reject(err);
+          this.requestMiddlewares[0](req, res, next, resolve, reject);
         } else {
-          resolve(res);
+          endRequest();
         }
-      });
+      };
+
+      var endRequest = () => {
+        req.end((err, completedRes) => {
+          if (err) {
+            return reject(err);
+          } else {
+            res = completedRes;
+            beginResponse();
+          }
+        });
+      };
+
+      var beginResponse = () => {
+        if (this.responseMiddlewares.length) {
+          var offset = 0;
+          var next = () => {
+            var layer = this.responseMiddlewares[++offset] || endResponse;
+            req.next = next;
+            return layer(req, res, next, resolve, reject);
+          };
+
+          this.responseMiddlewares[0](req, res, next, resolve, reject);
+        } else {
+          endResponse();
+        }
+      }
+
+      var endResponse = () => {
+        resolve(res);
+      };
+
+      beginRequest();
     });
   }
 
-  // Register callback to fire after each request finishes
-  // returns a deregister function.
-  on(callback) {
-    this.callbacks.push(callback);
-
-    return () => {
-      this.off(callback);
-    };
+  before(middleware) {
+    this.requestMiddlewares.push(middleware);
   }
 
-  off(callback) {
-    let idx = this.callbacks.indexOf(callback);
-
-    if (idx >= 0) {
-      this.callbacks.splice(idx, 1);
-    }
+  after(middleware) {
+    this.responseMiddlewares.push(middleware);
   }
 }
 

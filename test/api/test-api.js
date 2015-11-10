@@ -9,6 +9,36 @@ import _ from 'lodash';
 
 const api = new Papi();
 
+// api.before((req, res, next) => {
+//   console.log("A")
+//   res.body = "hello";
+//   next();
+// });
+//
+// api.before((req, res, next) => {
+//   console.log("B", res.body);
+//   next();
+// })
+//
+// api.before((req, res, next) => {
+//   console.log("C");
+//   next();
+// });
+//
+// api.before((req, res, next, resolve, reject) => {
+//   console.log("D")
+//   if (req.method == 'DELETE') {
+//     reject(new Error("401 Not Found"));
+//   } else {
+//     next();
+//   }
+// });
+//
+// api.after((req, res, next, resolve, reject) => {
+//   console.log("F");
+//   next();
+// });
+
 //Papi.generateMarkdown();
 
 api.auth.set({jwt: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNTRmMGRiNzMwOGFmYTEyYjUzNjIwNTg4In0.CvXGDKAJYZkoH3nnEirtlGlwRzErv1ANOJ-dVkUAnjo#_login_post'});
