@@ -18,22 +18,6 @@ Included is an XDomain distribution of Papi.js which will work on older browsers
 **NOTE** Because IE8 is ECMASCRIPT version 3 You will need to include es5-shim and es5-sham as well https://github.com/es-shims/es5-shim
 
 
-## Install
-
-You can install through npm and require in your project with commonJS require.
-
-##### npm
-```
-npm install papi
-```
-
-```javascript
-var Papi = require('papi');
-```
-
-
-
-
 ##### Download Release
 
 Releases can be downloaded here https://github.com/pressly/papi.js/releases you can then script include /dist/papi.js in your project
