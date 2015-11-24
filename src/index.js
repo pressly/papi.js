@@ -212,6 +212,10 @@ Papi.defineSchema()
       .resource('styles')
     .close()
 
+    .resource('addons').open()
+      .resource('configs')
+    .close()
+
     .resource('analytics').open()
       .get('summary',   { on: 'resource'})
       .get('visitors',  { on: 'resource'})
