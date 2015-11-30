@@ -35,7 +35,7 @@ var Papi = (function (_ResourceSchema) {
     _ResourceSchema.apply(this, arguments);
 
     this.options = options;
-    this.options.host = options.host || 'https://beta-api.pressly.com';
+    this.options.host = options.host || 'https://api.pressly.com';
 
     if (hasXDomain()) {
       var slaves = {};
