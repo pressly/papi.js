@@ -12,9 +12,7 @@ var _superagent = require('superagent');
 
 var _superagent2 = _interopRequireDefault(_superagent);
 
-var _bluebird = require('bluebird');
-
-var _bluebird2 = _interopRequireDefault(_bluebird);
+//import Promise from 'bluebird'; // XXX No longer require advanced features of bluebird. just use babels promise lib instead
 
 var _resourceSchema = require('./resource-schema');
 
@@ -104,7 +102,7 @@ var Papi = (function (_ResourceSchema) {
 
     var options = arguments.length <= 2 || arguments[2] === undefined ? {} : arguments[2];
 
-    return new _bluebird2['default'](function (resolve, reject) {
+    return new Promise(function (resolve, reject) {
       var url = /^(https?:)?\/\//.test(path) ? path : _this2.options.host + path;
 
       // Doesn't allow the delete keyword because it is reserved

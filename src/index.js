@@ -1,7 +1,7 @@
 'use strict';
 
 import superagent from 'superagent';
-import Promise from 'bluebird';
+//import Promise from 'bluebird'; // XXX No longer require advanced features of bluebird. just use babels promise lib instead
 import ResourceSchema from './resource-schema';
 
 function hasXDomain() {
