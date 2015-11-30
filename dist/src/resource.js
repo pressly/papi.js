@@ -1,14 +1,21 @@
 'use strict';
 
+//import {map, each, detect, where, findWhere, extend, clone, isEmpty, isArray, isObject, isNumber} from 'lodash';
 exports.__esModule = true;
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
-var _lodash = require('lodash');
-
-var _lodash2 = _interopRequireDefault(_lodash);
+var map = require('lodash/collection/map');
+var each = require('lodash/collection/each');
+var detect = require('lodash/collection/detect');
+var where = require('lodash/collection/where');
+var findWhere = require('lodash/collection/findWhere');
+var extend = require('lodash/object/extend');
+var clone = require('lodash/lang/clone');
+var isObject = require('lodash/lang/isObject');
+var isArray = require('lodash/lang/isArray');
+var isEmpty = require('lodash/lang/isEmpty');
+var isNumber = require('lodash/lang/isNumber');
 
 function deepClone(obj) {
   return JSON.parse(JSON.stringify(obj));
@@ -21,8 +28,8 @@ function singularize(string) {
 var parseHTTPLinks = function parseHTTPLinks(linksString) {
   var links = {};
 
-  if (linksString && !_lodash2['default'].isEmpty(linksString)) {
-    _lodash2['default'].each(linksString.split(','), function (link) {
+  if (linksString && !isEmpty(linksString)) {
+    each(linksString.split(','), function (link) {
       var _link$split = link.split(';');
 
       var href = _link$split[0];
@@ -57,7 +64,7 @@ var Resource = (function () {
     this.name = def.name;
     this.key = def.key;
 
-    this.children = _lodash2['default'].map(def.children, function (child, name) {
+    this.children = map(def.children, function (child, name) {
       return name;
     }) || [];
 
@@ -70,7 +77,7 @@ var Resource = (function () {
     if (parentResource) {
       var parentParams = {};
 
-      _lodash2['default'].each(parentResource.route.params, function (value, paramName) {
+      each(parentResource.route.params, function (value, paramName) {
         if (parentResource.key != _this.key && paramName == 'id') {
           paramName = singularize(parentResource.name) + 'Id';
         }
@@ -78,10 +85,10 @@ var Resource = (function () {
         parentParams[paramName] = value;
       });
 
-      _lodash2['default'].extend(this.route.params, parentParams);
+      extend(this.route.params, parentParams);
 
       if (inherit) {
-        this.route.queryParams = _lodash2['default'].clone(parentResource.route.queryParams);
+        this.route.queryParams = clone(parentResource.route.queryParams);
       }
     }
 
@@ -101,7 +108,7 @@ var Resource = (function () {
 
     var options = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
 
-    return this.api.request(options.method || 'get', this.buildRoute(options.path), _lodash2['default'].extend({}, this.options, { query: _lodash2['default'].extend({}, this.route.queryParams, options.query), data: options.data })).then(function (res) {
+    return this.api.request(options.method || 'get', this.buildRoute(options.path), extend({}, this.options, { query: extend({}, this.route.queryParams, options.query), data: options.data })).then(function (res) {
       _this2.setResponse(res);
       return res.body;
     });
@@ -110,7 +117,7 @@ var Resource = (function () {
   Resource.prototype.buildRoute = function buildRoute(appendPath) {
     var route = this.route.segments.join('');
 
-    _lodash2['default'].each(this.route.params, function (value, paramName) {
+    each(this.route.params, function (value, paramName) {
       route = route.replace('/:' + paramName, value ? '/' + value : '');
     });
 
@@ -124,7 +131,7 @@ var Resource = (function () {
   Resource.prototype.includeParams = function includeParams(params) {
     var _this3 = this;
 
-    _lodash2['default'].each(params, function (value, paramName) {
+    each(params, function (value, paramName) {
       if (_this3.route.params.hasOwnProperty(paramName)) {
         _this3.route.params[paramName] = value;
       } else {
@@ -137,7 +144,7 @@ var Resource = (function () {
   };
 
   Resource.prototype.query = function query(params) {
-    _lodash2['default'].extend(this.route.queryParams, params);
+    extend(this.route.queryParams, params);
 
     return this;
   };
@@ -163,7 +170,7 @@ var Resource = (function () {
   };
 
   Resource.prototype.$find = function $find(params) {
-    if (params && !_lodash2['default'].isObject(params)) {
+    if (params && !isObject(params)) {
       params = { id: params };
     }
 
@@ -221,7 +228,7 @@ var Resource = (function () {
 
     // Set a reference to the resource on the model
     model.$resource = function (name) {
-      if (_lodash2['default'].isEmpty(name)) {
+      if (isEmpty(name)) {
         return _this4;
       } else {
         return _this4.api.$resource(name, _this4);
@@ -234,7 +241,7 @@ var Resource = (function () {
   Resource.prototype.hydrateCollection = function hydrateCollection(data) {
     var _this5 = this;
 
-    var collection = _lodash2['default'].map(data, function (item) {
+    var collection = map(data, function (item) {
       // Models in a collection need a new resource created
       var resource = _this5.createResource();
 
@@ -253,7 +260,7 @@ var Resource = (function () {
 
             var method = options.append ? 'push' : 'unshift';
 
-            _lodash2['default'].each(res.body, function (item) {
+            each(res.body, function (item) {
               collection[method](_this5.hydrateModel(item));
             });
 
@@ -289,17 +296,17 @@ var Resource = (function () {
       },
 
       $find: function $find(id) {
-        return _lodash2['default'].detect(collection, function (item) {
+        return detect(collection, function (item) {
           return item.id == id;
         });
       },
 
       $findWhere: function $findWhere(params) {
-        return _lodash2['default'].findWhere(collection, params);
+        return findWhere(collection, params);
       },
 
       $where: function $where(params) {
-        return _lodash2['default'].where(collection, params);
+        return where(collection, params);
       },
 
       $create: function $create() {
@@ -317,7 +324,7 @@ var Resource = (function () {
           model = collection.$create(model);
         }
 
-        if (_lodash2['default'].isNumber(idx)) {
+        if (isNumber(idx)) {
           collection.splice(idx, 0, model);
         } else {
           collection.push(model);
@@ -332,9 +339,9 @@ var Resource = (function () {
 
       $remove: function $remove(arg) {
         // Remove multiples
-        if (_lodash2['default'].isArray(arg)) {
+        if (isArray(arg)) {
           var models = arg;
-          _lodash2['default'].each(models, function (model) {
+          each(models, function (model) {
             collection.$remove(model);
           });
 
@@ -342,7 +349,7 @@ var Resource = (function () {
         }
 
         var idx;
-        if (_lodash2['default'].isNumber(arg)) {
+        if (isNumber(arg)) {
           idx = arg;
         } else if (arg instanceof _this5.constructor.modelClass) {
           idx = collection.indexOf(arg);
@@ -376,7 +383,7 @@ var Resource = (function () {
       }
     };
 
-    _lodash2['default'].extend(collection, methods);
+    extend(collection, methods);
 
     return collection;
   };

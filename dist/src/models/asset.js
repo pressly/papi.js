@@ -12,9 +12,10 @@ var _model = require('../model');
 
 var _model2 = _interopRequireDefault(_model);
 
-var _lodash = require('lodash');
-
-var _lodash2 = _interopRequireDefault(_lodash);
+//import {chain, all, isEmpty} from 'lodash';
+var all = require('lodash/collection/all');
+var pick = require('lodash/object/pick');
+var isEmpty = require('lodash/lang/isEmpty');
 
 var DISPLAY_STATES = {
   VISIBLE: 1,
@@ -53,7 +54,7 @@ var Asset = (function (_Model) {
   };
 
   Asset.prototype.isOriginal = function isOriginal() {
-    return _lodash2['default'].chain(this.source).pick('network', 'uid', 'url').all(_lodash2['default'].isEmpty).value();
+    return all(pick(this.source, 'network', 'uid', 'url'), isEmpty);
   };
 
   return Asset;

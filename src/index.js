@@ -1,6 +1,5 @@
 'use strict';
 
-import _ from 'lodash';
 import superagent from 'superagent';
 import Promise from 'bluebird';
 import ResourceSchema from './resource-schema';

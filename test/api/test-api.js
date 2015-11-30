@@ -495,6 +495,8 @@ describe('Stream Assets Resource', function() {
   it('should find asset by slug', function(done) {
     api.$resource('hubs.assets', { hubId: mock.hubs[0].id }).$find({slug: "some-slug"}).then((res) => {
       res.should.be.instanceOf(models.Asset);
+      res.isVisible().should.equal(true);
+      res.isOriginal().should.equal(false);
 
       done();
     }).catch((err) => {

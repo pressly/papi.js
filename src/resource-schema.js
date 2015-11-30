@@ -1,6 +1,15 @@
 'use strict'
 
-import _ from 'lodash';
+//import {map, each, select, extend, last, capitalize, isObject, isArray, isEmpty} from 'lodash';
+var map =         require('lodash/collection/map');
+var each =        require('lodash/collection/each');
+var select =      require('lodash/collection/select');
+var extend =      require('lodash/object/extend');
+var last =        require('lodash/array/last');
+var capitalize =  require('lodash/string/capitalize');
+var isObject =    require('lodash/lang/isObject');
+var isArray =     require('lodash/lang/isArray');
+var isEmpty =     require('lodash/lang/isEmpty');
 
 import Resource from './resource';
 import * as models from './models';
@@ -10,7 +19,7 @@ function singularize(string) {
 }
 
 function classify(string) {
-  return singularize(_.map(string.split("_"), function(s) { return _.capitalize(s); }).join(''));
+  return singularize(map(string.split("_"), function(s) { return capitalize(s); }).join(''));
 }
 
 var buildRoute = function(resource) {
@@ -27,7 +36,7 @@ var buildRoute = function(resource) {
       var paramName = current.options.routeSegment ? parseRouteParams(current.options.routeSegment)[0] : current.options.paramName || 'id';
 
       if (current !== resource) {
-        paramName = singularize(current.name) + _.capitalize(paramName);
+        paramName = singularize(current.name) + capitalize(paramName);
       }
 
       var routeSegment = current.options.routeSegment ? current.options.routeSegment.replace(/\/:[^\/]+$/, `/:${paramName}`) : `/${current.name}/:${paramName}`;
@@ -41,7 +50,7 @@ var buildRoute = function(resource) {
   }
 
   var params = {};
-  _.each(parseRouteParams(path), function(paramName) {
+  each(parseRouteParams(path), function(paramName) {
     params[paramName] = null;
   });
 
@@ -50,7 +59,7 @@ var buildRoute = function(resource) {
 
 var reRouteParams = /:[^\/]+/gi;
 var parseRouteParams = function(route) {
-  return _.map(route.match(reRouteParams), function(param) {
+  return map(route.match(reRouteParams), function(param) {
     return param.slice(1);
   });
 };
@@ -87,8 +96,8 @@ export default class ResourceSchema {
       throw new Error("$resource: key is undefined");
     }
 
-    var name = _.last(key.split('.'));
-    var params = (_.isObject(arguments[1]) && !(arguments[1] instanceof Resource)) ? arguments[1] : undefined;
+    var name = last(key.split('.'));
+    var params = (isObject(arguments[1]) && !(arguments[1] instanceof Resource)) ? arguments[1] : undefined;
     var parentResource = arguments[2] || (!params && arguments[1]) || undefined;
 
     if (parentResource) {
@@ -164,8 +173,8 @@ ResourceSchema.defineSchema = function() {
             //console.log(`- adding collection action to ${parentPointer.current.key}:`, method, name);
 
             resourceClass.prototype['$' + name] = function(data = {}) {
-              return this.request(_.extend({ method: method, path: options.path || `/${name}`}, {data})).then((res) => {
-                if (_.isArray(res)) {
+              return this.request(extend({ method: method, path: options.path || `/${name}`}, {data})).then((res) => {
+                if (isArray(res)) {
                   return this.hydrateCollection(res);
                 } else {
                   return this.hydrateModel(res);
@@ -180,7 +189,7 @@ ResourceSchema.defineSchema = function() {
             //console.log(`- adding member action to ${parentPointer.current.key}:`, method, name);
 
             modelClass.prototype['$' + name] = function(data = {}) {
-              return this.$resource().request(_.extend({ method: method, path: options.path || `/${name}`}, {data})).then((res) => {
+              return this.$resource().request(extend({ method: method, path: options.path || `/${name}`}, {data})).then((res) => {
                 return this.$resource().hydrateModel(res);
               });
             }
@@ -212,79 +221,79 @@ ResourceSchema.defineSchema = function() {
     };
   };
 
-  return _.extend({}, pointer({}));
+  return extend({}, pointer({}));
 };
 
-ResourceSchema.generateMarkdown = function() {
-  var API = this;
-  let markdown = "";
-
-  _.each(API.resourceClasses, (resourceClass) => {
-    var def = resourceClass.definition;
-
-    markdown += `###${def.modelName}\n\n`;
-    markdown += `**\`${def.key}\`**\n\n`;
-
-    if (def.parent) {
-      markdown += '#####Parent\n\n';
-      markdown += `- [${def.parent.modelName}](#${def.parent.modelName.toLowerCase()}) \`${def.parent.key}\`\n\n`;
-    }
-
-    if (!_.isEmpty(def.children)) {
-      markdown += '#####Children\n\n';
-      _.each(def.children, (child) => {
-        markdown += `- [${child.modelName}](#${child.modelName.toLowerCase()}) \`${child.key}\`\n`;
-      });
-    }
-
-    markdown += '\n\n';
-
-    if (def.link) {
-      let link = API.resourceClasses[def.link].definition;
-      markdown += `See [${link.modelName}](#${link.modelName.toLowerCase()}) \`${link.key}\`\n\n`;
-    }
-
-    let pathRoot = def.route.path.replace(/\/:.+$/, '');
-
-    markdown += '#####REST Endpoints\n\n';
-
-    markdown += `- \`GET\` ${pathRoot}\n`;
-    markdown += `- \`POST\` ${pathRoot}\n`;
-    markdown += `- \`GET\` ${def.route.path}\n`;
-    markdown += `- \`PUT\` ${def.route.path}\n`;
-    markdown += `- \`DELETE\` ${def.route.path}\n\n`;
-
-    if (!_.isEmpty(def.actions)) {
-      let memberActions = _.select(def.actions, (action) => {
-        return action.options.on == 'member';
-      });
-
-      let collectionActions = _.select(def.actions, (action) => {
-        return action.options.on == 'collection';
-      });
-
-
-      if (!_.isEmpty(collectionActions)) {
-        markdown += "*Collection Actions*\n\n";
-
-        _.each(collectionActions, (action) => {
-          markdown += `- \`${action.method.toUpperCase()}\` ${pathRoot}/${action.name}\n`
-        });
-      }
-
-      markdown += "\n\n";
-
-      if (!_.isEmpty(memberActions)) {
-        markdown += "*Member Actions*\n\n";
-
-        _.each(memberActions, (action) => {
-          markdown += `- \`${action.method.toUpperCase()}\` ${def.route.path}/${action.name}\n`
-        });
-      }
-    }
-
-    markdown += "\n\n";
-  });
-
-  console.log(markdown);
-};
+// ResourceSchema.generateMarkdown = function() {
+//   var API = this;
+//   let markdown = "";
+//
+//   each(API.resourceClasses, (resourceClass) => {
+//     var def = resourceClass.definition;
+//
+//     markdown += `###${def.modelName}\n\n`;
+//     markdown += `**\`${def.key}\`**\n\n`;
+//
+//     if (def.parent) {
+//       markdown += '#####Parent\n\n';
+//       markdown += `- [${def.parent.modelName}](#${def.parent.modelName.toLowerCase()}) \`${def.parent.key}\`\n\n`;
+//     }
+//
+//     if (!isEmpty(def.children)) {
+//       markdown += '#####Children\n\n';
+//       each(def.children, (child) => {
+//         markdown += `- [${child.modelName}](#${child.modelName.toLowerCase()}) \`${child.key}\`\n`;
+//       });
+//     }
+//
+//     markdown += '\n\n';
+//
+//     if (def.link) {
+//       let link = API.resourceClasses[def.link].definition;
+//       markdown += `See [${link.modelName}](#${link.modelName.toLowerCase()}) \`${link.key}\`\n\n`;
+//     }
+//
+//     let pathRoot = def.route.path.replace(/\/:.+$/, '');
+//
+//     markdown += '#####REST Endpoints\n\n';
+//
+//     markdown += `- \`GET\` ${pathRoot}\n`;
+//     markdown += `- \`POST\` ${pathRoot}\n`;
+//     markdown += `- \`GET\` ${def.route.path}\n`;
+//     markdown += `- \`PUT\` ${def.route.path}\n`;
+//     markdown += `- \`DELETE\` ${def.route.path}\n\n`;
+//
+//     if (!isEmpty(def.actions)) {
+//       let memberActions = select(def.actions, (action) => {
+//         return action.options.on == 'member';
+//       });
+//
+//       let collectionActions = select(def.actions, (action) => {
+//         return action.options.on == 'collection';
+//       });
+//
+//
+//       if (!isEmpty(collectionActions)) {
+//         markdown += "*Collection Actions*\n\n";
+//
+//         each(collectionActions, (action) => {
+//           markdown += `- \`${action.method.toUpperCase()}\` ${pathRoot}/${action.name}\n`
+//         });
+//       }
+//
+//       markdown += "\n\n";
+//
+//       if (!isEmpty(memberActions)) {
+//         markdown += "*Member Actions*\n\n";
+//
+//         each(memberActions, (action) => {
+//           markdown += `- \`${action.method.toUpperCase()}\` ${def.route.path}/${action.name}\n`
+//         });
+//       }
+//     }
+//
+//     markdown += "\n\n";
+//   });
+//
+//   console.log(markdown);
+// };

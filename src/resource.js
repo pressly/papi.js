@@ -1,6 +1,17 @@
 'use strict'
 
-import _ from 'lodash';
+//import {map, each, detect, where, findWhere, extend, clone, isEmpty, isArray, isObject, isNumber} from 'lodash';
+var map =         require('lodash/collection/map');
+var each =        require('lodash/collection/each');
+var detect =      require('lodash/collection/detect');
+var where =       require('lodash/collection/where');
+var findWhere =   require('lodash/collection/findWhere');
+var extend =      require('lodash/object/extend');
+var clone =       require('lodash/lang/clone');
+var isObject =    require('lodash/lang/isObject');
+var isArray =     require('lodash/lang/isArray');
+var isEmpty =     require('lodash/lang/isEmpty');
+var isNumber =    require('lodash/lang/isNumber');
 
 function deepClone(obj) {
   return JSON.parse(JSON.stringify(obj));
@@ -13,8 +24,8 @@ function singularize(string) {
 var parseHTTPLinks = function(linksString) {
   var links = {};
 
-  if (linksString && !_.isEmpty(linksString)) {
-    _.each(linksString.split(','), function(link) {
+  if (linksString && !isEmpty(linksString)) {
+    each(linksString.split(','), function(link) {
       var [href, rel] = link.split(';');
       href = href.replace(/<(.*)>/, '$1').trim();
       rel = rel.replace(/rel="(.*)"/, '$1').trim();
@@ -39,7 +50,7 @@ export default class Resource {
     this.name = def.name;
     this.key = def.key;
 
-    this.children = _.map(def.children, function(child, name) { return name; }) || [];
+    this.children = map(def.children, function(child, name) { return name; }) || [];
 
     this.depth = parentResource ? parentResource.depth + 1 : 1;
 
@@ -50,7 +61,7 @@ export default class Resource {
     if (parentResource) {
       var parentParams = {};
 
-      _.each(parentResource.route.params, (value, paramName) => {
+      each(parentResource.route.params, (value, paramName) => {
         if (parentResource.key != this.key && paramName == 'id') {
           paramName = singularize(parentResource.name) + 'Id';
         }
@@ -58,10 +69,10 @@ export default class Resource {
         parentParams[paramName] = value;
       });
 
-      _.extend(this.route.params, parentParams);
+      extend(this.route.params, parentParams);
 
       if (inherit) {
-        this.route.queryParams = _.clone(parentResource.route.queryParams);
+        this.route.queryParams = clone(parentResource.route.queryParams);
       }
     }
 
@@ -75,7 +86,7 @@ export default class Resource {
   }
 
   request(options = {}) {
-    return this.api.request(options.method || 'get', this.buildRoute(options.path), _.extend({}, this.options, { query: _.extend({}, this.route.queryParams, options.query), data: options.data })).then((res) => {
+    return this.api.request(options.method || 'get', this.buildRoute(options.path), extend({}, this.options, { query: extend({}, this.route.queryParams, options.query), data: options.data })).then((res) => {
       this.setResponse(res);
       return res.body;
     });
@@ -84,7 +95,7 @@ export default class Resource {
   buildRoute(appendPath) {
     var route = this.route.segments.join('');
 
-    _.each(this.route.params, (value, paramName) => {
+    each(this.route.params, (value, paramName) => {
       route = route.replace('/:' + paramName, value ? '/' + value : '');
     });
 
@@ -96,7 +107,7 @@ export default class Resource {
   }
 
   includeParams(params) {
-    _.each(params, (value, paramName) => {
+    each(params, (value, paramName) => {
       if (this.route.params.hasOwnProperty(paramName)) {
         this.route.params[paramName] = value;
       } else {
@@ -109,7 +120,7 @@ export default class Resource {
   }
 
   query(params) {
-    _.extend(this.route.queryParams, params);
+    extend(this.route.queryParams, params);
 
     return this;
   }
@@ -135,7 +146,7 @@ export default class Resource {
   }
 
   $find(params) {
-    if (params && !_.isObject(params)) {
+    if (params && !isObject(params)) {
       params = { id: params };
     }
 
@@ -187,7 +198,7 @@ export default class Resource {
 
     // Set a reference to the resource on the model
     model.$resource = (name) => {
-      if (_.isEmpty(name)) {
+      if (isEmpty(name)) {
         return this;
       } else {
         return this.api.$resource(name, this);
@@ -198,7 +209,7 @@ export default class Resource {
   }
 
   hydrateCollection(data) {
-    var collection = _.map(data, (item) => {
+    var collection = map(data, (item) => {
       // Models in a collection need a new resource created
       var resource = this.createResource();
 
@@ -216,7 +227,7 @@ export default class Resource {
 
             var method = options.append ? 'push' : 'unshift';
 
-            _.each(res.body, (item) => {
+            each(res.body, (item) => {
               collection[method](this.hydrateModel(item));
             });
 
@@ -248,17 +259,17 @@ export default class Resource {
       },
 
       $find: (id) => {
-        return _.detect(collection, (item) => {
+        return detect(collection, (item) => {
           return item.id == id;
         });
       },
 
       $findWhere: (params) => {
-        return _.findWhere(collection, params);
+        return findWhere(collection, params);
       },
 
       $where: (params) => {
-        return _.where(collection, params);
+        return where(collection, params);
       },
 
       $create: (data = {}) => {
@@ -271,7 +282,7 @@ export default class Resource {
           model = collection.$create(model);
         }
 
-        if (_.isNumber(idx)) {
+        if (isNumber(idx)) {
           collection.splice(idx, 0, model);
         } else {
           collection.push(model);
@@ -286,9 +297,9 @@ export default class Resource {
 
       $remove: (arg) => {
         // Remove multiples
-        if (_.isArray(arg)) {
+        if (isArray(arg)) {
           var models = arg;
-          _.each(models, (model) => {
+          each(models, (model) => {
             collection.$remove(model);
           })
 
@@ -296,7 +307,7 @@ export default class Resource {
         }
 
         var idx;
-        if (_.isNumber(arg)) {
+        if (isNumber(arg)) {
           idx = arg;
         } else if (arg instanceof this.constructor.modelClass) {
           idx = collection.indexOf(arg);
@@ -328,7 +339,7 @@ export default class Resource {
       }
     };
 
-    _.extend(collection, methods);
+    extend(collection, methods);
 
     return collection;
   }
