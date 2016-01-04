@@ -13,16 +13,17 @@
     "type": "git",
     "url": "git://github.com/pressly/papi.js.git"
   },
-  "license": "BSD",
+  "license": "MIT",
   "homepage": "https://github.com/pressly/papi.js",
   "dependencies": {
     "babel-runtime": "5.8.20",
     "bluebird": "2.9.34",
-    "es5-shim": "^4.1.10",
+    "es5-shim": "4.1.10",
     "es5-shim-sham": "0.0.1",
+    "isomorphic-fetch": "2.2.0",
     "lodash": "3.10.1",
-    "superagent": "git+ssh://git@github.com:alinz/superagent.git#patched-content-type-1.4.0",
-    "xdomain": "^0.7.3"
+    "qs": "5.2.0",
+    "xdomain": "0.7.3"
   },
   "devDependencies": {
     "babel": "5.8.21",
@@ -48,7 +49,7 @@
     "karma-mocha": "^0.1.10",
     "karma-phantomjs-launcher": "^0.2.1",
     "mocha": "^2.2.4",
-    "nock": "^2.0.1",
+    "nock": "4.0.0",
     "phantomjs": "^1.9.18",
     "run-sequence": "^1.1.2",
     "should": "^6.0.1",
