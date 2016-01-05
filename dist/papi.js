@@ -3,12 +3,6 @@
 
 exports.__esModule = true;
 
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
 var _isomorphicFetch = require('isomorphic-fetch');
 
 var _isomorphicFetch2 = _interopRequireDefault(_isomorphicFetch);
@@ -17,11 +11,19 @@ var _resourceSchema = require('./resource-schema');
 
 var _resourceSchema2 = _interopRequireDefault(_resourceSchema);
 
-// Query string parser and stringifier
-
 var _qs = require('qs');
 
 var _qs2 = _interopRequireDefault(_qs);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+// Query string parser and stringifier
 
 var extend = require('lodash/object/extend');
 var isEmpty = require('lodash/lang/isEmpty');
@@ -34,27 +36,25 @@ var Papi = (function (_ResourceSchema) {
   _inherits(Papi, _ResourceSchema);
 
   function Papi() {
-    var _this = this;
-
     var options = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
 
     _classCallCheck(this, Papi);
 
-    _ResourceSchema.apply(this, arguments);
+    var _this = _possibleConstructorReturn(this, _ResourceSchema.apply(this, arguments));
 
-    this.options = options;
-    this.options.host = options.host || 'https://api.pressly.com';
+    _this.options = options;
+    _this.options.host = options.host || 'https://api.pressly.com';
 
     if (hasXDomain()) {
       var slaves = {};
-      slaves[this.options.host] = '/proxy.html';
+      slaves[_this.options.host] = '/proxy.html';
       window.xdomain.slaves(slaves);
     }
 
-    this.requestMiddlewares = [];
-    this.responseMiddlewares = [];
+    _this.requestMiddlewares = [];
+    _this.responseMiddlewares = [];
 
-    this.auth = {
+    _this.auth = {
       session: null,
 
       get: function get() {
@@ -101,9 +101,8 @@ var Papi = (function (_ResourceSchema) {
         });
       }
     };
+    return _this;
   }
-
-  // <= IE10, does not support static method inheritance
 
   Papi.prototype.request = function request(method, path) {
     var _this2 = this;
@@ -153,7 +152,7 @@ var Papi = (function (_ResourceSchema) {
       }
 
       if (!isEmpty(req.query)) {
-        req.url += '?' + _qs2['default'].stringify(req.query);
+        req.url += '?' + _qs2.default.stringify(req.query);
       }
 
       var res = {};
@@ -174,13 +173,13 @@ var Papi = (function (_ResourceSchema) {
 
       var endRequest = function endRequest() {
         // XXX this is where the request will be made
-        _isomorphicFetch2['default'](req.url, req).then(function (response) {
+        (0, _isomorphicFetch2.default)(req.url, req).then(function (response) {
           if (response.status >= 200 && response.status < 300) {
             res = response;
 
             response.json().then(function (body) {
               res.body = body;
-            })['catch'](function (err) {
+            }).catch(function (err) {
               res.body = {};
             }).then(function () {
               beginResponse();
@@ -222,25 +221,27 @@ var Papi = (function (_ResourceSchema) {
   };
 
   return Papi;
-})(_resourceSchema2['default']);
+})(_resourceSchema2.default);
 
-exports['default'] = Papi;
+// <= IE10, does not support static method inheritance
+
+exports.default = Papi;
 if (Papi.defineSchema == undefined) {
-  Papi.defineSchema = _resourceSchema2['default'].defineSchema;
+  Papi.defineSchema = _resourceSchema2.default.defineSchema;
 }
 
-Papi.defineSchema().resource('accounts').open().get('available', { on: 'resource' }).post('become', { on: 'member' }).resource('users').resource('hubs', { link: 'hubs' }).close().resource('organizations').open().resource('users').resource('hubs').resource('invites').close().resource('posts', { routeSegment: '/stream/posts/:id' }).resource('hubs').open().get('search', { on: 'resource' }).post('upgrade', { on: 'member' }).post('accept_invite', { on: 'member' }).post('reject_invite', { on: 'member' }).resource('apps').open().get('current', { on: 'resource', path: '/current' }).get('build', { on: 'member', path: '/build_app' }).get('status', { on: 'member' }).resource('styles').close().resource('addons').open().resource('configs').close().resource('analytics').open().get('summary', { on: 'resource' }).get('visitors', { on: 'resource' }).get('pageviews', { on: 'resource' }).get('duration', { on: 'resource' }).close().resource('feeds').open().resource('assets', { modelName: 'FeedAsset' }).close().resource('invites').open().post('bulk_invite', { on: 'resource' }).post('resend', { on: 'member' }).post('accept', { on: 'member', routeSegment: '/invites/:hash' }).post('reject', { on: 'member', routeSegment: '/invites/:hash' }).close().resource('recommendations').resource('users').open().post('grant_access', { on: 'resource' })['delete']('revoke_access', { on: 'member' }).close().resource('collections').open().put('reorder', { on: 'resource' }).close().resource('tags').resource('assets', { routeSegment: '/stream/:id' }).open().put('feature', { on: 'member' }).put('unfeature', { on: 'member' }).put('hide', { on: 'member' }).put('unhide', { on: 'member' }).put('lock', { on: 'member' }).put('unlock', { on: 'member' }).resource('likes').resource('comments').close().resource('drafts').open().put('publish', { on: 'member' }).close().close().resource('invites').open().get('incoming', { on: 'resource' }).get('outgoing', { on: 'resource' }).post('bulk_invite', { on: 'resource' }).post('resend', { on: 'member' }).post('accept', { on: 'member', key: 'hash' }).post('reject', { on: 'member', key: 'hash' }).close().resource('code_revisions').open().get('fetch_repo', { on: 'member' })
+Papi.defineSchema().resource('accounts').open().get('available', { on: 'resource' }).post('become', { on: 'member' }).resource('users').resource('hubs', { link: 'hubs' }).close().resource('organizations').open().resource('users').resource('hubs').resource('invites').close().resource('posts', { routeSegment: '/stream/posts/:id' }).resource('hubs').open().get('search', { on: 'resource' }).post('upgrade', { on: 'member' }).post('accept_invite', { on: 'member' }).post('reject_invite', { on: 'member' }).resource('apps').open().get('current', { on: 'resource', path: '/current' }).get('build', { on: 'member', path: '/build_app' }).get('status', { on: 'member' }).resource('styles').close().resource('addons').open().resource('configs').close().resource('analytics').open().get('summary', { on: 'resource' }).get('visitors', { on: 'resource' }).get('pageviews', { on: 'resource' }).get('duration', { on: 'resource' }).close().resource('feeds').open().resource('assets', { modelName: 'FeedAsset' }).close().resource('invites').open().post('bulk_invite', { on: 'resource' }).post('resend', { on: 'member' }).post('accept', { on: 'member', routeSegment: '/invites/:hash' }).post('reject', { on: 'member', routeSegment: '/invites/:hash' }).close().resource('recommendations').resource('users').open().post('grant_access', { on: 'resource' }).delete('revoke_access', { on: 'member' }).close().resource('collections').open().put('reorder', { on: 'resource' }).close().resource('tags').resource('assets', { routeSegment: '/stream/:id' }).open().put('feature', { on: 'member' }).put('unfeature', { on: 'member' }).put('hide', { on: 'member' }).put('unhide', { on: 'member' }).put('lock', { on: 'member' }).put('unlock', { on: 'member' }).resource('likes').resource('comments').close().resource('drafts').open().put('publish', { on: 'member' }).close().close().resource('invites').open().get('incoming', { on: 'resource' }).get('outgoing', { on: 'resource' }).post('bulk_invite', { on: 'resource' }).post('resend', { on: 'member' }).post('accept', { on: 'member', key: 'hash' }).post('reject', { on: 'member', key: 'hash' }).close().resource('code_revisions').open().get('fetch_repo', { on: 'member' })
 
 // This resource links to the root hubs resource
 .resource('hubs', { link: 'hubs' }).close().resource('signup').open().get('account_uid_available', { on: 'member' }).get('account_email_available', { on: 'member' }).close().resource('users').open().get('roles', { on: 'resource' }).resource('hubs').resource('organizations').close().resource('discover').open().resource('users', { link: 'users' }).resource('organizations', { link: 'organizations' }).resource('hubs', { link: 'hubs' }).resource('posts').close().resource('stream').open().resource('following').close();
-module.exports = exports['default'];
 },{"./resource-schema":21,"isomorphic-fetch":23,"lodash/lang/isEmpty":110,"lodash/object/extend":118,"qs":127}],2:[function(require,module,exports){
 'use strict';
 
 //import {extend, filter, pick, difference, keys, functions} from 'lodash';
+
 exports.__esModule = true;
 
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var extend = require('lodash/object/extend');
 var keys = require('lodash/object/keys');
@@ -290,22 +291,23 @@ var Model = (function () {
   return Model;
 })();
 
-exports['default'] = Model;
-module.exports = exports['default'];
+exports.default = Model;
 },{"lodash/array/difference":25,"lodash/collection/filter":31,"lodash/object/extend":118,"lodash/object/functions":119,"lodash/object/keys":120,"lodash/object/pick":123}],3:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
 
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
 var _model = require('../model');
 
 var _model2 = _interopRequireDefault(_model);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 var Account = (function (_Model) {
   _inherits(Account, _Model);
@@ -313,28 +315,29 @@ var Account = (function (_Model) {
   function Account() {
     _classCallCheck(this, Account);
 
-    _Model.apply(this, arguments);
+    return _possibleConstructorReturn(this, _Model.apply(this, arguments));
   }
 
   return Account;
-})(_model2['default']);
+})(_model2.default);
 
-exports['default'] = Account;
-module.exports = exports['default'];
+exports.default = Account;
 },{"../model":2}],4:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
 
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
 var _model = require('../model');
 
 var _model2 = _interopRequireDefault(_model);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 var App = (function (_Model) {
   _inherits(App, _Model);
@@ -342,28 +345,29 @@ var App = (function (_Model) {
   function App() {
     _classCallCheck(this, App);
 
-    _Model.apply(this, arguments);
+    return _possibleConstructorReturn(this, _Model.apply(this, arguments));
   }
 
   return App;
-})(_model2['default']);
+})(_model2.default);
 
-exports['default'] = App;
-module.exports = exports['default'];
+exports.default = App;
 },{"../model":2}],5:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
 
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
 var _model = require('../model');
 
 var _model2 = _interopRequireDefault(_model);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 //import {chain, all, isEmpty} from 'lodash';
 var all = require('lodash/collection/all');
@@ -383,7 +387,7 @@ var Asset = (function (_Model) {
   function Asset() {
     _classCallCheck(this, Asset);
 
-    _Model.apply(this, arguments);
+    return _possibleConstructorReturn(this, _Model.apply(this, arguments));
   }
 
   Asset.prototype.isVisible = function isVisible() {
@@ -411,24 +415,25 @@ var Asset = (function (_Model) {
   };
 
   return Asset;
-})(_model2['default']);
+})(_model2.default);
 
-exports['default'] = Asset;
-module.exports = exports['default'];
+exports.default = Asset;
 },{"../model":2,"lodash/collection/all":27,"lodash/lang/isEmpty":110,"lodash/object/pick":123}],6:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
 
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
 var _model = require('../model');
 
 var _model2 = _interopRequireDefault(_model);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 var CodeRevision = (function (_Model) {
   _inherits(CodeRevision, _Model);
@@ -436,28 +441,29 @@ var CodeRevision = (function (_Model) {
   function CodeRevision() {
     _classCallCheck(this, CodeRevision);
 
-    _Model.apply(this, arguments);
+    return _possibleConstructorReturn(this, _Model.apply(this, arguments));
   }
 
   return CodeRevision;
-})(_model2['default']);
+})(_model2.default);
 
-exports['default'] = CodeRevision;
-module.exports = exports['default'];
+exports.default = CodeRevision;
 },{"../model":2}],7:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
 
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
 var _model = require('../model');
 
 var _model2 = _interopRequireDefault(_model);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 var Collection = (function (_Model) {
   _inherits(Collection, _Model);
@@ -465,28 +471,29 @@ var Collection = (function (_Model) {
   function Collection() {
     _classCallCheck(this, Collection);
 
-    _Model.apply(this, arguments);
+    return _possibleConstructorReturn(this, _Model.apply(this, arguments));
   }
 
   return Collection;
-})(_model2['default']);
+})(_model2.default);
 
-exports['default'] = Collection;
-module.exports = exports['default'];
+exports.default = Collection;
 },{"../model":2}],8:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
 
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
 var _model = require('../model');
 
 var _model2 = _interopRequireDefault(_model);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 var Comment = (function (_Model) {
   _inherits(Comment, _Model);
@@ -494,28 +501,29 @@ var Comment = (function (_Model) {
   function Comment() {
     _classCallCheck(this, Comment);
 
-    _Model.apply(this, arguments);
+    return _possibleConstructorReturn(this, _Model.apply(this, arguments));
   }
 
   return Comment;
-})(_model2['default']);
+})(_model2.default);
 
-exports['default'] = Comment;
-module.exports = exports['default'];
+exports.default = Comment;
 },{"../model":2}],9:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
 
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
 var _model = require('../model');
 
 var _model2 = _interopRequireDefault(_model);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 var Draft = (function (_Model) {
   _inherits(Draft, _Model);
@@ -523,28 +531,29 @@ var Draft = (function (_Model) {
   function Draft() {
     _classCallCheck(this, Draft);
 
-    _Model.apply(this, arguments);
+    return _possibleConstructorReturn(this, _Model.apply(this, arguments));
   }
 
   return Draft;
-})(_model2['default']);
+})(_model2.default);
 
-exports['default'] = Draft;
-module.exports = exports['default'];
+exports.default = Draft;
 },{"../model":2}],10:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
 
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
 var _model = require('../model');
 
 var _model2 = _interopRequireDefault(_model);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 var FeedAsset = (function (_Model) {
   _inherits(FeedAsset, _Model);
@@ -552,28 +561,29 @@ var FeedAsset = (function (_Model) {
   function FeedAsset() {
     _classCallCheck(this, FeedAsset);
 
-    _Model.apply(this, arguments);
+    return _possibleConstructorReturn(this, _Model.apply(this, arguments));
   }
 
   return FeedAsset;
-})(_model2['default']);
+})(_model2.default);
 
-exports['default'] = FeedAsset;
-module.exports = exports['default'];
+exports.default = FeedAsset;
 },{"../model":2}],11:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
 
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
 var _model = require('../model');
 
 var _model2 = _interopRequireDefault(_model);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 var Feed = (function (_Model) {
   _inherits(Feed, _Model);
@@ -581,28 +591,29 @@ var Feed = (function (_Model) {
   function Feed() {
     _classCallCheck(this, Feed);
 
-    _Model.apply(this, arguments);
+    return _possibleConstructorReturn(this, _Model.apply(this, arguments));
   }
 
   return Feed;
-})(_model2['default']);
+})(_model2.default);
 
-exports['default'] = Feed;
-module.exports = exports['default'];
+exports.default = Feed;
 },{"../model":2}],12:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
 
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
 var _model = require('../model');
 
 var _model2 = _interopRequireDefault(_model);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 var Hub = (function (_Model) {
   _inherits(Hub, _Model);
@@ -610,106 +621,195 @@ var Hub = (function (_Model) {
   function Hub() {
     _classCallCheck(this, Hub);
 
-    _Model.apply(this, arguments);
+    return _possibleConstructorReturn(this, _Model.apply(this, arguments));
   }
 
   return Hub;
-})(_model2['default']);
+})(_model2.default);
 
-exports['default'] = Hub;
-module.exports = exports['default'];
+exports.default = Hub;
 },{"../model":2}],13:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
 
-function _interopRequire(obj) { return obj && obj.__esModule ? obj['default'] : obj; }
-
 var _model = require('../model');
 
-exports.Base = _interopRequire(_model);
+Object.defineProperty(exports, 'Base', {
+  enumerable: true,
+  get: function get() {
+    return _model.default;
+  }
+});
 
 var _account = require('./account');
 
-exports.Account = _interopRequire(_account);
+Object.defineProperty(exports, 'Account', {
+  enumerable: true,
+  get: function get() {
+    return _account.default;
+  }
+});
 
 var _organization = require('./organization');
 
-exports.Organization = _interopRequire(_organization);
+Object.defineProperty(exports, 'Organization', {
+  enumerable: true,
+  get: function get() {
+    return _organization.default;
+  }
+});
 
 var _app = require('./app');
 
-exports.App = _interopRequire(_app);
+Object.defineProperty(exports, 'App', {
+  enumerable: true,
+  get: function get() {
+    return _app.default;
+  }
+});
 
 var _asset = require('./asset');
 
-exports.Asset = _interopRequire(_asset);
+Object.defineProperty(exports, 'Asset', {
+  enumerable: true,
+  get: function get() {
+    return _asset.default;
+  }
+});
 
 var _codeRevision = require('./code-revision');
 
-exports.CodeRevision = _interopRequire(_codeRevision);
+Object.defineProperty(exports, 'CodeRevision', {
+  enumerable: true,
+  get: function get() {
+    return _codeRevision.default;
+  }
+});
 
 var _collection = require('./collection');
 
-exports.Collection = _interopRequire(_collection);
+Object.defineProperty(exports, 'Collection', {
+  enumerable: true,
+  get: function get() {
+    return _collection.default;
+  }
+});
 
 var _comment = require('./comment');
 
-exports.Comment = _interopRequire(_comment);
+Object.defineProperty(exports, 'Comment', {
+  enumerable: true,
+  get: function get() {
+    return _comment.default;
+  }
+});
 
 var _draft = require('./draft');
 
-exports.Draft = _interopRequire(_draft);
+Object.defineProperty(exports, 'Draft', {
+  enumerable: true,
+  get: function get() {
+    return _draft.default;
+  }
+});
 
 var _feed = require('./feed');
 
-exports.Feed = _interopRequire(_feed);
+Object.defineProperty(exports, 'Feed', {
+  enumerable: true,
+  get: function get() {
+    return _feed.default;
+  }
+});
 
 var _feedAsset = require('./feed-asset');
 
-exports.FeedAsset = _interopRequire(_feedAsset);
+Object.defineProperty(exports, 'FeedAsset', {
+  enumerable: true,
+  get: function get() {
+    return _feedAsset.default;
+  }
+});
 
 var _hub = require('./hub');
 
-exports.Hub = _interopRequire(_hub);
+Object.defineProperty(exports, 'Hub', {
+  enumerable: true,
+  get: function get() {
+    return _hub.default;
+  }
+});
 
 var _invite = require('./invite');
 
-exports.Invite = _interopRequire(_invite);
+Object.defineProperty(exports, 'Invite', {
+  enumerable: true,
+  get: function get() {
+    return _invite.default;
+  }
+});
 
 var _like = require('./like');
 
-exports.Like = _interopRequire(_like);
+Object.defineProperty(exports, 'Like', {
+  enumerable: true,
+  get: function get() {
+    return _like.default;
+  }
+});
 
 var _recommendation = require('./recommendation');
 
-exports.Recommendation = _interopRequire(_recommendation);
+Object.defineProperty(exports, 'Recommendation', {
+  enumerable: true,
+  get: function get() {
+    return _recommendation.default;
+  }
+});
 
 var _style = require('./style');
 
-exports.Style = _interopRequire(_style);
+Object.defineProperty(exports, 'Style', {
+  enumerable: true,
+  get: function get() {
+    return _style.default;
+  }
+});
 
 var _tag = require('./tag');
 
-exports.Tag = _interopRequire(_tag);
+Object.defineProperty(exports, 'Tag', {
+  enumerable: true,
+  get: function get() {
+    return _tag.default;
+  }
+});
 
 var _user = require('./user');
 
-exports.User = _interopRequire(_user);
+Object.defineProperty(exports, 'User', {
+  enumerable: true,
+  get: function get() {
+    return _user.default;
+  }
+});
 },{"../model":2,"./account":3,"./app":4,"./asset":5,"./code-revision":6,"./collection":7,"./comment":8,"./draft":9,"./feed":11,"./feed-asset":10,"./hub":12,"./invite":14,"./like":15,"./organization":16,"./recommendation":17,"./style":18,"./tag":19,"./user":20}],14:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
 
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
 var _model = require('../model');
 
 var _model2 = _interopRequireDefault(_model);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 var Invite = (function (_Model) {
   _inherits(Invite, _Model);
@@ -717,28 +817,29 @@ var Invite = (function (_Model) {
   function Invite() {
     _classCallCheck(this, Invite);
 
-    _Model.apply(this, arguments);
+    return _possibleConstructorReturn(this, _Model.apply(this, arguments));
   }
 
   return Invite;
-})(_model2['default']);
+})(_model2.default);
 
-exports['default'] = Invite;
-module.exports = exports['default'];
+exports.default = Invite;
 },{"../model":2}],15:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
 
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
 var _model = require('../model');
 
 var _model2 = _interopRequireDefault(_model);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 var Like = (function (_Model) {
   _inherits(Like, _Model);
@@ -746,28 +847,29 @@ var Like = (function (_Model) {
   function Like() {
     _classCallCheck(this, Like);
 
-    _Model.apply(this, arguments);
+    return _possibleConstructorReturn(this, _Model.apply(this, arguments));
   }
 
   return Like;
-})(_model2['default']);
+})(_model2.default);
 
-exports['default'] = Like;
-module.exports = exports['default'];
+exports.default = Like;
 },{"../model":2}],16:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
 
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
 var _model = require('../model');
 
 var _model2 = _interopRequireDefault(_model);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 var Organization = (function (_Model) {
   _inherits(Organization, _Model);
@@ -775,28 +877,29 @@ var Organization = (function (_Model) {
   function Organization() {
     _classCallCheck(this, Organization);
 
-    _Model.apply(this, arguments);
+    return _possibleConstructorReturn(this, _Model.apply(this, arguments));
   }
 
   return Organization;
-})(_model2['default']);
+})(_model2.default);
 
-exports['default'] = Organization;
-module.exports = exports['default'];
+exports.default = Organization;
 },{"../model":2}],17:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
 
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
 var _model = require('../model');
 
 var _model2 = _interopRequireDefault(_model);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 var Recommendation = (function (_Model) {
   _inherits(Recommendation, _Model);
@@ -804,28 +907,29 @@ var Recommendation = (function (_Model) {
   function Recommendation() {
     _classCallCheck(this, Recommendation);
 
-    _Model.apply(this, arguments);
+    return _possibleConstructorReturn(this, _Model.apply(this, arguments));
   }
 
   return Recommendation;
-})(_model2['default']);
+})(_model2.default);
 
-exports['default'] = Recommendation;
-module.exports = exports['default'];
+exports.default = Recommendation;
 },{"../model":2}],18:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
 
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
 var _model = require('../model');
 
 var _model2 = _interopRequireDefault(_model);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 var Style = (function (_Model) {
   _inherits(Style, _Model);
@@ -833,28 +937,29 @@ var Style = (function (_Model) {
   function Style() {
     _classCallCheck(this, Style);
 
-    _Model.apply(this, arguments);
+    return _possibleConstructorReturn(this, _Model.apply(this, arguments));
   }
 
   return Style;
-})(_model2['default']);
+})(_model2.default);
 
-exports['default'] = Style;
-module.exports = exports['default'];
+exports.default = Style;
 },{"../model":2}],19:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
 
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
 var _model = require('../model');
 
 var _model2 = _interopRequireDefault(_model);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 var Tag = (function (_Model) {
   _inherits(Tag, _Model);
@@ -862,28 +967,29 @@ var Tag = (function (_Model) {
   function Tag() {
     _classCallCheck(this, Tag);
 
-    _Model.apply(this, arguments);
+    return _possibleConstructorReturn(this, _Model.apply(this, arguments));
   }
 
   return Tag;
-})(_model2['default']);
+})(_model2.default);
 
-exports['default'] = Tag;
-module.exports = exports['default'];
+exports.default = Tag;
 },{"../model":2}],20:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
 
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
 var _model = require('../model');
 
 var _model2 = _interopRequireDefault(_model);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 var User = (function (_Model) {
   _inherits(User, _Model);
@@ -891,7 +997,7 @@ var User = (function (_Model) {
   function User() {
     _classCallCheck(this, User);
 
-    _Model.apply(this, arguments);
+    return _possibleConstructorReturn(this, _Model.apply(this, arguments));
   }
 
   User.prototype.hasAccess = function hasAccess() {
@@ -899,23 +1005,15 @@ var User = (function (_Model) {
   };
 
   return User;
-})(_model2['default']);
+})(_model2.default);
 
-exports['default'] = User;
-module.exports = exports['default'];
+exports.default = User;
 },{"../model":2}],21:[function(require,module,exports){
 'use strict';
 
 //import {map, each, select, extend, last, capitalize, isObject, isArray, isEmpty} from 'lodash';
+
 exports.__esModule = true;
-
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj['default'] = obj; return newObj; } }
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
 var _resource = require('./resource');
 
@@ -924,6 +1022,16 @@ var _resource2 = _interopRequireDefault(_resource);
 var _models = require('./models');
 
 var models = _interopRequireWildcard(_models);
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var map = require('lodash/collection/map');
 var each = require('lodash/collection/each');
@@ -1021,7 +1129,7 @@ var ResourceSchema = (function () {
     }
 
     var name = last(key.split('.'));
-    var params = isObject(arguments[1]) && !(arguments[1] instanceof _resource2['default']) ? arguments[1] : undefined;
+    var params = isObject(arguments[1]) && !(arguments[1] instanceof _resource2.default) ? arguments[1] : undefined;
     var parentResource = arguments[2] || !params && arguments[1] || undefined;
 
     if (parentResource) {
@@ -1038,7 +1146,7 @@ var ResourceSchema = (function () {
   return ResourceSchema;
 })();
 
-exports['default'] = ResourceSchema;
+exports.default = ResourceSchema;
 ;
 
 ResourceSchema.defineSchema = function () {
@@ -1074,11 +1182,11 @@ ResourceSchema.defineSchema = function () {
           function resourceClass() {
             _classCallCheck(this, resourceClass);
 
-            _Resource.apply(this, arguments);
+            return _possibleConstructorReturn(this, _Resource.apply(this, arguments));
           }
 
           return resourceClass;
-        })(_resource2['default']);
+        })(_resource2.default);
 
         resourceClass.definition = def;
         resourceClass.modelClass = models[def.modelName] || models.Base;
@@ -1108,15 +1216,15 @@ ResourceSchema.defineSchema = function () {
             //console.log(`- adding collection action to ${parentPointer.current.key}:`, method, name);
 
             resourceClass.prototype['$' + name] = function () {
-              var _this = this;
+              var _this2 = this;
 
               var data = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
 
               return this.request(extend({ method: method, path: options.path || '/' + name }, { data: data })).then(function (res) {
                 if (isArray(res)) {
-                  return _this.hydrateCollection(res);
+                  return _this2.hydrateCollection(res);
                 } else {
-                  return _this.hydrateModel(res);
+                  return _this2.hydrateModel(res);
                 }
               });
             };
@@ -1128,12 +1236,12 @@ ResourceSchema.defineSchema = function () {
             //console.log(`- adding member action to ${parentPointer.current.key}:`, method, name);
 
             modelClass.prototype['$' + name] = function () {
-              var _this2 = this;
+              var _this3 = this;
 
               var data = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
 
               return this.$resource().request(extend({ method: method, path: options.path || '/' + name }, { data: data })).then(function (res) {
-                return _this2.$resource().hydrateModel(res);
+                return _this3.$resource().hydrateModel(res);
               });
             };
           }
@@ -1158,7 +1266,7 @@ ResourceSchema.defineSchema = function () {
         return this.action.call(this, 'patch', arguments[0], arguments[1]);
       },
 
-      'delete': function _delete() {
+      delete: function _delete() {
         return this.action.call(this, 'delete', arguments[0], arguments[1]);
       }
     };
@@ -1240,14 +1348,16 @@ ResourceSchema.defineSchema = function () {
 //
 //   console.log(markdown);
 // };
-module.exports = exports['default'];
 },{"./models":13,"./resource":22,"lodash/array/last":26,"lodash/collection/each":29,"lodash/collection/map":35,"lodash/collection/select":36,"lodash/lang/isArray":109,"lodash/lang/isEmpty":110,"lodash/lang/isObject":114,"lodash/object/extend":118,"lodash/string/capitalize":124}],22:[function(require,module,exports){
 'use strict';
 
 //import {map, each, detect, where, findWhere, extend, clone, isEmpty, isArray, isObject, isNumber} from 'lodash';
+
 exports.__esModule = true;
 
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.constructor === Symbol ? "symbol" : typeof obj; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var map = require('lodash/collection/map');
 var each = require('lodash/collection/each');
@@ -1560,11 +1670,12 @@ var Resource = (function () {
         return resource.hydrateModel(data, { newRecord: true });
       },
 
-      $add: function $add(model, idx) {
-        if (model === undefined) model = {};
+      $add: function $add() {
+        var model = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+        var idx = arguments[1];
         var applySorting = arguments.length <= 2 || arguments[2] === undefined ? false : arguments[2];
 
-        if (typeof model == 'object' && !(model instanceof _this5.constructor.modelClass)) {
+        if ((typeof model === 'undefined' ? 'undefined' : _typeof(model)) == 'object' && !(model instanceof _this5.constructor.modelClass)) {
           model = collection.$create(model);
         }
 
@@ -1605,7 +1716,7 @@ var Resource = (function () {
       },
 
       $reposition: function $reposition(fromIdx, toIdx) {
-        if (fromIdx != toIdx && (fromIdx >= 0 && fromIdx < collection.length) && (toIdx >= 0 && toIdx < collection.length)) {
+        if (fromIdx != toIdx && fromIdx >= 0 && fromIdx < collection.length && toIdx >= 0 && toIdx < collection.length) {
           var model = collection.$remove(fromIdx);
 
           if (model) {
@@ -1635,8 +1746,7 @@ var Resource = (function () {
   return Resource;
 })();
 
-exports['default'] = Resource;
-module.exports = exports['default'];
+exports.default = Resource;
 },{"lodash/collection/detect":28,"lodash/collection/each":29,"lodash/collection/findWhere":33,"lodash/collection/map":35,"lodash/collection/where":37,"lodash/lang/clone":107,"lodash/lang/isArray":109,"lodash/lang/isEmpty":110,"lodash/lang/isNumber":113,"lodash/lang/isObject":114,"lodash/object/extend":118}],23:[function(require,module,exports){
 // the whatwg-fetch polyfill installs the fetch() function
 // on the global object (window or self)

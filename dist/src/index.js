@@ -2,12 +2,6 @@
 
 exports.__esModule = true;
 
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
 var _isomorphicFetch = require('isomorphic-fetch');
 
 var _isomorphicFetch2 = _interopRequireDefault(_isomorphicFetch);
@@ -16,11 +10,19 @@ var _resourceSchema = require('./resource-schema');
 
 var _resourceSchema2 = _interopRequireDefault(_resourceSchema);
 
-// Query string parser and stringifier
-
 var _qs = require('qs');
 
 var _qs2 = _interopRequireDefault(_qs);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+// Query string parser and stringifier
 
 var extend = require('lodash/object/extend');
 var isEmpty = require('lodash/lang/isEmpty');
@@ -33,27 +35,25 @@ var Papi = (function (_ResourceSchema) {
   _inherits(Papi, _ResourceSchema);
 
   function Papi() {
-    var _this = this;
-
     var options = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
 
     _classCallCheck(this, Papi);
 
-    _ResourceSchema.apply(this, arguments);
+    var _this = _possibleConstructorReturn(this, _ResourceSchema.apply(this, arguments));
 
-    this.options = options;
-    this.options.host = options.host || 'https://api.pressly.com';
+    _this.options = options;
+    _this.options.host = options.host || 'https://api.pressly.com';
 
     if (hasXDomain()) {
       var slaves = {};
-      slaves[this.options.host] = '/proxy.html';
+      slaves[_this.options.host] = '/proxy.html';
       window.xdomain.slaves(slaves);
     }
 
-    this.requestMiddlewares = [];
-    this.responseMiddlewares = [];
+    _this.requestMiddlewares = [];
+    _this.responseMiddlewares = [];
 
-    this.auth = {
+    _this.auth = {
       session: null,
 
       get: function get() {
@@ -100,9 +100,8 @@ var Papi = (function (_ResourceSchema) {
         });
       }
     };
+    return _this;
   }
-
-  // <= IE10, does not support static method inheritance
 
   Papi.prototype.request = function request(method, path) {
     var _this2 = this;
@@ -152,7 +151,7 @@ var Papi = (function (_ResourceSchema) {
       }
 
       if (!isEmpty(req.query)) {
-        req.url += '?' + _qs2['default'].stringify(req.query);
+        req.url += '?' + _qs2.default.stringify(req.query);
       }
 
       var res = {};
@@ -173,13 +172,13 @@ var Papi = (function (_ResourceSchema) {
 
       var endRequest = function endRequest() {
         // XXX this is where the request will be made
-        _isomorphicFetch2['default'](req.url, req).then(function (response) {
+        (0, _isomorphicFetch2.default)(req.url, req).then(function (response) {
           if (response.status >= 200 && response.status < 300) {
             res = response;
 
             response.json().then(function (body) {
               res.body = body;
-            })['catch'](function (err) {
+            }).catch(function (err) {
               res.body = {};
             }).then(function () {
               beginResponse();
@@ -221,15 +220,16 @@ var Papi = (function (_ResourceSchema) {
   };
 
   return Papi;
-})(_resourceSchema2['default']);
+})(_resourceSchema2.default);
 
-exports['default'] = Papi;
+// <= IE10, does not support static method inheritance
+
+exports.default = Papi;
 if (Papi.defineSchema == undefined) {
-  Papi.defineSchema = _resourceSchema2['default'].defineSchema;
+  Papi.defineSchema = _resourceSchema2.default.defineSchema;
 }
 
-Papi.defineSchema().resource('accounts').open().get('available', { on: 'resource' }).post('become', { on: 'member' }).resource('users').resource('hubs', { link: 'hubs' }).close().resource('organizations').open().resource('users').resource('hubs').resource('invites').close().resource('posts', { routeSegment: '/stream/posts/:id' }).resource('hubs').open().get('search', { on: 'resource' }).post('upgrade', { on: 'member' }).post('accept_invite', { on: 'member' }).post('reject_invite', { on: 'member' }).resource('apps').open().get('current', { on: 'resource', path: '/current' }).get('build', { on: 'member', path: '/build_app' }).get('status', { on: 'member' }).resource('styles').close().resource('addons').open().resource('configs').close().resource('analytics').open().get('summary', { on: 'resource' }).get('visitors', { on: 'resource' }).get('pageviews', { on: 'resource' }).get('duration', { on: 'resource' }).close().resource('feeds').open().resource('assets', { modelName: 'FeedAsset' }).close().resource('invites').open().post('bulk_invite', { on: 'resource' }).post('resend', { on: 'member' }).post('accept', { on: 'member', routeSegment: '/invites/:hash' }).post('reject', { on: 'member', routeSegment: '/invites/:hash' }).close().resource('recommendations').resource('users').open().post('grant_access', { on: 'resource' })['delete']('revoke_access', { on: 'member' }).close().resource('collections').open().put('reorder', { on: 'resource' }).close().resource('tags').resource('assets', { routeSegment: '/stream/:id' }).open().put('feature', { on: 'member' }).put('unfeature', { on: 'member' }).put('hide', { on: 'member' }).put('unhide', { on: 'member' }).put('lock', { on: 'member' }).put('unlock', { on: 'member' }).resource('likes').resource('comments').close().resource('drafts').open().put('publish', { on: 'member' }).close().close().resource('invites').open().get('incoming', { on: 'resource' }).get('outgoing', { on: 'resource' }).post('bulk_invite', { on: 'resource' }).post('resend', { on: 'member' }).post('accept', { on: 'member', key: 'hash' }).post('reject', { on: 'member', key: 'hash' }).close().resource('code_revisions').open().get('fetch_repo', { on: 'member' })
+Papi.defineSchema().resource('accounts').open().get('available', { on: 'resource' }).post('become', { on: 'member' }).resource('users').resource('hubs', { link: 'hubs' }).close().resource('organizations').open().resource('users').resource('hubs').resource('invites').close().resource('posts', { routeSegment: '/stream/posts/:id' }).resource('hubs').open().get('search', { on: 'resource' }).post('upgrade', { on: 'member' }).post('accept_invite', { on: 'member' }).post('reject_invite', { on: 'member' }).resource('apps').open().get('current', { on: 'resource', path: '/current' }).get('build', { on: 'member', path: '/build_app' }).get('status', { on: 'member' }).resource('styles').close().resource('addons').open().resource('configs').close().resource('analytics').open().get('summary', { on: 'resource' }).get('visitors', { on: 'resource' }).get('pageviews', { on: 'resource' }).get('duration', { on: 'resource' }).close().resource('feeds').open().resource('assets', { modelName: 'FeedAsset' }).close().resource('invites').open().post('bulk_invite', { on: 'resource' }).post('resend', { on: 'member' }).post('accept', { on: 'member', routeSegment: '/invites/:hash' }).post('reject', { on: 'member', routeSegment: '/invites/:hash' }).close().resource('recommendations').resource('users').open().post('grant_access', { on: 'resource' }).delete('revoke_access', { on: 'member' }).close().resource('collections').open().put('reorder', { on: 'resource' }).close().resource('tags').resource('assets', { routeSegment: '/stream/:id' }).open().put('feature', { on: 'member' }).put('unfeature', { on: 'member' }).put('hide', { on: 'member' }).put('unhide', { on: 'member' }).put('lock', { on: 'member' }).put('unlock', { on: 'member' }).resource('likes').resource('comments').close().resource('drafts').open().put('publish', { on: 'member' }).close().close().resource('invites').open().get('incoming', { on: 'resource' }).get('outgoing', { on: 'resource' }).post('bulk_invite', { on: 'resource' }).post('resend', { on: 'member' }).post('accept', { on: 'member', key: 'hash' }).post('reject', { on: 'member', key: 'hash' }).close().resource('code_revisions').open().get('fetch_repo', { on: 'member' })
 
 // This resource links to the root hubs resource
 .resource('hubs', { link: 'hubs' }).close().resource('signup').open().get('account_uid_available', { on: 'member' }).get('account_email_available', { on: 'member' }).close().resource('users').open().get('roles', { on: 'resource' }).resource('hubs').resource('organizations').close().resource('discover').open().resource('users', { link: 'users' }).resource('organizations', { link: 'organizations' }).resource('hubs', { link: 'hubs' }).resource('posts').close().resource('stream').open().resource('following').close();
-module.exports = exports['default'];

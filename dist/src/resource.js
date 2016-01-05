@@ -1,9 +1,12 @@
 'use strict';
 
 //import {map, each, detect, where, findWhere, extend, clone, isEmpty, isArray, isObject, isNumber} from 'lodash';
+
 exports.__esModule = true;
 
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.constructor === Symbol ? "symbol" : typeof obj; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var map = require('lodash/collection/map');
 var each = require('lodash/collection/each');
@@ -316,11 +319,12 @@ var Resource = (function () {
         return resource.hydrateModel(data, { newRecord: true });
       },
 
-      $add: function $add(model, idx) {
-        if (model === undefined) model = {};
+      $add: function $add() {
+        var model = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+        var idx = arguments[1];
         var applySorting = arguments.length <= 2 || arguments[2] === undefined ? false : arguments[2];
 
-        if (typeof model == 'object' && !(model instanceof _this5.constructor.modelClass)) {
+        if ((typeof model === 'undefined' ? 'undefined' : _typeof(model)) == 'object' && !(model instanceof _this5.constructor.modelClass)) {
           model = collection.$create(model);
         }
 
@@ -361,7 +365,7 @@ var Resource = (function () {
       },
 
       $reposition: function $reposition(fromIdx, toIdx) {
-        if (fromIdx != toIdx && (fromIdx >= 0 && fromIdx < collection.length) && (toIdx >= 0 && toIdx < collection.length)) {
+        if (fromIdx != toIdx && fromIdx >= 0 && fromIdx < collection.length && toIdx >= 0 && toIdx < collection.length) {
           var model = collection.$remove(fromIdx);
 
           if (model) {
@@ -391,5 +395,4 @@ var Resource = (function () {
   return Resource;
 })();
 
-exports['default'] = Resource;
-module.exports = exports['default'];
+exports.default = Resource;

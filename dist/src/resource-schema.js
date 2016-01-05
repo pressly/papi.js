@@ -1,15 +1,8 @@
 'use strict';
 
 //import {map, each, select, extend, last, capitalize, isObject, isArray, isEmpty} from 'lodash';
+
 exports.__esModule = true;
-
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj['default'] = obj; return newObj; } }
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
 var _resource = require('./resource');
 
@@ -18,6 +11,16 @@ var _resource2 = _interopRequireDefault(_resource);
 var _models = require('./models');
 
 var models = _interopRequireWildcard(_models);
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var map = require('lodash/collection/map');
 var each = require('lodash/collection/each');
@@ -115,7 +118,7 @@ var ResourceSchema = (function () {
     }
 
     var name = last(key.split('.'));
-    var params = isObject(arguments[1]) && !(arguments[1] instanceof _resource2['default']) ? arguments[1] : undefined;
+    var params = isObject(arguments[1]) && !(arguments[1] instanceof _resource2.default) ? arguments[1] : undefined;
     var parentResource = arguments[2] || !params && arguments[1] || undefined;
 
     if (parentResource) {
@@ -132,7 +135,7 @@ var ResourceSchema = (function () {
   return ResourceSchema;
 })();
 
-exports['default'] = ResourceSchema;
+exports.default = ResourceSchema;
 ;
 
 ResourceSchema.defineSchema = function () {
@@ -168,11 +171,11 @@ ResourceSchema.defineSchema = function () {
           function resourceClass() {
             _classCallCheck(this, resourceClass);
 
-            _Resource.apply(this, arguments);
+            return _possibleConstructorReturn(this, _Resource.apply(this, arguments));
           }
 
           return resourceClass;
-        })(_resource2['default']);
+        })(_resource2.default);
 
         resourceClass.definition = def;
         resourceClass.modelClass = models[def.modelName] || models.Base;
@@ -202,15 +205,15 @@ ResourceSchema.defineSchema = function () {
             //console.log(`- adding collection action to ${parentPointer.current.key}:`, method, name);
 
             resourceClass.prototype['$' + name] = function () {
-              var _this = this;
+              var _this2 = this;
 
               var data = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
 
               return this.request(extend({ method: method, path: options.path || '/' + name }, { data: data })).then(function (res) {
                 if (isArray(res)) {
-                  return _this.hydrateCollection(res);
+                  return _this2.hydrateCollection(res);
                 } else {
-                  return _this.hydrateModel(res);
+                  return _this2.hydrateModel(res);
                 }
               });
             };
@@ -222,12 +225,12 @@ ResourceSchema.defineSchema = function () {
             //console.log(`- adding member action to ${parentPointer.current.key}:`, method, name);
 
             modelClass.prototype['$' + name] = function () {
-              var _this2 = this;
+              var _this3 = this;
 
               var data = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
 
               return this.$resource().request(extend({ method: method, path: options.path || '/' + name }, { data: data })).then(function (res) {
-                return _this2.$resource().hydrateModel(res);
+                return _this3.$resource().hydrateModel(res);
               });
             };
           }
@@ -252,7 +255,7 @@ ResourceSchema.defineSchema = function () {
         return this.action.call(this, 'patch', arguments[0], arguments[1]);
       },
 
-      'delete': function _delete() {
+      delete: function _delete() {
         return this.action.call(this, 'delete', arguments[0], arguments[1]);
       }
     };
@@ -334,4 +337,3 @@ ResourceSchema.defineSchema = function () {
 //
 //   console.log(markdown);
 // };
-module.exports = exports['default'];

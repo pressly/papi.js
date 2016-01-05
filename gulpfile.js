@@ -13,13 +13,15 @@ gulp.task('build:clean', function(cb) {
 
 gulp.task('build:es6', function() {
   return gulp.src('src/**/*.js')
-    //.pipe(babel({loose: 'all', optional: ['runtime']}))
-    .pipe(require('gulp-babel')({loose: 'all'}))
+    //.pipe(require('gulp-babel')({loose: 'all'}))
+    .pipe(require('gulp-babel')({
+      presets: ['es2015-loose']
+    }))
     .pipe(gulp.dest('build/src'));
 });
 
 gulp.task('build:bundle', function () {
-  return require('browserify')({ entries: './build/src/index.js', standalone: 'Papi' })
+  return require('browserify')({ entries: './build/src/index.js', standalone: 'Papi'})
     .bundle()
     .pipe(require('vinyl-source-stream')('papi.js'))
     .pipe(gulp.dest('build'))

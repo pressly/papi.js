@@ -1,9 +1,10 @@
 'use strict';
 
 //import {extend, filter, pick, difference, keys, functions} from 'lodash';
+
 exports.__esModule = true;
 
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var extend = require('lodash/object/extend');
 var keys = require('lodash/object/keys');
@@ -53,5 +54,4 @@ var Model = (function () {
   return Model;
 })();
 
-exports['default'] = Model;
-module.exports = exports['default'];
+exports.default = Model;
