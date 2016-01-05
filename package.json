@@ -22,6 +22,7 @@
     "isomorphic-fetch": "2.2.0",
     "lodash": "3.10.1",
     "qs": "5.2.0",
+    "querystring": "^0.2.0",
     "xdomain": "0.7.3"
   },
   "devDependencies": {
