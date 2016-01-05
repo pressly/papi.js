@@ -14,9 +14,7 @@ gulp.task('build:clean', function(cb) {
 gulp.task('build:es6', function() {
   return gulp.src('src/**/*.js')
     //.pipe(require('gulp-babel')({loose: 'all'}))
-    .pipe(require('gulp-babel')({
-      presets: ['es2015-loose']
-    }))
+    .pipe(require('gulp-babel')())
     .pipe(gulp.dest('build/src'));
 });
 
