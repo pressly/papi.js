@@ -34,7 +34,7 @@ export default class Papi extends ResourceSchema {
 
       get: () => {
         return this.request('get', '/session').then((res) => {
-          return this.auth.set(res.body);
+          return this.auth.set(res.data);
         });
       },
 
@@ -60,7 +60,7 @@ export default class Papi extends ResourceSchema {
 
       login: (email, password) => {
         return this.request('post', '/auth/login', { data: { email, password } }).then((res) => {
-          return this.auth.set(res.body);
+          return this.auth.set(res.data);
         });
       },
 
@@ -147,16 +147,18 @@ export default class Papi extends ResourceSchema {
           if (response.status >= 200 && response.status < 300) {
             res = response;
 
-            response.json().then((body) => {
-              res.body = body;
+            response.json().then((data) => {
+              res.data = data;
             }).catch((err) => {
-              res.body = {};
+              res.data = {};
             }).then(() => {
               beginResponse();
             });
           } else {
             return reject(response);
           }
+        }).catch((err) => {
+          return reject(err);
         });
       };
 

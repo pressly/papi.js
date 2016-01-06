@@ -113,7 +113,7 @@ var Resource = (function () {
 
     return this.api.request(options.method || 'get', this.buildRoute(options.path), extend({}, this.options, { query: extend({}, this.route.queryParams, options.query), data: options.data })).then(function (res) {
       _this2.setResponse(res);
-      return res.body;
+      return res.data;
     });
   };
 
@@ -263,7 +263,7 @@ var Resource = (function () {
 
             var method = options.append ? 'push' : 'unshift';
 
-            each(res.body, function (item) {
+            each(res.data, function (item) {
               collection[method](_this5.hydrateModel(item));
             });
 

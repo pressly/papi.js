@@ -58,7 +58,7 @@ var Papi = (function (_ResourceSchema) {
 
       get: function get() {
         return _this.request('get', '/session').then(function (res) {
-          return _this.auth.set(res.body);
+          return _this.auth.set(res.data);
         });
       },
 
@@ -84,7 +84,7 @@ var Papi = (function (_ResourceSchema) {
 
       login: function login(email, password) {
         return _this.request('post', '/auth/login', { data: { email: email, password: password } }).then(function (res) {
-          return _this.auth.set(res.body);
+          return _this.auth.set(res.data);
         });
       },
 
@@ -176,16 +176,18 @@ var Papi = (function (_ResourceSchema) {
           if (response.status >= 200 && response.status < 300) {
             res = response;
 
-            response.json().then(function (body) {
-              res.body = body;
+            response.json().then(function (data) {
+              res.data = data;
             }).catch(function (err) {
-              res.body = {};
+              res.data = {};
             }).then(function () {
               beginResponse();
             });
           } else {
             return reject(response);
           }
+        }).catch(function (err) {
+          return reject(err);
         });
       };
 

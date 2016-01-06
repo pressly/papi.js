@@ -12,15 +12,6 @@ api.auth.set({jwt: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNTRmMGR
 
 var mockRequest = nock(api.options.host).matchHeader('authorization', function() { return `Bearer ${api.auth.session.jwt}`; });
 
-// /** Stream Assets Requests **************************************************/
-// // all
-// .get(`/hubs/${mock.hubs[0].id}/stream`).reply(200, mock.assets)
-//
-// .get(`/hubs/${mock.hubs[0].id}/stream?slug=some-slug`).times(3).reply(200, mock.assets[0])
-//
-// .get(`/hubs/${mock.hubs[0].id}/stream/${mock.assets[0].id}/comments`).reply(200, mock.comments)
-
-
 describe('Stream Assets Resource', function() {
   it('should allow assets with custom routeSegment', function(done) {
     mockRequest.get(`/hubs/${mock.hubs[0].id}/stream`).reply(200, mock.assets);
