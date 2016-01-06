@@ -3,12 +3,6 @@
 import fetch from 'isomorphic-fetch';
 import ResourceSchema from './resource-schema';
 
-// var fetch = function() {
-//   return new Promise((resolve, reject) => {
-//     resolve({status: 200, body: {}, body});
-//   })
-// };
-
 // Query string parser and stringifier
 import qs from 'querystring';
 

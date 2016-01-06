@@ -141,6 +141,7 @@ exports.default = ResourceSchema;
 ResourceSchema.defineSchema = function () {
   var API = this;
 
+  API.models = models;
   API.resourceClasses = {};
 
   var pointer = function pointer(bucket, parentPointer) {

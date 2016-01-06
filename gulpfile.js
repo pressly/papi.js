@@ -5,6 +5,7 @@ var runSequence = require('run-sequence');
 /** BUILD *********************************************************************/
 gulp.task('build', function(cb) {
   return runSequence('build:clean', 'build:es6', 'build:bundle', cb);
+  //return runSequence('build:clean', 'build:bundle-babelify', cb);
 });
 
 gulp.task('build:clean', function(cb) {
@@ -26,6 +27,14 @@ gulp.task('build:bundle', function () {
     .pipe(connect.reload());
 });
 
+gulp.task('build:bundle-babelify', function () {
+  return require('browserify')({ entries: './src/index.js', standalone: 'Papi'})
+    .transform('babelify')
+    .bundle()
+    .pipe(require('vinyl-source-stream')('papi.js'))
+    .pipe(gulp.dest('build'))
+    .pipe(connect.reload());
+});
 
 /** DIST **********************************************************************/
 gulp.task('dist', ['build'], function(cb) {

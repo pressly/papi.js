@@ -2,4 +2,5 @@
 --reporter spec
 --ui bdd
 --recursive
+--bail
 --compilers js:babel-register
