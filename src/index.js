@@ -1,5 +1,7 @@
 'use strict';
 
+require('es6-promise').polyfill();
+
 import fetch from 'isomorphic-fetch';
 import ResourceSchema from './resource-schema';
 
