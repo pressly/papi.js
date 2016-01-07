@@ -150,7 +150,7 @@ export default class Papi extends ResourceSchema {
             res = response;
 
             response.json().then((data) => {
-              res.data = data;
+              res.data = data || {};
             }).catch((err) => {
               res.data = {};
             }).then(() => {

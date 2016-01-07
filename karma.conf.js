@@ -36,7 +36,6 @@ module.exports = function(config) {
       extensions: ['.js']
     },
 
-
     // test results reporter to use
     // possible values: 'dots', 'progress'
     // available reporters: https://npmjs.org/browse/keyword/karma-reporter
@@ -60,13 +59,59 @@ module.exports = function(config) {
     autoWatch: true,
 
 
+    browserStack: {
+      username: 'jeffbrenner',
+      accessKey: 'Spvs8gA6h4HkqR9Ttz3r'
+    },
+
+    // define browsers
+    customLaunchers: {
+      bs_firefox_mac: {
+        base: 'BrowserStack',
+        browser: 'firefox',
+        browser_version: '21.0',
+        os: 'OS X',
+        os_version: 'Mountain Lion'
+      },
+      bs_iphone5: {
+        base: 'BrowserStack',
+        device: 'iPhone 5',
+        os: 'ios',
+        os_version: '6.0'
+      },
+      bs_ie11_windows8: {
+        base: 'BrowserStack',
+        browser: 'ie',
+        browser_version: '11',
+        os: 'Windows',
+        os_version: '8.1'
+      },
+      bs_ie10_windows7: {
+        base: 'BrowserStack',
+        browser: 'ie',
+        browser_version: '10',
+        os: 'Windows',
+        os_version: '7'
+      },
+      bs_ie9_windows7: {
+        base: 'BrowserStack',
+        browser: 'ie',
+        browser_version: '9',
+        os: 'Windows',
+        os_version: '7'
+      }
+    },
+
+
     // start these browsers
     // available browser launchers: https://npmjs.org/browse/keyword/karma-launcher
     //browsers: ['Chrome', 'Firefox', 'PhantomJS'],
-    browsers: ['Chrome'],
+    //browsers: ['Firefox'],
+    //browsers: ['bs_firefox_mac', 'bs_iphone5', 'bs_ie11_windows8', 'bs_ie10_windows7', 'bs_ie9_windows7'],
+    browsers: ['bs_ie9_windows7'],
 
     // Continuous Integration mode
     // if true, Karma captures browsers, runs the tests and exits
-    singleRun: false
+    singleRun: true
   })
 }
