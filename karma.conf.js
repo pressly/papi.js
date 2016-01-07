@@ -66,6 +66,13 @@ module.exports = function(config) {
 
     // define browsers
     customLaunchers: {
+      bs_chrome_mac: {
+        base: 'BrowserStack',
+        browser: 'chrome',
+        browser_version: '47.0',
+        os: 'OS X',
+        os_version: 'El Capitan'
+      },
       bs_firefox_mac: {
         base: 'BrowserStack',
         browser: 'firefox',
@@ -108,7 +115,7 @@ module.exports = function(config) {
     //browsers: ['Chrome', 'Firefox', 'PhantomJS'],
     //browsers: ['Firefox'],
     //browsers: ['bs_firefox_mac', 'bs_iphone5', 'bs_ie11_windows8', 'bs_ie10_windows7', 'bs_ie9_windows7'],
-    browsers: ['bs_ie9_windows7'],
+    browsers: ['bs_chrome_mac', 'bs_ie11_windows8', 'bs_ie9_windows7'],
 
     // Continuous Integration mode
     // if true, Karma captures browsers, runs the tests and exits

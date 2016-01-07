@@ -2,10 +2,13 @@
 
 require('es6-promise').polyfill();
 
-import fetch from 'isomorphic-fetch';
-import ResourceSchema from './resource-schema';
+import _fetch from 'isomorphic-fetch';
+if (!global.fetch) {
+  global.fetch = _fetch;
+}
 
-// Query string parser and stringifier
+// Query string parser and stringifier -- fetch does not support any query string
+// parsing so we need to handle it separately.
 import qs from 'querystring';
 
 var extend =      require('lodash/object/extend');
@@ -14,6 +17,8 @@ var isEmpty =     require('lodash/lang/isEmpty');
 function hasXDomain() {
   return typeof window !== 'undefined' && window.xdomain != null;
 }
+
+import ResourceSchema from './resource-schema';
 
 export default class Papi extends ResourceSchema {
   constructor(options = {}) {
