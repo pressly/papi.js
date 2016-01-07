@@ -1,5 +1,5 @@
 import mockRequest from '../../lib/mock-request';
- 
+
 //import nock from 'nock'; // Needs to be imported first before papi because it overrides http and so does node-fetch
 
 import Papi from '../../src';
@@ -23,6 +23,7 @@ describe('Hubs Resource', function () {
 
     api.$resource('hubs').$all().then((res) => {
       res.should.not.be.empty;
+      should(res.length).equal(6);
       res[0].should.instanceOf(models.Hub);
       should(res[0].$newRecord).not.equal(true);
 
@@ -68,7 +69,7 @@ describe('Hubs Resource', function () {
     mockRequest.get('/hubs?limit=3').reply(200, mock.hubs.slice(0, 3));
 
     api.$resource('hubs').limit(3).$all().then((res) => {
-      res.length.should.equal(3);
+      should(res.length).equal(3);
       res[0].should.instanceOf(models.Hub);
 
       done();

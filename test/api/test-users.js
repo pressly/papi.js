@@ -36,7 +36,7 @@ describe('Users Resource', function () {
 
     api.$resource('users').$find(mock.users[0].id).then((res) => {
       res.should.instanceOf(models.User);
-      res.id.should.equal(mock.users[0].id);
+      should(res.id).equal(mock.users[0].id);
       should(res.$newRecord).not.equal(true);
 
       done();
@@ -63,7 +63,7 @@ describe('Users Resource', function () {
 
     api.$resource('users', { id: mock.users[0].id }).$find().then((res) => {
       res.should.instanceOf(models.User);
-      res.id.should.equal(mock.users[0].id);
+      should(res.id).equal(mock.users[0].id);
 
       done();
     }).catch((err) => {

@@ -23,7 +23,7 @@ describe('Organizations Resource', function () {
       res.should.not.be.empty;
       res[0].should.instanceOf(models.Organization);
       should(res[0].$newRecord).not.equal(true);
-
+      should(res.length).equal(1);
       should.exist(res.$nextPage);
 
       done();
@@ -37,7 +37,7 @@ describe('Organizations Resource', function () {
 
     api.$resource('organizations').$find(mock.organizations[0].id).then((res) => {
       res.should.instanceOf(models.Organization);
-      res.id.should.equal(mock.organizations[0].id);
+      should(res.id).equal(mock.organizations[0].id);
       should(res.$newRecord).not.equal(true);
 
       done();
@@ -51,7 +51,7 @@ describe('Organizations Resource', function () {
 
     api.$resource('organizations', { id: mock.organizations[0].id }).$find().then((res) => {
       res.should.instanceOf(models.Organization);
-      res.id.should.equal(mock.organizations[0].id);
+      should(res.id).equal(mock.organizations[0].id);
 
       done();
     }).catch((err) => {

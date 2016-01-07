@@ -36,11 +36,11 @@ describe('Collections', function() {
   });
 
   it('should add a new model', function(done) {
-    collection.length.should.equal(mock.hubs.length);
+    should(collection.length).equal(mock.hubs.length);
     var model = collection.$create({ name: 'Hello' });
 
     collection.$add(model);
-    collection.length.should.equal(mock.hubs.length + 1);
+    should(collection.length).equal(mock.hubs.length + 1);
 
     done();
   });
@@ -49,16 +49,16 @@ describe('Collections', function() {
     var model = _.last(collection);
 
     collection.$remove(model);
-    collection.length.should.equal(mock.hubs.length);
+    should(collection.length).equal(mock.hubs.length);
 
     done();
   });
 
   it('should add a new model at an index', function(done) {
-    collection.length.should.equal(mock.hubs.length);
+    should(collection.length).equal(mock.hubs.length);
     var model = collection.$create({ name: 'Hello' });
     collection.$add(model, 3);
-    collection.length.should.equal(mock.hubs.length + 1);
+    should(collection.length).equal(mock.hubs.length + 1);
     collection[3].should.equal(model);
 
     done();
@@ -67,7 +67,7 @@ describe('Collections', function() {
   it('should remove a model at an index', function(done) {
     var model = collection.$remove(3);
     model.name.should.equal('Hello');
-    collection.length.should.equal(mock.hubs.length);
+    should(collection.length).equal(mock.hubs.length);
 
     done();
   });
@@ -82,7 +82,7 @@ describe('Collections', function() {
     collection.$reposition(1, mock.hubs.length);
     collection[mock.hubs.length].should.equal(model);
 
-    collection.length.should.equal(mock.hubs.length + 1);
+    should(collection.length).equal(mock.hubs.length + 1);
 
     done();
   });
@@ -108,7 +108,7 @@ describe('Collections', function() {
     var model = collection.$find(mock.hubs[0].id);
 
     collection.$delete(model).then((res) => {
-      collection.length.should.equal(mock.hubs.length);
+      should(collection.length).equal(mock.hubs.length);
 
       done();
     }).catch((err) => {
@@ -122,8 +122,8 @@ describe('Collections', function() {
     var model = collection.$create({name: 'Hello'});
     model.$save().then(function() {
       model.name.should.equal('Hello');
-      model.id.should.equal(1234);
-      model.$resource().route.params.id.should.equal(1234);
+      should(model.id).equal(1234);
+      should(model.$resource().route.params.id).equal(1234);
 
       done();
     }).catch((err) => {
