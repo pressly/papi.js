@@ -1155,8 +1155,6 @@ if (typeof this.define === "function" && this.define.amd) {
 (function (global){
 'use strict';
 
-exports.__esModule = true;
-
 var _isomorphicFetch = require('isomorphic-fetch');
 
 var _isomorphicFetch2 = _interopRequireDefault(_isomorphicFetch);
@@ -1386,9 +1384,9 @@ var Papi = (function (_ResourceSchema) {
   return Papi;
 })(_resourceSchema2.default);
 
-// <= IE10, does not support static method inheritance
+module.exports = Papi;
 
-exports.default = Papi;
+// <= IE10, does not support static method inheritance
 if (Papi.defineSchema == undefined) {
   Papi.defineSchema = _resourceSchema2.default.defineSchema;
 }
