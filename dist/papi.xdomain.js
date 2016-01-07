@@ -1152,6 +1152,7 @@ if (typeof this.define === "function" && this.define.amd) {
 
 }.call(this,window));
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.Papi = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+(function (global){
 'use strict';
 
 exports.__esModule = true;
@@ -1160,13 +1161,13 @@ var _isomorphicFetch = require('isomorphic-fetch');
 
 var _isomorphicFetch2 = _interopRequireDefault(_isomorphicFetch);
 
-var _resourceSchema = require('./resource-schema');
-
-var _resourceSchema2 = _interopRequireDefault(_resourceSchema);
-
 var _querystring = require('querystring');
 
 var _querystring2 = _interopRequireDefault(_querystring);
+
+var _resourceSchema = require('./resource-schema');
+
+var _resourceSchema2 = _interopRequireDefault(_resourceSchema);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -1178,7 +1179,12 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 require('es6-promise').polyfill();
 
-// Query string parser and stringifier
+if (!global.fetch) {
+  global.fetch = _isomorphicFetch2.default;
+}
+
+// Query string parser and stringifier -- fetch does not support any query string
+// parsing so we need to handle it separately.
 
 var extend = require('lodash/object/extend');
 var isEmpty = require('lodash/lang/isEmpty');
@@ -1328,12 +1334,12 @@ var Papi = (function (_ResourceSchema) {
 
       var endRequest = function endRequest() {
         // XXX this is where the request will be made
-        (0, _isomorphicFetch2.default)(req.url, req).then(function (response) {
+        fetch(req.url, req).then(function (response) {
           if (response.status >= 200 && response.status < 300) {
             res = response;
 
             response.json().then(function (data) {
-              res.data = data;
+              res.data = data || {};
             }).catch(function (err) {
               res.data = {};
             }).then(function () {
@@ -1391,6 +1397,7 @@ Papi.defineSchema().resource('accounts').open().get('available', { on: 'resource
 
 // This resource links to the root hubs resource
 .resource('hubs', { link: 'hubs' }).close().resource('signup').open().get('account_uid_available', { on: 'member' }).get('account_email_available', { on: 'member' }).close().resource('users').open().get('roles', { on: 'resource' }).resource('hubs').resource('organizations').close().resource('discover').open().resource('users', { link: 'users' }).resource('organizations', { link: 'organizations' }).resource('hubs', { link: 'hubs' }).resource('posts').close().resource('stream').open().resource('following').close();
+}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{"./resource-schema":21,"es6-promise":23,"isomorphic-fetch":24,"lodash/lang/isEmpty":110,"lodash/object/extend":118,"querystring":130}],2:[function(require,module,exports){
 'use strict';
 

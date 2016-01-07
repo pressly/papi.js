@@ -6,13 +6,13 @@ var _isomorphicFetch = require('isomorphic-fetch');
 
 var _isomorphicFetch2 = _interopRequireDefault(_isomorphicFetch);
 
-var _resourceSchema = require('./resource-schema');
-
-var _resourceSchema2 = _interopRequireDefault(_resourceSchema);
-
 var _querystring = require('querystring');
 
 var _querystring2 = _interopRequireDefault(_querystring);
+
+var _resourceSchema = require('./resource-schema');
+
+var _resourceSchema2 = _interopRequireDefault(_resourceSchema);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -24,7 +24,12 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 require('es6-promise').polyfill();
 
-// Query string parser and stringifier
+if (!global.fetch) {
+  global.fetch = _isomorphicFetch2.default;
+}
+
+// Query string parser and stringifier -- fetch does not support any query string
+// parsing so we need to handle it separately.
 
 var extend = require('lodash/object/extend');
 var isEmpty = require('lodash/lang/isEmpty');
@@ -174,12 +179,12 @@ var Papi = (function (_ResourceSchema) {
 
       var endRequest = function endRequest() {
         // XXX this is where the request will be made
-        (0, _isomorphicFetch2.default)(req.url, req).then(function (response) {
+        fetch(req.url, req).then(function (response) {
           if (response.status >= 200 && response.status < 300) {
             res = response;
 
             response.json().then(function (data) {
-              res.data = data;
+              res.data = data || {};
             }).catch(function (err) {
               res.data = {};
             }).then(function () {
