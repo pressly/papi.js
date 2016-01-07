@@ -88,7 +88,7 @@ export default class Resource {
   request(options = {}) {
     return this.api.request(options.method || 'get', this.buildRoute(options.path), extend({}, this.options, { query: extend({}, this.route.queryParams, options.query), data: options.data })).then((res) => {
       this.setResponse(res);
-      return res.body;
+      return res.data;
     });
   }
 
@@ -227,7 +227,7 @@ export default class Resource {
 
             var method = options.append ? 'push' : 'unshift';
 
-            each(res.body, (item) => {
+            each(res.data, (item) => {
               collection[method](this.hydrateModel(item));
             });
 

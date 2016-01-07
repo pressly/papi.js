@@ -2,76 +2,164 @@
 
 exports.__esModule = true;
 
-function _interopRequire(obj) { return obj && obj.__esModule ? obj['default'] : obj; }
-
 var _model = require('../model');
 
-exports.Base = _interopRequire(_model);
+Object.defineProperty(exports, 'Base', {
+  enumerable: true,
+  get: function get() {
+    return _model.default;
+  }
+});
 
 var _account = require('./account');
 
-exports.Account = _interopRequire(_account);
+Object.defineProperty(exports, 'Account', {
+  enumerable: true,
+  get: function get() {
+    return _account.default;
+  }
+});
 
 var _organization = require('./organization');
 
-exports.Organization = _interopRequire(_organization);
+Object.defineProperty(exports, 'Organization', {
+  enumerable: true,
+  get: function get() {
+    return _organization.default;
+  }
+});
 
 var _app = require('./app');
 
-exports.App = _interopRequire(_app);
+Object.defineProperty(exports, 'App', {
+  enumerable: true,
+  get: function get() {
+    return _app.default;
+  }
+});
 
 var _asset = require('./asset');
 
-exports.Asset = _interopRequire(_asset);
+Object.defineProperty(exports, 'Asset', {
+  enumerable: true,
+  get: function get() {
+    return _asset.default;
+  }
+});
 
 var _codeRevision = require('./code-revision');
 
-exports.CodeRevision = _interopRequire(_codeRevision);
+Object.defineProperty(exports, 'CodeRevision', {
+  enumerable: true,
+  get: function get() {
+    return _codeRevision.default;
+  }
+});
 
 var _collection = require('./collection');
 
-exports.Collection = _interopRequire(_collection);
+Object.defineProperty(exports, 'Collection', {
+  enumerable: true,
+  get: function get() {
+    return _collection.default;
+  }
+});
 
 var _comment = require('./comment');
 
-exports.Comment = _interopRequire(_comment);
+Object.defineProperty(exports, 'Comment', {
+  enumerable: true,
+  get: function get() {
+    return _comment.default;
+  }
+});
 
 var _draft = require('./draft');
 
-exports.Draft = _interopRequire(_draft);
+Object.defineProperty(exports, 'Draft', {
+  enumerable: true,
+  get: function get() {
+    return _draft.default;
+  }
+});
 
 var _feed = require('./feed');
 
-exports.Feed = _interopRequire(_feed);
+Object.defineProperty(exports, 'Feed', {
+  enumerable: true,
+  get: function get() {
+    return _feed.default;
+  }
+});
 
 var _feedAsset = require('./feed-asset');
 
-exports.FeedAsset = _interopRequire(_feedAsset);
+Object.defineProperty(exports, 'FeedAsset', {
+  enumerable: true,
+  get: function get() {
+    return _feedAsset.default;
+  }
+});
 
 var _hub = require('./hub');
 
-exports.Hub = _interopRequire(_hub);
+Object.defineProperty(exports, 'Hub', {
+  enumerable: true,
+  get: function get() {
+    return _hub.default;
+  }
+});
 
 var _invite = require('./invite');
 
-exports.Invite = _interopRequire(_invite);
+Object.defineProperty(exports, 'Invite', {
+  enumerable: true,
+  get: function get() {
+    return _invite.default;
+  }
+});
 
 var _like = require('./like');
 
-exports.Like = _interopRequire(_like);
+Object.defineProperty(exports, 'Like', {
+  enumerable: true,
+  get: function get() {
+    return _like.default;
+  }
+});
 
 var _recommendation = require('./recommendation');
 
-exports.Recommendation = _interopRequire(_recommendation);
+Object.defineProperty(exports, 'Recommendation', {
+  enumerable: true,
+  get: function get() {
+    return _recommendation.default;
+  }
+});
 
 var _style = require('./style');
 
-exports.Style = _interopRequire(_style);
+Object.defineProperty(exports, 'Style', {
+  enumerable: true,
+  get: function get() {
+    return _style.default;
+  }
+});
 
 var _tag = require('./tag');
 
-exports.Tag = _interopRequire(_tag);
+Object.defineProperty(exports, 'Tag', {
+  enumerable: true,
+  get: function get() {
+    return _tag.default;
+  }
+});
 
 var _user = require('./user');
 
-exports.User = _interopRequire(_user);
+Object.defineProperty(exports, 'User', {
+  enumerable: true,
+  get: function get() {
+    return _user.default;
+  }
+});

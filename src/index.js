@@ -1,14 +1,26 @@
 'use strict';
 
-import superagent from 'superagent';
-//import Promise from 'bluebird'; // XXX No longer require advanced features of bluebird. just use babels promise lib instead
-import ResourceSchema from './resource-schema';
+require('es6-promise').polyfill();
+
+import _fetch from 'isomorphic-fetch';
+if (!global.fetch) {
+  global.fetch = _fetch;
+}
+
+// Query string parser and stringifier -- fetch does not support any query string
+// parsing so we need to handle it separately.
+import qs from 'querystring';
+
+var extend =      require('lodash/object/extend');
+var isEmpty =     require('lodash/lang/isEmpty');
 
 function hasXDomain() {
   return typeof window !== 'undefined' && window.xdomain != null;
 }
 
-export default class Papi extends ResourceSchema {
+import ResourceSchema from './resource-schema';
+
+class Papi extends ResourceSchema {
   constructor(options = {}) {
     super(...arguments);
 
@@ -29,7 +41,7 @@ export default class Papi extends ResourceSchema {
 
       get: () => {
         return this.request('get', '/session').then((res) => {
-          return this.auth.set(res.body);
+          return this.auth.set(res.data);
         });
       },
 
@@ -55,7 +67,7 @@ export default class Papi extends ResourceSchema {
 
       login: (email, password) => {
         return this.request('post', '/auth/login', { data: { email, password } }).then((res) => {
-          return this.auth.set(res.body);
+          return this.auth.set(res.data);
         });
       },
 
@@ -77,52 +89,56 @@ export default class Papi extends ResourceSchema {
     return new Promise((resolve, reject) => {
       var url = /^(https?:)?\/\//.test(path) ? path : this.options.host + path;
 
-      // Doesn't allow the delete keyword because it is reserved
-      if (method == 'delete') {
-        method = 'del';
+      var req = {
+        url: url,
+        method: method,
+        headers: {},
+        query: {}
       }
 
-      var req = superagent[method](url);
-      var res = {};
+      req.headers['Content-Type'] = 'application/json';
 
-      req.set('Content-Type', 'application/json');
-
-      if (options.timeout || this.options.timeout) {
-        req.timeout(options.timeout || this.options.timeout);
-      }
+      // if (options.timeout || this.options.timeout) {
+      //   req.timeout(options.timeout || this.options.timeout);
+      // }
 
       // Allow sending cookies from origin
       if (typeof req.withCredentials == 'function' && !hasXDomain()) {
-        req.withCredentials();
+        req.credentials = 'include'
       }
 
       // Send Authorization header when we have a JSON Web Token set in the session
       if (this.auth.session && this.auth.session.jwt) {
-        req.set('Authorization', 'Bearer ' + this.auth.session.jwt)
+        req.headers['Authorization'] = 'Bearer ' + this.auth.session.jwt
       }
 
-      req.set('Accept', 'application/vnd.pressly.v0.12+json')
+      req.headers['Accept'] = 'application/vnd.pressly.v0.12+json'
 
       // Query params to be added to the url
       if (options.query) {
-        req.query(options.query);
+        extend(req.query, options.query);
       }
 
       // Data to send (with get requests these are converted into query params)
       if (options.data) {
         if (method == 'get') {
-          req.query(options.data);
+          extend(req.query, options.data);
         } else {
-          req.send(options.data);
+          req.body = JSON.stringify(options.data);
         }
       }
+
+      if (!isEmpty(req.query)) {
+        req.url += '?' + qs.stringify(req.query);
+      }
+
+      var res = {};
 
       var beginRequest = () => {
         if (this.requestMiddlewares.length) {
           var offset = 0;
           var next = () => {
             var layer = this.requestMiddlewares[++offset] || endRequest;
-            req.next = next;
             return layer(req, res, next, resolve, reject);
           };
 
@@ -133,13 +149,23 @@ export default class Papi extends ResourceSchema {
       };
 
       var endRequest = () => {
-        req.end((err, completedRes) => {
-          if (err) {
-            return reject(err);
+        // XXX this is where the request will be made
+        fetch(req.url, req).then((response) => {
+          if (response.status >= 200 && response.status < 300) {
+            res = response;
+
+            response.json().then((data) => {
+              res.data = data || {};
+            }).catch((err) => {
+              res.data = {};
+            }).then(() => {
+              beginResponse();
+            });
           } else {
-            res = completedRes;
-            beginResponse();
+            return reject(response);
           }
+        }).catch((err) => {
+          return reject(err);
         });
       };
 
@@ -148,7 +174,6 @@ export default class Papi extends ResourceSchema {
           var offset = 0;
           var next = () => {
             var layer = this.responseMiddlewares[++offset] || endResponse;
-            req.next = next;
             return layer(req, res, next, resolve, reject);
           };
 
@@ -174,6 +199,8 @@ export default class Papi extends ResourceSchema {
     this.responseMiddlewares.push(middleware);
   }
 }
+
+module.exports = Papi;
 
 // <= IE10, does not support static method inheritance
 if (Papi.defineSchema == undefined) {
