@@ -21,6 +21,7 @@ module.exports = function(config) {
 
     // list of files / patterns to load in the browser
     files: [
+      './node_modules/phantomjs-polyfill/bind-polyfill.js',
       'test/**/*.js'
     ],
 
@@ -120,10 +121,10 @@ module.exports = function(config) {
     // start these browsers
     // available browser launchers: https://npmjs.org/browse/keyword/karma-launcher
     //browsers: ['Chrome', 'Firefox', 'PhantomJS'],
-    //browsers: ['Chrome'],
+    browsers: ['PhantomJS'],
     //browsers: ['bs_firefox_mac', 'bs_iphone5', 'bs_ie11_windows8', 'bs_ie10_windows7', 'bs_ie9_windows7'],
     //browsers: ['bs_chrome_mac', 'bs_ie11_windows8', 'bs_ie9_windows7'],
-    browsers: ['bs_ie9_windows7'],
+    //browsers: ['bs_ie9_windows7'],
 
     // Continuous Integration mode
     // if true, Karma captures browsers, runs the tests and exits
