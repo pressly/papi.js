@@ -20,7 +20,7 @@ function hasXDomain() {
 
 import ResourceSchema from './resource-schema';
 
-export default class Papi extends ResourceSchema {
+class Papi extends ResourceSchema {
   constructor(options = {}) {
     super(...arguments);
 
@@ -199,6 +199,8 @@ export default class Papi extends ResourceSchema {
     this.responseMiddlewares.push(middleware);
   }
 }
+
+module.exports = Papi;
 
 // <= IE10, does not support static method inheritance
 if (Papi.defineSchema == undefined) {
