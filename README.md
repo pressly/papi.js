@@ -30,13 +30,13 @@ This will expose the `Papi` class globally.
 
 ## API Docs
 
-1. Login to https://beta.pressly.com
-2. View docs at: https://beta-api.pressly.com/docs
+1. Login to https://pressly.com
+2. View docs at: https://api.pressly.com/docs
 
 ## Getting a JWT
 
-1. Login to https://beta.pressly.com
-2. Visit https://beta-api.pressly.com/auth/session and copy the `jwt` string
+1. Login to https://pressly.com
+2. Visit https://api.pressly.com/auth/session and copy the `jwt` string
 
 ## Connection
 
@@ -52,11 +52,11 @@ var api = new Papi();
 You can also optionally specify options.
 
 #### Options
-- **host** | String | defaults to 'https://beta-api.pressly.com'
+- **host** | String | defaults to 'https://api.pressly.com'
 - **timeout** | Integer | Global timeout in ms for all requests
 
 ```javascript
-var api = new Papi({ host: 'https://dev-api.pressly.com', timeout: 20000 });
+var api = new Papi({ host: 'https://staging-api.pressly.com', timeout: 20000 });
 ```
 
 ## Authentication
