@@ -1,12 +1,11 @@
 'use strict'
 
-import {map, each, filter, extend, last, capitalize, isObject, isArray, isEmpty} from 'lodash';
+import {map, each, filter, extend, last, isObject, isArray, isEmpty} from 'lodash';
 // var map =         require('lodash/collection/map');
 // var each =        require('lodash/collection/each');
 // var filter =      require('lodash/collection/filter');
 // var extend =      require('lodash/object/extend');
 // var last =        require('lodash/array/last');
-// var capitalize =  require('lodash/string/capitalize');
 // var isObject =    require('lodash/lang/isObject');
 // var isArray =     require('lodash/lang/isArray');
 // var isEmpty =     require('lodash/lang/isEmpty');
@@ -16,6 +15,10 @@ import * as models from './models';
 
 function singularize(string) {
   return string.replace(/s$/, '');
+}
+
+function capitalize(string) {
+  return string.charAt(0).toUpperCase() + string.slice(1);
 }
 
 function classify(string) {
