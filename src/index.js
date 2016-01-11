@@ -222,6 +222,8 @@ Papi.defineSchema()
     .resource('invites')
   .close()
 
+  .resource('activity')
+
   .resource('posts', { routeSegment: '/stream/posts/:id'})
 
   .resource('hubs').open()
