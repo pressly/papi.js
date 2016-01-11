@@ -1,9 +1,9 @@
 'use strict'
 
-import {map, each, where, find, extend, clone, isEmpty, isArray, isObject, isNumber} from 'lodash';
+import {map, each, filter, find, extend, clone, isEmpty, isArray, isObject, isNumber} from 'lodash';
 // var map =         require('lodash/collection/map');
 // var each =        require('lodash/collection/each');
-// var where =       require('lodash/collection/where');
+// var filter =       require('lodash/collection/filter');
 // var find =   require('lodash/collection/find');
 // var extend =      require('lodash/object/extend');
 // var clone =       require('lodash/lang/clone');
@@ -268,7 +268,7 @@ export default class Resource {
       },
 
       $where: (params) => {
-        return where(collection, params);
+        return filter(collection, params);
       },
 
       $create: (data = {}) => {
