@@ -26,7 +26,6 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 // var filter =      require('lodash/collection/filter');
 // var extend =      require('lodash/object/extend');
 // var last =        require('lodash/array/last');
-// var capitalize =  require('lodash/string/capitalize');
 // var isObject =    require('lodash/lang/isObject');
 // var isArray =     require('lodash/lang/isArray');
 // var isEmpty =     require('lodash/lang/isEmpty');
@@ -35,9 +34,13 @@ function singularize(string) {
   return string.replace(/s$/, '');
 }
 
+function capitalize(string) {
+  return string.charAt(0).toUpperCase() + string.slice(1);
+}
+
 function classify(string) {
   return singularize((0, _lodash.map)(string.split("_"), function (s) {
-    return (0, _lodash.capitalize)(s);
+    return capitalize(s);
   }).join(''));
 }
 
@@ -55,7 +58,7 @@ var buildRoute = function buildRoute(resource) {
       var paramName = current.options.routeSegment ? parseRouteParams(current.options.routeSegment)[0] : current.options.paramName || 'id';
 
       if (current !== resource) {
-        paramName = singularize(current.name) + (0, _lodash.capitalize)(paramName);
+        paramName = singularize(current.name) + capitalize(paramName);
       }
 
       var routeSegment = current.options.routeSegment ? current.options.routeSegment.replace(/\/:[^\/]+$/, '/:' + paramName) : '/' + current.name + '/:' + paramName;

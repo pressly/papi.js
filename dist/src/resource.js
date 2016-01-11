@@ -10,7 +10,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 // var map =         require('lodash/collection/map');
 // var each =        require('lodash/collection/each');
-// var where =       require('lodash/collection/where');
+// var filter =       require('lodash/collection/filter');
 // var find =   require('lodash/collection/find');
 // var extend =      require('lodash/object/extend');
 // var clone =       require('lodash/lang/clone');
@@ -308,7 +308,7 @@ var Resource = function () {
       },
 
       $where: function $where(params) {
-        return (0, _lodash.where)(collection, params);
+        return (0, _lodash.filter)(collection, params);
       },
 
       $create: function $create() {
