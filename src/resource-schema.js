@@ -1,9 +1,9 @@
 'use strict'
 
-import {map, each, select, extend, last, capitalize, isObject, isArray, isEmpty} from 'lodash';
+import {map, each, filter, extend, last, capitalize, isObject, isArray, isEmpty} from 'lodash';
 // var map =         require('lodash/collection/map');
 // var each =        require('lodash/collection/each');
-// var select =      require('lodash/collection/select');
+// var filter =      require('lodash/collection/filter');
 // var extend =      require('lodash/object/extend');
 // var last =        require('lodash/array/last');
 // var capitalize =  require('lodash/string/capitalize');
@@ -265,11 +265,11 @@ ResourceSchema.defineSchema = function() {
 //     markdown += `- \`DELETE\` ${def.route.path}\n\n`;
 //
 //     if (!isEmpty(def.actions)) {
-//       let memberActions = select(def.actions, (action) => {
+//       let memberActions = filter(def.actions, (action) => {
 //         return action.options.on == 'member';
 //       });
 //
-//       let collectionActions = select(def.actions, (action) => {
+//       let collectionActions = filter(def.actions, (action) => {
 //         return action.options.on == 'collection';
 //       });
 //

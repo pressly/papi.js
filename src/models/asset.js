@@ -1,6 +1,6 @@
 import Model from '../model';
 import {every, pick, isEmpty} from 'lodash';
-// var all = require('lodash/collection/all');
+// var every = require('lodash/collection/every');
 // var pick = require('lodash/object/pick');
 // var isEmpty = require('lodash/lang/isEmpty');
 

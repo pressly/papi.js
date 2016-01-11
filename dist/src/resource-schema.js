@@ -23,7 +23,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 // var map =         require('lodash/collection/map');
 // var each =        require('lodash/collection/each');
-// var select =      require('lodash/collection/select');
+// var filter =      require('lodash/collection/filter');
 // var extend =      require('lodash/object/extend');
 // var last =        require('lodash/array/last');
 // var capitalize =  require('lodash/string/capitalize');
@@ -304,11 +304,11 @@ ResourceSchema.defineSchema = function () {
 //     markdown += `- \`DELETE\` ${def.route.path}\n\n`;
 //
 //     if (!isEmpty(def.actions)) {
-//       let memberActions = select(def.actions, (action) => {
+//       let memberActions = filter(def.actions, (action) => {
 //         return action.options.on == 'member';
 //       });
 //
-//       let collectionActions = select(def.actions, (action) => {
+//       let collectionActions = filter(def.actions, (action) => {
 //         return action.options.on == 'collection';
 //       });
 //
