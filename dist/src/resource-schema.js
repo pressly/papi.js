@@ -1,6 +1,6 @@
 'use strict';
 
-//import {map, each, select, extend, last, capitalize, isObject, isArray, isEmpty} from 'lodash';
+//import {map, each, select, extend, last, isObject, isArray, isEmpty} from 'lodash';
 
 exports.__esModule = true;
 
@@ -27,13 +27,16 @@ var each = require('lodash/collection/each');
 var select = require('lodash/collection/select');
 var extend = require('lodash/object/extend');
 var last = require('lodash/array/last');
-var capitalize = require('lodash/string/capitalize');
 var isObject = require('lodash/lang/isObject');
 var isArray = require('lodash/lang/isArray');
 var isEmpty = require('lodash/lang/isEmpty');
 
 function singularize(string) {
   return string.replace(/s$/, '');
+}
+
+function capitalize(string) {
+  return string.charAt(0).toUpperCase() + string.slice(1);
 }
 
 function classify(string) {
@@ -96,7 +99,7 @@ var buildKey = function buildKey(resource, name) {
   return segments.join('.');
 };
 
-var ResourceSchema = (function () {
+var ResourceSchema = function () {
   function ResourceSchema() {
     _classCallCheck(this, ResourceSchema);
   }
@@ -133,7 +136,7 @@ var ResourceSchema = (function () {
   };
 
   return ResourceSchema;
-})();
+}();
 
 exports.default = ResourceSchema;
 ;
@@ -166,7 +169,7 @@ ResourceSchema.defineSchema = function () {
         this.current = bucket[name] = def;
 
         // create a class for this specific resource and assign the definition
-        var resourceClass = (function (_Resource) {
+        var resourceClass = function (_Resource) {
           _inherits(resourceClass, _Resource);
 
           function resourceClass() {
@@ -176,7 +179,7 @@ ResourceSchema.defineSchema = function () {
           }
 
           return resourceClass;
-        })(_resource2.default);
+        }(_resource2.default);
 
         resourceClass.definition = def;
         resourceClass.modelClass = models[def.modelName] || models.Base;

@@ -26,7 +26,7 @@ var DISPLAY_STATES = {
   LOCKED: 8
 };
 
-var Asset = (function (_Model) {
+var Asset = function (_Model) {
   _inherits(Asset, _Model);
 
   function Asset() {
@@ -60,6 +60,6 @@ var Asset = (function (_Model) {
   };
 
   return Asset;
-})(_model2.default);
+}(_model2.default);
 
 exports.default = Asset;

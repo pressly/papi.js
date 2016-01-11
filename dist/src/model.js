@@ -13,7 +13,7 @@ var pick = require('lodash/object/pick');
 var filter = require('lodash/collection/filter');
 var difference = require('lodash/array/difference');
 
-var Model = (function () {
+var Model = function () {
   function Model(data) {
     var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
 
@@ -52,6 +52,6 @@ var Model = (function () {
   };
 
   return Model;
-})();
+}();
 
 exports.default = Model;

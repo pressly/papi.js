@@ -2,9 +2,9 @@
 
 //import {map, each, detect, where, findWhere, extend, clone, isEmpty, isArray, isObject, isNumber} from 'lodash';
 
-exports.__esModule = true;
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
 
-function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.constructor === Symbol ? "symbol" : typeof obj; }
+exports.__esModule = true;
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -47,7 +47,7 @@ var parseHTTPLinks = function parseHTTPLinks(linksString) {
   return links;
 };
 
-var Resource = (function () {
+var Resource = function () {
   function Resource(api, parentResource) {
     var _this = this;
 
@@ -393,6 +393,6 @@ var Resource = (function () {
   };
 
   return Resource;
-})();
+}();
 
 exports.default = Resource;

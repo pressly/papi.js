@@ -38,7 +38,7 @@ function hasXDomain() {
   return typeof window !== 'undefined' && window.xdomain != null;
 }
 
-var Papi = (function (_ResourceSchema) {
+var Papi = function (_ResourceSchema) {
   _inherits(Papi, _ResourceSchema);
 
   function Papi() {
@@ -229,7 +229,7 @@ var Papi = (function (_ResourceSchema) {
   };
 
   return Papi;
-})(_resourceSchema2.default);
+}(_resourceSchema2.default);
 
 module.exports = Papi;
 
@@ -238,12 +238,12 @@ if (Papi.defineSchema == undefined) {
   Papi.defineSchema = _resourceSchema2.default.defineSchema;
 }
 
-Papi.defineSchema().resource('accounts').open().get('available', { on: 'resource' }).post('become', { on: 'member' }).resource('users').resource('hubs', { link: 'hubs' }).close().resource('organizations').open().resource('users').resource('hubs').resource('invites').close().resource('posts', { routeSegment: '/stream/posts/:id' }).resource('hubs').open().get('search', { on: 'resource' }).post('upgrade', { on: 'member' }).post('accept_invite', { on: 'member' }).post('reject_invite', { on: 'member' }).resource('apps').open().get('current', { on: 'resource', path: '/current' }).get('build', { on: 'member', path: '/build_app' }).get('status', { on: 'member' }).resource('styles').close().resource('addons').open().resource('configs').close().resource('analytics').open().get('summary', { on: 'resource' }).get('visitors', { on: 'resource' }).get('pageviews', { on: 'resource' }).get('duration', { on: 'resource' }).close().resource('feeds').open().resource('assets', { modelName: 'FeedAsset' }).close().resource('invites').open().post('bulk_invite', { on: 'resource' }).post('resend', { on: 'member' }).post('accept', { on: 'member', routeSegment: '/invites/:hash' }).post('reject', { on: 'member', routeSegment: '/invites/:hash' }).close().resource('recommendations').resource('users').open().post('grant_access', { on: 'resource' }).delete('revoke_access', { on: 'member' }).close().resource('collections').open().put('reorder', { on: 'resource' }).close().resource('tags').resource('assets', { routeSegment: '/stream/:id' }).open().put('feature', { on: 'member' }).put('unfeature', { on: 'member' }).put('hide', { on: 'member' }).put('unhide', { on: 'member' }).put('lock', { on: 'member' }).put('unlock', { on: 'member' }).resource('likes').resource('comments').close().resource('drafts').open().put('publish', { on: 'member' }).close().close().resource('invites').open().get('incoming', { on: 'resource' }).get('outgoing', { on: 'resource' }).post('bulk_invite', { on: 'resource' }).post('resend', { on: 'member' }).post('accept', { on: 'member', key: 'hash' }).post('reject', { on: 'member', key: 'hash' }).close().resource('code_revisions').open().get('fetch_repo', { on: 'member' })
+Papi.defineSchema().resource('accounts').open().get('available', { on: 'resource' }).post('become', { on: 'member' }).resource('users').resource('hubs', { link: 'hubs' }).close().resource('organizations').open().resource('users').resource('hubs').resource('invites').close().resource('activity').resource('posts', { routeSegment: '/stream/posts/:id' }).resource('hubs').open().get('search', { on: 'resource' }).post('upgrade', { on: 'member' }).post('accept_invite', { on: 'member' }).post('reject_invite', { on: 'member' }).resource('apps').open().get('current', { on: 'resource', path: '/current' }).get('build', { on: 'member', path: '/build_app' }).get('status', { on: 'member' }).resource('styles').close().resource('addons').open().resource('configs').close().resource('analytics').open().get('summary', { on: 'resource' }).get('visitors', { on: 'resource' }).get('pageviews', { on: 'resource' }).get('duration', { on: 'resource' }).close().resource('feeds').open().resource('assets', { modelName: 'FeedAsset' }).close().resource('invites').open().post('bulk_invite', { on: 'resource' }).post('resend', { on: 'member' }).post('accept', { on: 'member', routeSegment: '/invites/:hash' }).post('reject', { on: 'member', routeSegment: '/invites/:hash' }).close().resource('recommendations').resource('users').open().post('grant_access', { on: 'resource' }).delete('revoke_access', { on: 'member' }).close().resource('collections').open().put('reorder', { on: 'resource' }).close().resource('tags').resource('assets', { routeSegment: '/stream/:id' }).open().put('feature', { on: 'member' }).put('unfeature', { on: 'member' }).put('hide', { on: 'member' }).put('unhide', { on: 'member' }).put('lock', { on: 'member' }).put('unlock', { on: 'member' }).resource('likes').resource('comments').close().resource('drafts').open().put('publish', { on: 'member' }).close().close().resource('invites').open().get('incoming', { on: 'resource' }).get('outgoing', { on: 'resource' }).post('bulk_invite', { on: 'resource' }).post('resend', { on: 'member' }).post('accept', { on: 'member', key: 'hash' }).post('reject', { on: 'member', key: 'hash' }).close().resource('code_revisions').open().get('fetch_repo', { on: 'member' })
 
 // This resource links to the root hubs resource
 .resource('hubs', { link: 'hubs' }).close().resource('signup').open().get('account_uid_available', { on: 'member' }).get('account_email_available', { on: 'member' }).close().resource('users').open().get('roles', { on: 'resource' }).resource('hubs').resource('organizations').close().resource('discover').open().resource('users', { link: 'users' }).resource('organizations', { link: 'organizations' }).resource('hubs', { link: 'hubs' }).resource('posts').close().resource('stream').open().resource('following').close();
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./resource-schema":21,"es6-promise":23,"isomorphic-fetch":24,"lodash/lang/isEmpty":110,"lodash/object/extend":118,"querystring":130}],2:[function(require,module,exports){
+},{"./resource-schema":21,"es6-promise":23,"isomorphic-fetch":24,"lodash/lang/isEmpty":110,"lodash/object/extend":118,"querystring":129}],2:[function(require,module,exports){
 'use strict';
 
 //import {extend, filter, pick, difference, keys, functions} from 'lodash';
@@ -259,7 +259,7 @@ var pick = require('lodash/object/pick');
 var filter = require('lodash/collection/filter');
 var difference = require('lodash/array/difference');
 
-var Model = (function () {
+var Model = function () {
   function Model(data) {
     var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
 
@@ -298,7 +298,7 @@ var Model = (function () {
   };
 
   return Model;
-})();
+}();
 
 exports.default = Model;
 },{"lodash/array/difference":25,"lodash/collection/filter":31,"lodash/object/extend":118,"lodash/object/functions":119,"lodash/object/keys":120,"lodash/object/pick":123}],3:[function(require,module,exports){
@@ -318,7 +318,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var Account = (function (_Model) {
+var Account = function (_Model) {
   _inherits(Account, _Model);
 
   function Account() {
@@ -328,7 +328,7 @@ var Account = (function (_Model) {
   }
 
   return Account;
-})(_model2.default);
+}(_model2.default);
 
 exports.default = Account;
 },{"../model":2}],4:[function(require,module,exports){
@@ -348,7 +348,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var App = (function (_Model) {
+var App = function (_Model) {
   _inherits(App, _Model);
 
   function App() {
@@ -358,7 +358,7 @@ var App = (function (_Model) {
   }
 
   return App;
-})(_model2.default);
+}(_model2.default);
 
 exports.default = App;
 },{"../model":2}],5:[function(require,module,exports){
@@ -390,7 +390,7 @@ var DISPLAY_STATES = {
   LOCKED: 8
 };
 
-var Asset = (function (_Model) {
+var Asset = function (_Model) {
   _inherits(Asset, _Model);
 
   function Asset() {
@@ -424,7 +424,7 @@ var Asset = (function (_Model) {
   };
 
   return Asset;
-})(_model2.default);
+}(_model2.default);
 
 exports.default = Asset;
 },{"../model":2,"lodash/collection/all":27,"lodash/lang/isEmpty":110,"lodash/object/pick":123}],6:[function(require,module,exports){
@@ -444,7 +444,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var CodeRevision = (function (_Model) {
+var CodeRevision = function (_Model) {
   _inherits(CodeRevision, _Model);
 
   function CodeRevision() {
@@ -454,7 +454,7 @@ var CodeRevision = (function (_Model) {
   }
 
   return CodeRevision;
-})(_model2.default);
+}(_model2.default);
 
 exports.default = CodeRevision;
 },{"../model":2}],7:[function(require,module,exports){
@@ -474,7 +474,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var Collection = (function (_Model) {
+var Collection = function (_Model) {
   _inherits(Collection, _Model);
 
   function Collection() {
@@ -484,7 +484,7 @@ var Collection = (function (_Model) {
   }
 
   return Collection;
-})(_model2.default);
+}(_model2.default);
 
 exports.default = Collection;
 },{"../model":2}],8:[function(require,module,exports){
@@ -504,7 +504,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var Comment = (function (_Model) {
+var Comment = function (_Model) {
   _inherits(Comment, _Model);
 
   function Comment() {
@@ -514,7 +514,7 @@ var Comment = (function (_Model) {
   }
 
   return Comment;
-})(_model2.default);
+}(_model2.default);
 
 exports.default = Comment;
 },{"../model":2}],9:[function(require,module,exports){
@@ -534,7 +534,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var Draft = (function (_Model) {
+var Draft = function (_Model) {
   _inherits(Draft, _Model);
 
   function Draft() {
@@ -544,7 +544,7 @@ var Draft = (function (_Model) {
   }
 
   return Draft;
-})(_model2.default);
+}(_model2.default);
 
 exports.default = Draft;
 },{"../model":2}],10:[function(require,module,exports){
@@ -564,7 +564,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var FeedAsset = (function (_Model) {
+var FeedAsset = function (_Model) {
   _inherits(FeedAsset, _Model);
 
   function FeedAsset() {
@@ -574,7 +574,7 @@ var FeedAsset = (function (_Model) {
   }
 
   return FeedAsset;
-})(_model2.default);
+}(_model2.default);
 
 exports.default = FeedAsset;
 },{"../model":2}],11:[function(require,module,exports){
@@ -594,7 +594,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var Feed = (function (_Model) {
+var Feed = function (_Model) {
   _inherits(Feed, _Model);
 
   function Feed() {
@@ -604,7 +604,7 @@ var Feed = (function (_Model) {
   }
 
   return Feed;
-})(_model2.default);
+}(_model2.default);
 
 exports.default = Feed;
 },{"../model":2}],12:[function(require,module,exports){
@@ -624,7 +624,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var Hub = (function (_Model) {
+var Hub = function (_Model) {
   _inherits(Hub, _Model);
 
   function Hub() {
@@ -634,7 +634,7 @@ var Hub = (function (_Model) {
   }
 
   return Hub;
-})(_model2.default);
+}(_model2.default);
 
 exports.default = Hub;
 },{"../model":2}],13:[function(require,module,exports){
@@ -820,7 +820,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var Invite = (function (_Model) {
+var Invite = function (_Model) {
   _inherits(Invite, _Model);
 
   function Invite() {
@@ -830,7 +830,7 @@ var Invite = (function (_Model) {
   }
 
   return Invite;
-})(_model2.default);
+}(_model2.default);
 
 exports.default = Invite;
 },{"../model":2}],15:[function(require,module,exports){
@@ -850,7 +850,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var Like = (function (_Model) {
+var Like = function (_Model) {
   _inherits(Like, _Model);
 
   function Like() {
@@ -860,7 +860,7 @@ var Like = (function (_Model) {
   }
 
   return Like;
-})(_model2.default);
+}(_model2.default);
 
 exports.default = Like;
 },{"../model":2}],16:[function(require,module,exports){
@@ -880,7 +880,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var Organization = (function (_Model) {
+var Organization = function (_Model) {
   _inherits(Organization, _Model);
 
   function Organization() {
@@ -890,7 +890,7 @@ var Organization = (function (_Model) {
   }
 
   return Organization;
-})(_model2.default);
+}(_model2.default);
 
 exports.default = Organization;
 },{"../model":2}],17:[function(require,module,exports){
@@ -910,7 +910,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var Recommendation = (function (_Model) {
+var Recommendation = function (_Model) {
   _inherits(Recommendation, _Model);
 
   function Recommendation() {
@@ -920,7 +920,7 @@ var Recommendation = (function (_Model) {
   }
 
   return Recommendation;
-})(_model2.default);
+}(_model2.default);
 
 exports.default = Recommendation;
 },{"../model":2}],18:[function(require,module,exports){
@@ -940,7 +940,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var Style = (function (_Model) {
+var Style = function (_Model) {
   _inherits(Style, _Model);
 
   function Style() {
@@ -950,7 +950,7 @@ var Style = (function (_Model) {
   }
 
   return Style;
-})(_model2.default);
+}(_model2.default);
 
 exports.default = Style;
 },{"../model":2}],19:[function(require,module,exports){
@@ -970,7 +970,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var Tag = (function (_Model) {
+var Tag = function (_Model) {
   _inherits(Tag, _Model);
 
   function Tag() {
@@ -980,7 +980,7 @@ var Tag = (function (_Model) {
   }
 
   return Tag;
-})(_model2.default);
+}(_model2.default);
 
 exports.default = Tag;
 },{"../model":2}],20:[function(require,module,exports){
@@ -1000,7 +1000,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var User = (function (_Model) {
+var User = function (_Model) {
   _inherits(User, _Model);
 
   function User() {
@@ -1014,13 +1014,13 @@ var User = (function (_Model) {
   };
 
   return User;
-})(_model2.default);
+}(_model2.default);
 
 exports.default = User;
 },{"../model":2}],21:[function(require,module,exports){
 'use strict';
 
-//import {map, each, select, extend, last, capitalize, isObject, isArray, isEmpty} from 'lodash';
+//import {map, each, select, extend, last, isObject, isArray, isEmpty} from 'lodash';
 
 exports.__esModule = true;
 
@@ -1047,13 +1047,16 @@ var each = require('lodash/collection/each');
 var select = require('lodash/collection/select');
 var extend = require('lodash/object/extend');
 var last = require('lodash/array/last');
-var capitalize = require('lodash/string/capitalize');
 var isObject = require('lodash/lang/isObject');
 var isArray = require('lodash/lang/isArray');
 var isEmpty = require('lodash/lang/isEmpty');
 
 function singularize(string) {
   return string.replace(/s$/, '');
+}
+
+function capitalize(string) {
+  return string.charAt(0).toUpperCase() + string.slice(1);
 }
 
 function classify(string) {
@@ -1116,7 +1119,7 @@ var buildKey = function buildKey(resource, name) {
   return segments.join('.');
 };
 
-var ResourceSchema = (function () {
+var ResourceSchema = function () {
   function ResourceSchema() {
     _classCallCheck(this, ResourceSchema);
   }
@@ -1153,7 +1156,7 @@ var ResourceSchema = (function () {
   };
 
   return ResourceSchema;
-})();
+}();
 
 exports.default = ResourceSchema;
 ;
@@ -1186,7 +1189,7 @@ ResourceSchema.defineSchema = function () {
         this.current = bucket[name] = def;
 
         // create a class for this specific resource and assign the definition
-        var resourceClass = (function (_Resource) {
+        var resourceClass = function (_Resource) {
           _inherits(resourceClass, _Resource);
 
           function resourceClass() {
@@ -1196,7 +1199,7 @@ ResourceSchema.defineSchema = function () {
           }
 
           return resourceClass;
-        })(_resource2.default);
+        }(_resource2.default);
 
         resourceClass.definition = def;
         resourceClass.modelClass = models[def.modelName] || models.Base;
@@ -1358,14 +1361,14 @@ ResourceSchema.defineSchema = function () {
 //
 //   console.log(markdown);
 // };
-},{"./models":13,"./resource":22,"lodash/array/last":26,"lodash/collection/each":29,"lodash/collection/map":35,"lodash/collection/select":36,"lodash/lang/isArray":109,"lodash/lang/isEmpty":110,"lodash/lang/isObject":114,"lodash/object/extend":118,"lodash/string/capitalize":124}],22:[function(require,module,exports){
+},{"./models":13,"./resource":22,"lodash/array/last":26,"lodash/collection/each":29,"lodash/collection/map":35,"lodash/collection/select":36,"lodash/lang/isArray":109,"lodash/lang/isEmpty":110,"lodash/lang/isObject":114,"lodash/object/extend":118}],22:[function(require,module,exports){
 'use strict';
 
 //import {map, each, detect, where, findWhere, extend, clone, isEmpty, isArray, isObject, isNumber} from 'lodash';
 
-exports.__esModule = true;
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
 
-function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.constructor === Symbol ? "symbol" : typeof obj; }
+exports.__esModule = true;
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -1408,7 +1411,7 @@ var parseHTTPLinks = function parseHTTPLinks(linksString) {
   return links;
 };
 
-var Resource = (function () {
+var Resource = function () {
   function Resource(api, parentResource) {
     var _this = this;
 
@@ -1754,7 +1757,7 @@ var Resource = (function () {
   };
 
   return Resource;
-})();
+}();
 
 exports.default = Resource;
 },{"lodash/collection/detect":28,"lodash/collection/each":29,"lodash/collection/findWhere":33,"lodash/collection/map":35,"lodash/collection/where":37,"lodash/lang/clone":107,"lodash/lang/isArray":109,"lodash/lang/isEmpty":110,"lodash/lang/isNumber":113,"lodash/lang/isObject":114,"lodash/object/extend":118}],23:[function(require,module,exports){
@@ -2728,7 +2731,7 @@ exports.default = Resource;
 
 
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"_process":127}],24:[function(require,module,exports){
+},{"_process":126}],24:[function(require,module,exports){
 // the whatwg-fetch polyfill installs the fetch() function
 // on the global object (window or self)
 //
@@ -2736,7 +2739,7 @@ exports.default = Resource;
 require('whatwg-fetch');
 module.exports = self.fetch.bind(self);
 
-},{"whatwg-fetch":131}],25:[function(require,module,exports){
+},{"whatwg-fetch":130}],25:[function(require,module,exports){
 var baseDifference = require('../internal/baseDifference'),
     baseFlatten = require('../internal/baseFlatten'),
     isArrayLike = require('../internal/isArrayLike'),
@@ -3529,7 +3532,7 @@ function baseCallback(func, thisArg, argCount) {
 
 module.exports = baseCallback;
 
-},{"../utility/identity":125,"../utility/property":126,"./baseMatches":69,"./baseMatchesProperty":70,"./bindCallback":75}],50:[function(require,module,exports){
+},{"../utility/identity":124,"../utility/property":125,"./baseMatches":69,"./baseMatchesProperty":70,"./bindCallback":75}],50:[function(require,module,exports){
 var arrayCopy = require('./arrayCopy'),
     arrayEach = require('./arrayEach'),
     baseAssign = require('./baseAssign'),
@@ -4466,7 +4469,7 @@ function bindCallback(func, thisArg, argCount) {
 
 module.exports = bindCallback;
 
-},{"../utility/identity":125}],76:[function(require,module,exports){
+},{"../utility/identity":124}],76:[function(require,module,exports){
 (function (global){
 /** Native method references. */
 var ArrayBuffer = global.ArrayBuffer,
@@ -6118,29 +6121,6 @@ var pick = restParam(function(object, props) {
 module.exports = pick;
 
 },{"../function/restParam":38,"../internal/baseFlatten":58,"../internal/bindCallback":75,"../internal/pickByArray":102,"../internal/pickByCallback":103}],124:[function(require,module,exports){
-var baseToString = require('../internal/baseToString');
-
-/**
- * Capitalizes the first character of `string`.
- *
- * @static
- * @memberOf _
- * @category String
- * @param {string} [string=''] The string to capitalize.
- * @returns {string} Returns the capitalized string.
- * @example
- *
- * _.capitalize('fred');
- * // => 'Fred'
- */
-function capitalize(string) {
-  string = baseToString(string);
-  return string && (string.charAt(0).toUpperCase() + string.slice(1));
-}
-
-module.exports = capitalize;
-
-},{"../internal/baseToString":74}],125:[function(require,module,exports){
 /**
  * This method returns the first argument provided to it.
  *
@@ -6162,7 +6142,7 @@ function identity(value) {
 
 module.exports = identity;
 
-},{}],126:[function(require,module,exports){
+},{}],125:[function(require,module,exports){
 var baseProperty = require('../internal/baseProperty'),
     basePropertyDeep = require('../internal/basePropertyDeep'),
     isKey = require('../internal/isKey');
@@ -6195,7 +6175,7 @@ function property(path) {
 
 module.exports = property;
 
-},{"../internal/baseProperty":71,"../internal/basePropertyDeep":72,"../internal/isKey":98}],127:[function(require,module,exports){
+},{"../internal/baseProperty":71,"../internal/basePropertyDeep":72,"../internal/isKey":98}],126:[function(require,module,exports){
 // shim for using process in browser
 
 var process = module.exports = {};
@@ -6288,7 +6268,7 @@ process.chdir = function (dir) {
 };
 process.umask = function() { return 0; };
 
-},{}],128:[function(require,module,exports){
+},{}],127:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -6374,7 +6354,7 @@ var isArray = Array.isArray || function (xs) {
   return Object.prototype.toString.call(xs) === '[object Array]';
 };
 
-},{}],129:[function(require,module,exports){
+},{}],128:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -6461,13 +6441,13 @@ var objectKeys = Object.keys || function (obj) {
   return res;
 };
 
-},{}],130:[function(require,module,exports){
+},{}],129:[function(require,module,exports){
 'use strict';
 
 exports.decode = exports.parse = require('./decode');
 exports.encode = exports.stringify = require('./encode');
 
-},{"./decode":128,"./encode":129}],131:[function(require,module,exports){
+},{"./decode":127,"./encode":128}],130:[function(require,module,exports){
 (function() {
   'use strict';
 
