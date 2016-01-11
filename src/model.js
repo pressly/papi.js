@@ -1,12 +1,12 @@
 'use strict'
 
-//import {extend, filter, pick, difference, keys, functions} from 'lodash';
-var extend =      require('lodash/object/extend');
-var keys =        require('lodash/object/keys');
-var functions =   require('lodash/object/functions');
-var pick =        require('lodash/object/pick');
-var filter =      require('lodash/collection/filter');
-var difference =  require('lodash/array/difference');
+import {extend, filter, pick, difference, keys, functions} from 'lodash';
+// var extend =      require('lodash/object/extend');
+// var keys =        require('lodash/object/keys');
+// var functions =   require('lodash/object/functions');
+// var pick =        require('lodash/object/pick');
+// var filter =      require('lodash/collection/filter');
+// var difference =  require('lodash/array/difference');
 
 export default class Model {
   constructor(data, options = {}) {

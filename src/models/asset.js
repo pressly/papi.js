@@ -1,8 +1,8 @@
 import Model from '../model';
-//import {chain, all, isEmpty} from 'lodash';
-var all = require('lodash/collection/all');
-var pick = require('lodash/object/pick');
-var isEmpty = require('lodash/lang/isEmpty');
+import {every, pick, isEmpty} from 'lodash';
+// var all = require('lodash/collection/all');
+// var pick = require('lodash/object/pick');
+// var isEmpty = require('lodash/lang/isEmpty');
 
 var DISPLAY_STATES = {
   VISIBLE:      1,
@@ -33,6 +33,6 @@ export default class Asset extends Model {
   }
 
   isOriginal() {
-    return all(pick(this.source, 'network', 'uid', 'url'), isEmpty);
+    return every(pick(this.source, 'network', 'uid', 'url'), isEmpty);
   }
 }

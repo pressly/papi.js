@@ -1,25 +1,25 @@
 'use strict';
 
-//import {extend, filter, pick, difference, keys, functions} from 'lodash';
-
 exports.__esModule = true;
+
+var _lodash = require('lodash');
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var extend = require('lodash/object/extend');
-var keys = require('lodash/object/keys');
-var functions = require('lodash/object/functions');
-var pick = require('lodash/object/pick');
-var filter = require('lodash/collection/filter');
-var difference = require('lodash/array/difference');
+// var extend =      require('lodash/object/extend');
+// var keys =        require('lodash/object/keys');
+// var functions =   require('lodash/object/functions');
+// var pick =        require('lodash/object/pick');
+// var filter =      require('lodash/collection/filter');
+// var difference =  require('lodash/array/difference');
 
-var Model = (function () {
+var Model = function () {
   function Model(data) {
     var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
 
     _classCallCheck(this, Model);
 
-    extend(this, data);
+    (0, _lodash.extend)(this, data);
 
     this.$newRecord = true;
   }
@@ -37,21 +37,21 @@ var Model = (function () {
       _this.$newRecord = false;
       _this.$resource().sync(res);
 
-      return extend(_this, res);
+      return (0, _lodash.extend)(_this, res);
     });
   };
 
   Model.prototype.$attributes = function $attributes() {
-    return filter(difference(keys(this), functions(this)), function (x) {
+    return (0, _lodash.filter)((0, _lodash.difference)((0, _lodash.keys)(this), (0, _lodash.functions)(this)), function (x) {
       return x[0] != '$';
     });
   };
 
   Model.prototype.$data = function $data() {
-    return pick(this, this.$attributes());
+    return (0, _lodash.pick)(this, this.$attributes());
   };
 
   return Model;
-})();
+}();
 
 exports.default = Model;

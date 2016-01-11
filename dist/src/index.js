@@ -8,6 +8,8 @@ var _querystring = require('querystring');
 
 var _querystring2 = _interopRequireDefault(_querystring);
 
+var _lodash = require('lodash');
+
 var _resourceSchema = require('./resource-schema');
 
 var _resourceSchema2 = _interopRequireDefault(_resourceSchema);
@@ -29,14 +31,14 @@ if (!global.fetch) {
 // Query string parser and stringifier -- fetch does not support any query string
 // parsing so we need to handle it separately.
 
-var extend = require('lodash/object/extend');
-var isEmpty = require('lodash/lang/isEmpty');
+// var extend =      require('lodash/object/extend');
+// var isEmpty =     require('lodash/lang/isEmpty');
 
 function hasXDomain() {
   return typeof window !== 'undefined' && window.xdomain != null;
 }
 
-var Papi = (function (_ResourceSchema) {
+var Papi = function (_ResourceSchema) {
   _inherits(Papi, _ResourceSchema);
 
   function Papi() {
@@ -143,19 +145,19 @@ var Papi = (function (_ResourceSchema) {
 
       // Query params to be added to the url
       if (options.query) {
-        extend(req.query, options.query);
+        (0, _lodash.extend)(req.query, options.query);
       }
 
       // Data to send (with get requests these are converted into query params)
       if (options.data) {
         if (method == 'get') {
-          extend(req.query, options.data);
+          (0, _lodash.extend)(req.query, options.data);
         } else {
           req.body = JSON.stringify(options.data);
         }
       }
 
-      if (!isEmpty(req.query)) {
+      if (!(0, _lodash.isEmpty)(req.query)) {
         req.url += '?' + _querystring2.default.stringify(req.query);
       }
 
@@ -227,7 +229,7 @@ var Papi = (function (_ResourceSchema) {
   };
 
   return Papi;
-})(_resourceSchema2.default);
+}(_resourceSchema2.default);
 
 module.exports = Papi;
 

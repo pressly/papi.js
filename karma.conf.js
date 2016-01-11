@@ -46,7 +46,8 @@ module.exports = function(config) {
     // test results reporter to use
     // possible values: 'dots', 'progress'
     // available reporters: https://npmjs.org/browse/keyword/karma-reporter
-    reporters: ['progress'],
+    //reporters: ['progress'],
+    reporters: ['dots', 'saucelabs'],
     //reporters: ['spec'], // just like mocha
 
 
@@ -70,6 +71,10 @@ module.exports = function(config) {
     browserStack: {
       username: 'jeffbrenner',
       accessKey: 'Spvs8gA6h4HkqR9Ttz3r'
+    },
+
+    sauceLabs: {
+      testName: 'Papi.js'
     },
 
     // define browsers
@@ -114,17 +119,43 @@ module.exports = function(config) {
         browser_version: '9',
         os: 'Windows',
         os_version: '7'
+      },
+      sl_chrome: {
+        base: 'SauceLabs',
+        browserName: 'chrome',
+        platform: 'Windows 7',
+        version: '35'
+      },
+      sl_firefox: {
+        base: 'SauceLabs',
+        browserName: 'firefox',
+        version: '30'
+      },
+      sl_ios_safari: {
+        base: 'SauceLabs',
+        browserName: 'iphone',
+        platform: 'OS X 10.9',
+        version: '7.1'
+      },
+      sl_ie_11: {
+        base: 'SauceLabs',
+        browserName: 'internet explorer',
+        platform: 'Windows 8.1',
+        version: '11'
       }
     },
+
+
 
 
     // start these browsers
     // available browser launchers: https://npmjs.org/browse/keyword/karma-launcher
     //browsers: ['Chrome', 'Firefox', 'PhantomJS'],
-    browsers: ['PhantomJS'],
+    //browsers: ['PhantomJS'],
     //browsers: ['bs_firefox_mac', 'bs_iphone5', 'bs_ie11_windows8', 'bs_ie10_windows7', 'bs_ie9_windows7'],
     //browsers: ['bs_chrome_mac', 'bs_ie11_windows8', 'bs_ie9_windows7'],
     //browsers: ['bs_ie9_windows7'],
+    browsers: ['sl_chrome'],
 
     // Continuous Integration mode
     // if true, Karma captures browsers, runs the tests and exits

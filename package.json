@@ -18,7 +18,7 @@
   "dependencies": {
     "es6-promise": "^3.0.2",
     "isomorphic-fetch": "2.2.0",
-    "lodash": "3.10.1",
+    "lodash": "https://github.com/lodash/lodash.git#9a2748c1ead0308557a35ac47ab0b0f2f62db74e",
     "querystring": "0.2.0"
   },
   "devDependencies": {
@@ -52,6 +52,7 @@
     "karma-firefox-launcher": "^0.1.6",
     "karma-mocha": "0.2.1",
     "karma-phantomjs-launcher": "^0.2.1",
+    "karma-sauce-launcher": "^0.3.0",
     "karma-spec-reporter": "0.0.23",
     "mocha": "^2.2.4",
     "nock": "5.0.0",

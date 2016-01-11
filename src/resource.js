@@ -1,17 +1,16 @@
 'use strict'
 
-//import {map, each, detect, where, findWhere, extend, clone, isEmpty, isArray, isObject, isNumber} from 'lodash';
-var map =         require('lodash/collection/map');
-var each =        require('lodash/collection/each');
-var detect =      require('lodash/collection/detect');
-var where =       require('lodash/collection/where');
-var findWhere =   require('lodash/collection/findWhere');
-var extend =      require('lodash/object/extend');
-var clone =       require('lodash/lang/clone');
-var isObject =    require('lodash/lang/isObject');
-var isArray =     require('lodash/lang/isArray');
-var isEmpty =     require('lodash/lang/isEmpty');
-var isNumber =    require('lodash/lang/isNumber');
+import {map, each, where, find, extend, clone, isEmpty, isArray, isObject, isNumber} from 'lodash';
+// var map =         require('lodash/collection/map');
+// var each =        require('lodash/collection/each');
+// var where =       require('lodash/collection/where');
+// var find =   require('lodash/collection/find');
+// var extend =      require('lodash/object/extend');
+// var clone =       require('lodash/lang/clone');
+// var isObject =    require('lodash/lang/isObject');
+// var isArray =     require('lodash/lang/isArray');
+// var isEmpty =     require('lodash/lang/isEmpty');
+// var isNumber =    require('lodash/lang/isNumber');
 
 function deepClone(obj) {
   return JSON.parse(JSON.stringify(obj));
@@ -259,13 +258,13 @@ export default class Resource {
       },
 
       $find: (id) => {
-        return detect(collection, (item) => {
+        return find(collection, (item) => {
           return item.id == id;
         });
       },
 
       $findWhere: (params) => {
-        return findWhere(collection, params);
+        return find(collection, params);
       },
 
       $where: (params) => {

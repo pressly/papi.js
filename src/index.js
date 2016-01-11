@@ -11,8 +11,9 @@ if (!global.fetch) {
 // parsing so we need to handle it separately.
 import qs from 'querystring';
 
-var extend =      require('lodash/object/extend');
-var isEmpty =     require('lodash/lang/isEmpty');
+import {extend, isEmpty} from 'lodash';
+// var extend =      require('lodash/object/extend');
+// var isEmpty =     require('lodash/lang/isEmpty');
 
 function hasXDomain() {
   return typeof window !== 'undefined' && window.xdomain != null;
