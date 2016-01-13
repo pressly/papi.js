@@ -1,24 +1,56 @@
 'use strict';
 
-//import {map, each, detect, where, findWhere, extend, clone, isEmpty, isArray, isObject, isNumber} from 'lodash';
-
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
 
 exports.__esModule = true;
 
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+var _isArray = require('lodash/lang/isArray');
 
-var map = require('lodash/collection/map');
-var each = require('lodash/collection/each');
-var detect = require('lodash/collection/detect');
-var where = require('lodash/collection/where');
-var findWhere = require('lodash/collection/findWhere');
-var extend = require('lodash/object/extend');
-var clone = require('lodash/lang/clone');
-var isObject = require('lodash/lang/isObject');
-var isArray = require('lodash/lang/isArray');
-var isEmpty = require('lodash/lang/isEmpty');
-var isNumber = require('lodash/lang/isNumber');
+var _isArray2 = _interopRequireDefault(_isArray);
+
+var _isNumber = require('lodash/lang/isNumber');
+
+var _isNumber2 = _interopRequireDefault(_isNumber);
+
+var _where = require('lodash/collection/where');
+
+var _where2 = _interopRequireDefault(_where);
+
+var _findWhere = require('lodash/collection/findWhere');
+
+var _findWhere2 = _interopRequireDefault(_findWhere);
+
+var _detect = require('lodash/collection/detect');
+
+var _detect2 = _interopRequireDefault(_detect);
+
+var _isObject = require('lodash/lang/isObject');
+
+var _isObject2 = _interopRequireDefault(_isObject);
+
+var _clone = require('lodash/lang/clone');
+
+var _clone2 = _interopRequireDefault(_clone);
+
+var _extend = require('lodash/object/extend');
+
+var _extend2 = _interopRequireDefault(_extend);
+
+var _map = require('lodash/collection/map');
+
+var _map2 = _interopRequireDefault(_map);
+
+var _each = require('lodash/collection/each');
+
+var _each2 = _interopRequireDefault(_each);
+
+var _isEmpty = require('lodash/lang/isEmpty');
+
+var _isEmpty2 = _interopRequireDefault(_isEmpty);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function deepClone(obj) {
   return JSON.parse(JSON.stringify(obj));
@@ -31,8 +63,8 @@ function singularize(string) {
 var parseHTTPLinks = function parseHTTPLinks(linksString) {
   var links = {};
 
-  if (linksString && !isEmpty(linksString)) {
-    each(linksString.split(','), function (link) {
+  if (linksString && !(0, _isEmpty2.default)(linksString)) {
+    (0, _each2.default)(linksString.split(','), function (link) {
       var _link$split = link.split(';');
 
       var href = _link$split[0];
@@ -67,7 +99,7 @@ var Resource = function () {
     this.name = def.name;
     this.key = def.key;
 
-    this.children = map(def.children, function (child, name) {
+    this.children = (0, _map2.default)(def.children, function (child, name) {
       return name;
     }) || [];
 
@@ -80,7 +112,7 @@ var Resource = function () {
     if (parentResource) {
       var parentParams = {};
 
-      each(parentResource.route.params, function (value, paramName) {
+      (0, _each2.default)(parentResource.route.params, function (value, paramName) {
         if (parentResource.key != _this.key && paramName == 'id') {
           paramName = singularize(parentResource.name) + 'Id';
         }
@@ -88,10 +120,10 @@ var Resource = function () {
         parentParams[paramName] = value;
       });
 
-      extend(this.route.params, parentParams);
+      (0, _extend2.default)(this.route.params, parentParams);
 
       if (inherit) {
-        this.route.queryParams = clone(parentResource.route.queryParams);
+        this.route.queryParams = (0, _clone2.default)(parentResource.route.queryParams);
       }
     }
 
@@ -111,7 +143,7 @@ var Resource = function () {
 
     var options = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
 
-    return this.api.request(options.method || 'get', this.buildRoute(options.path), extend({}, this.options, { query: extend({}, this.route.queryParams, options.query), data: options.data })).then(function (res) {
+    return this.api.request(options.method || 'get', this.buildRoute(options.path), (0, _extend2.default)({}, this.options, { query: (0, _extend2.default)({}, this.route.queryParams, options.query), data: options.data })).then(function (res) {
       _this2.setResponse(res);
       return res.data;
     });
@@ -120,7 +152,7 @@ var Resource = function () {
   Resource.prototype.buildRoute = function buildRoute(appendPath) {
     var route = this.route.segments.join('');
 
-    each(this.route.params, function (value, paramName) {
+    (0, _each2.default)(this.route.params, function (value, paramName) {
       route = route.replace('/:' + paramName, value ? '/' + value : '');
     });
 
@@ -134,7 +166,7 @@ var Resource = function () {
   Resource.prototype.includeParams = function includeParams(params) {
     var _this3 = this;
 
-    each(params, function (value, paramName) {
+    (0, _each2.default)(params, function (value, paramName) {
       if (_this3.route.params.hasOwnProperty(paramName)) {
         _this3.route.params[paramName] = value;
       } else {
@@ -147,7 +179,7 @@ var Resource = function () {
   };
 
   Resource.prototype.query = function query(params) {
-    extend(this.route.queryParams, params);
+    (0, _extend2.default)(this.route.queryParams, params);
 
     return this;
   };
@@ -173,7 +205,7 @@ var Resource = function () {
   };
 
   Resource.prototype.$find = function $find(params) {
-    if (params && !isObject(params)) {
+    if (params && !(0, _isObject2.default)(params)) {
       params = { id: params };
     }
 
@@ -231,7 +263,7 @@ var Resource = function () {
 
     // Set a reference to the resource on the model
     model.$resource = function (name) {
-      if (isEmpty(name)) {
+      if ((0, _isEmpty2.default)(name)) {
         return _this4;
       } else {
         return _this4.api.$resource(name, _this4);
@@ -244,7 +276,7 @@ var Resource = function () {
   Resource.prototype.hydrateCollection = function hydrateCollection(data) {
     var _this5 = this;
 
-    var collection = map(data, function (item) {
+    var collection = (0, _map2.default)(data, function (item) {
       // Models in a collection need a new resource created
       var resource = _this5.createResource();
 
@@ -263,7 +295,7 @@ var Resource = function () {
 
             var method = options.append ? 'push' : 'unshift';
 
-            each(res.data, function (item) {
+            (0, _each2.default)(res.data, function (item) {
               collection[method](_this5.hydrateModel(item));
             });
 
@@ -299,17 +331,17 @@ var Resource = function () {
       },
 
       $find: function $find(id) {
-        return detect(collection, function (item) {
+        return (0, _detect2.default)(collection, function (item) {
           return item.id == id;
         });
       },
 
       $findWhere: function $findWhere(params) {
-        return findWhere(collection, params);
+        return (0, _findWhere2.default)(collection, params);
       },
 
       $where: function $where(params) {
-        return where(collection, params);
+        return (0, _where2.default)(collection, params);
       },
 
       $create: function $create() {
@@ -328,7 +360,7 @@ var Resource = function () {
           model = collection.$create(model);
         }
 
-        if (isNumber(idx)) {
+        if ((0, _isNumber2.default)(idx)) {
           collection.splice(idx, 0, model);
         } else {
           collection.push(model);
@@ -343,9 +375,9 @@ var Resource = function () {
 
       $remove: function $remove(arg) {
         // Remove multiples
-        if (isArray(arg)) {
+        if ((0, _isArray2.default)(arg)) {
           var models = arg;
-          each(models, function (model) {
+          (0, _each2.default)(models, function (model) {
             collection.$remove(model);
           });
 
@@ -353,7 +385,7 @@ var Resource = function () {
         }
 
         var idx;
-        if (isNumber(arg)) {
+        if ((0, _isNumber2.default)(arg)) {
           idx = arg;
         } else if (arg instanceof _this5.constructor.modelClass) {
           idx = collection.indexOf(arg);
@@ -387,7 +419,7 @@ var Resource = function () {
       }
     };
 
-    extend(collection, methods);
+    (0, _extend2.default)(collection, methods);
 
     return collection;
   };

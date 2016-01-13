@@ -1,14 +1,6 @@
 'use strict'
 
-//import {map, each, select, extend, last, isObject, isArray, isEmpty} from 'lodash';
-var map =         require('lodash/collection/map');
-var each =        require('lodash/collection/each');
-var select =      require('lodash/collection/select');
-var extend =      require('lodash/object/extend');
-var last =        require('lodash/array/last');
-var isObject =    require('lodash/lang/isObject');
-var isArray =     require('lodash/lang/isArray');
-var isEmpty =     require('lodash/lang/isEmpty');
+import {map, each, select, extend, last, isObject, isArray, isEmpty} from 'lodash';
 
 import Resource from './resource';
 import * as models from './models';

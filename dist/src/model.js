@@ -1,17 +1,34 @@
 'use strict';
 
-//import {extend, filter, pick, difference, keys, functions} from 'lodash';
-
 exports.__esModule = true;
 
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+var _pick = require('lodash/object/pick');
 
-var extend = require('lodash/object/extend');
-var keys = require('lodash/object/keys');
-var functions = require('lodash/object/functions');
-var pick = require('lodash/object/pick');
-var filter = require('lodash/collection/filter');
-var difference = require('lodash/array/difference');
+var _pick2 = _interopRequireDefault(_pick);
+
+var _functions = require('lodash/object/functions');
+
+var _functions2 = _interopRequireDefault(_functions);
+
+var _keys = require('lodash/object/keys');
+
+var _keys2 = _interopRequireDefault(_keys);
+
+var _difference = require('lodash/array/difference');
+
+var _difference2 = _interopRequireDefault(_difference);
+
+var _filter = require('lodash/collection/filter');
+
+var _filter2 = _interopRequireDefault(_filter);
+
+var _extend = require('lodash/object/extend');
+
+var _extend2 = _interopRequireDefault(_extend);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var Model = function () {
   function Model(data) {
@@ -19,7 +36,7 @@ var Model = function () {
 
     _classCallCheck(this, Model);
 
-    extend(this, data);
+    (0, _extend2.default)(this, data);
 
     this.$newRecord = true;
   }
@@ -37,18 +54,18 @@ var Model = function () {
       _this.$newRecord = false;
       _this.$resource().sync(res);
 
-      return extend(_this, res);
+      return (0, _extend2.default)(_this, res);
     });
   };
 
   Model.prototype.$attributes = function $attributes() {
-    return filter(difference(keys(this), functions(this)), function (x) {
+    return (0, _filter2.default)((0, _difference2.default)((0, _keys2.default)(this), (0, _functions2.default)(this)), function (x) {
       return x[0] != '$';
     });
   };
 
   Model.prototype.$data = function $data() {
-    return pick(this, this.$attributes());
+    return (0, _pick2.default)(this, this.$attributes());
   };
 
   return Model;

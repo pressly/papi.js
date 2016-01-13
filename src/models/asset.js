@@ -1,8 +1,5 @@
 import Model from '../model';
-//import {chain, all, isEmpty} from 'lodash';
-var all = require('lodash/collection/all');
-var pick = require('lodash/object/pick');
-var isEmpty = require('lodash/lang/isEmpty');
+import {all, pick, isEmpty} from 'lodash';
 
 var DISPLAY_STATES = {
   VISIBLE:      1,

@@ -1,17 +1,6 @@
 'use strict'
 
-//import {map, each, detect, where, findWhere, extend, clone, isEmpty, isArray, isObject, isNumber} from 'lodash';
-var map =         require('lodash/collection/map');
-var each =        require('lodash/collection/each');
-var detect =      require('lodash/collection/detect');
-var where =       require('lodash/collection/where');
-var findWhere =   require('lodash/collection/findWhere');
-var extend =      require('lodash/object/extend');
-var clone =       require('lodash/lang/clone');
-var isObject =    require('lodash/lang/isObject');
-var isArray =     require('lodash/lang/isArray');
-var isEmpty =     require('lodash/lang/isEmpty');
-var isNumber =    require('lodash/lang/isNumber');
+import {map, each, detect, where, findWhere, extend, clone, isEmpty, isArray, isObject, isNumber} from 'lodash';
 
 function deepClone(obj) {
   return JSON.parse(JSON.stringify(obj));

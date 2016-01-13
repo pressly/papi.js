@@ -1,5 +1,13 @@
 'use strict';
 
+var _isEmpty = require('lodash/lang/isEmpty');
+
+var _isEmpty2 = _interopRequireDefault(_isEmpty);
+
+var _extend = require('lodash/object/extend');
+
+var _extend2 = _interopRequireDefault(_extend);
+
 var _isomorphicFetch = require('isomorphic-fetch');
 
 var _isomorphicFetch2 = _interopRequireDefault(_isomorphicFetch);
@@ -28,9 +36,6 @@ if (!global.fetch) {
 
 // Query string parser and stringifier -- fetch does not support any query string
 // parsing so we need to handle it separately.
-
-var extend = require('lodash/object/extend');
-var isEmpty = require('lodash/lang/isEmpty');
 
 function hasXDomain() {
   return typeof window !== 'undefined' && window.xdomain != null;
@@ -143,19 +148,19 @@ var Papi = function (_ResourceSchema) {
 
       // Query params to be added to the url
       if (options.query) {
-        extend(req.query, options.query);
+        (0, _extend2.default)(req.query, options.query);
       }
 
       // Data to send (with get requests these are converted into query params)
       if (options.data) {
         if (method == 'get') {
-          extend(req.query, options.data);
+          (0, _extend2.default)(req.query, options.data);
         } else {
           req.body = JSON.stringify(options.data);
         }
       }
 
-      if (!isEmpty(req.query)) {
+      if (!(0, _isEmpty2.default)(req.query)) {
         req.url += '?' + _querystring2.default.stringify(req.query);
       }
 

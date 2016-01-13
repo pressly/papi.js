@@ -1,8 +1,30 @@
 'use strict';
 
-//import {map, each, select, extend, last, isObject, isArray, isEmpty} from 'lodash';
-
 exports.__esModule = true;
+
+var _isArray = require('lodash/lang/isArray');
+
+var _isArray2 = _interopRequireDefault(_isArray);
+
+var _extend = require('lodash/object/extend');
+
+var _extend2 = _interopRequireDefault(_extend);
+
+var _isObject = require('lodash/lang/isObject');
+
+var _isObject2 = _interopRequireDefault(_isObject);
+
+var _last = require('lodash/array/last');
+
+var _last2 = _interopRequireDefault(_last);
+
+var _each = require('lodash/collection/each');
+
+var _each2 = _interopRequireDefault(_each);
+
+var _map = require('lodash/collection/map');
+
+var _map2 = _interopRequireDefault(_map);
 
 var _resource = require('./resource');
 
@@ -22,15 +44,6 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var map = require('lodash/collection/map');
-var each = require('lodash/collection/each');
-var select = require('lodash/collection/select');
-var extend = require('lodash/object/extend');
-var last = require('lodash/array/last');
-var isObject = require('lodash/lang/isObject');
-var isArray = require('lodash/lang/isArray');
-var isEmpty = require('lodash/lang/isEmpty');
-
 function singularize(string) {
   return string.replace(/s$/, '');
 }
@@ -40,7 +53,7 @@ function capitalize(string) {
 }
 
 function classify(string) {
-  return singularize(map(string.split("_"), function (s) {
+  return singularize((0, _map2.default)(string.split("_"), function (s) {
     return capitalize(s);
   }).join(''));
 }
@@ -73,7 +86,7 @@ var buildRoute = function buildRoute(resource) {
   }
 
   var params = {};
-  each(parseRouteParams(path), function (paramName) {
+  (0, _each2.default)(parseRouteParams(path), function (paramName) {
     params[paramName] = null;
   });
 
@@ -82,7 +95,7 @@ var buildRoute = function buildRoute(resource) {
 
 var reRouteParams = /:[^\/]+/gi;
 var parseRouteParams = function parseRouteParams(route) {
-  return map(route.match(reRouteParams), function (param) {
+  return (0, _map2.default)(route.match(reRouteParams), function (param) {
     return param.slice(1);
   });
 };
@@ -120,8 +133,8 @@ var ResourceSchema = function () {
       throw new Error("$resource: key is undefined");
     }
 
-    var name = last(key.split('.'));
-    var params = isObject(arguments[1]) && !(arguments[1] instanceof _resource2.default) ? arguments[1] : undefined;
+    var name = (0, _last2.default)(key.split('.'));
+    var params = (0, _isObject2.default)(arguments[1]) && !(arguments[1] instanceof _resource2.default) ? arguments[1] : undefined;
     var parentResource = arguments[2] || !params && arguments[1] || undefined;
 
     if (parentResource) {
@@ -213,8 +226,8 @@ ResourceSchema.defineSchema = function () {
 
               var data = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
 
-              return this.request(extend({ method: method, path: options.path || '/' + name }, { data: data })).then(function (res) {
-                if (isArray(res)) {
+              return this.request((0, _extend2.default)({ method: method, path: options.path || '/' + name }, { data: data })).then(function (res) {
+                if ((0, _isArray2.default)(res)) {
                   return _this2.hydrateCollection(res);
                 } else {
                   return _this2.hydrateModel(res);
@@ -233,7 +246,7 @@ ResourceSchema.defineSchema = function () {
 
               var data = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
 
-              return this.$resource().request(extend({ method: method, path: options.path || '/' + name }, { data: data })).then(function (res) {
+              return this.$resource().request((0, _extend2.default)({ method: method, path: options.path || '/' + name }, { data: data })).then(function (res) {
                 return _this3.$resource().hydrateModel(res);
               });
             };
@@ -265,7 +278,7 @@ ResourceSchema.defineSchema = function () {
     };
   };
 
-  return extend({}, pointer({}));
+  return (0, _extend2.default)({}, pointer({}));
 };
 
 // ResourceSchema.generateMarkdown = function() {
