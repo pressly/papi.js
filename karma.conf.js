@@ -155,7 +155,7 @@ module.exports = function(config) {
     //browsers: ['bs_firefox_mac', 'bs_iphone5', 'bs_ie11_windows8', 'bs_ie10_windows7', 'bs_ie9_windows7'],
     //browsers: ['bs_chrome_mac', 'bs_ie11_windows8', 'bs_ie9_windows7'],
     //browsers: ['bs_ie9_windows7'],
-    browsers: ['sl_chrome'],
+    browsers: ['sl_ie_11'],
 
     // Continuous Integration mode
     // if true, Karma captures browsers, runs the tests and exits
