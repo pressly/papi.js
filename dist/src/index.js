@@ -1,5 +1,13 @@
 'use strict';
 
+var _isEmpty = require('lodash/isEmpty');
+
+var _isEmpty2 = _interopRequireDefault(_isEmpty);
+
+var _assignIn = require('lodash/assignIn');
+
+var _assignIn2 = _interopRequireDefault(_assignIn);
+
 var _isomorphicFetch = require('isomorphic-fetch');
 
 var _isomorphicFetch2 = _interopRequireDefault(_isomorphicFetch);
@@ -7,8 +15,6 @@ var _isomorphicFetch2 = _interopRequireDefault(_isomorphicFetch);
 var _querystring = require('querystring');
 
 var _querystring2 = _interopRequireDefault(_querystring);
-
-var _lodash = require('lodash');
 
 var _resourceSchema = require('./resource-schema');
 
@@ -30,9 +36,6 @@ if (!global.fetch) {
 
 // Query string parser and stringifier -- fetch does not support any query string
 // parsing so we need to handle it separately.
-
-// var extend =      require('lodash/object/extend');
-// var isEmpty =     require('lodash/lang/isEmpty');
 
 function hasXDomain() {
   return typeof window !== 'undefined' && window.xdomain != null;
@@ -145,19 +148,19 @@ var Papi = function (_ResourceSchema) {
 
       // Query params to be added to the url
       if (options.query) {
-        (0, _lodash.extend)(req.query, options.query);
+        (0, _assignIn2.default)(req.query, options.query);
       }
 
       // Data to send (with get requests these are converted into query params)
       if (options.data) {
         if (method == 'get') {
-          (0, _lodash.extend)(req.query, options.data);
+          (0, _assignIn2.default)(req.query, options.data);
         } else {
           req.body = JSON.stringify(options.data);
         }
       }
 
-      if (!(0, _lodash.isEmpty)(req.query)) {
+      if (!(0, _isEmpty2.default)(req.query)) {
         req.url += '?' + _querystring2.default.stringify(req.query);
       }
 

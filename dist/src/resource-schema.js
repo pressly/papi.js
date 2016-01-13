@@ -2,7 +2,29 @@
 
 exports.__esModule = true;
 
-var _lodash = require('lodash');
+var _isArray = require('lodash/isArray');
+
+var _isArray2 = _interopRequireDefault(_isArray);
+
+var _assignIn = require('lodash/assignIn');
+
+var _assignIn2 = _interopRequireDefault(_assignIn);
+
+var _isObject = require('lodash/isObject');
+
+var _isObject2 = _interopRequireDefault(_isObject);
+
+var _last = require('lodash/last');
+
+var _last2 = _interopRequireDefault(_last);
+
+var _each = require('lodash/each');
+
+var _each2 = _interopRequireDefault(_each);
+
+var _map = require('lodash/map');
+
+var _map2 = _interopRequireDefault(_map);
 
 var _resource = require('./resource');
 
@@ -21,14 +43,6 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-// var map =         require('lodash/collection/map');
-// var each =        require('lodash/collection/each');
-// var filter =      require('lodash/collection/filter');
-// var extend =      require('lodash/object/extend');
-// var last =        require('lodash/array/last');
-// var isObject =    require('lodash/lang/isObject');
-// var isArray =     require('lodash/lang/isArray');
-// var isEmpty =     require('lodash/lang/isEmpty');
 
 function singularize(string) {
   return string.replace(/s$/, '');
@@ -39,7 +53,7 @@ function capitalize(string) {
 }
 
 function classify(string) {
-  return singularize((0, _lodash.map)(string.split("_"), function (s) {
+  return singularize((0, _map2.default)(string.split("_"), function (s) {
     return capitalize(s);
   }).join(''));
 }
@@ -72,7 +86,7 @@ var buildRoute = function buildRoute(resource) {
   }
 
   var params = {};
-  (0, _lodash.each)(parseRouteParams(path), function (paramName) {
+  (0, _each2.default)(parseRouteParams(path), function (paramName) {
     params[paramName] = null;
   });
 
@@ -81,7 +95,7 @@ var buildRoute = function buildRoute(resource) {
 
 var reRouteParams = /:[^\/]+/gi;
 var parseRouteParams = function parseRouteParams(route) {
-  return (0, _lodash.map)(route.match(reRouteParams), function (param) {
+  return (0, _map2.default)(route.match(reRouteParams), function (param) {
     return param.slice(1);
   });
 };
@@ -119,8 +133,8 @@ var ResourceSchema = function () {
       throw new Error("$resource: key is undefined");
     }
 
-    var name = (0, _lodash.last)(key.split('.'));
-    var params = (0, _lodash.isObject)(arguments[1]) && !(arguments[1] instanceof _resource2.default) ? arguments[1] : undefined;
+    var name = (0, _last2.default)(key.split('.'));
+    var params = (0, _isObject2.default)(arguments[1]) && !(arguments[1] instanceof _resource2.default) ? arguments[1] : undefined;
     var parentResource = arguments[2] || !params && arguments[1] || undefined;
 
     if (parentResource) {
@@ -212,8 +226,8 @@ ResourceSchema.defineSchema = function () {
 
               var data = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
 
-              return this.request((0, _lodash.extend)({ method: method, path: options.path || '/' + name }, { data: data })).then(function (res) {
-                if ((0, _lodash.isArray)(res)) {
+              return this.request((0, _assignIn2.default)({ method: method, path: options.path || '/' + name }, { data: data })).then(function (res) {
+                if ((0, _isArray2.default)(res)) {
                   return _this2.hydrateCollection(res);
                 } else {
                   return _this2.hydrateModel(res);
@@ -232,7 +246,7 @@ ResourceSchema.defineSchema = function () {
 
               var data = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
 
-              return this.$resource().request((0, _lodash.extend)({ method: method, path: options.path || '/' + name }, { data: data })).then(function (res) {
+              return this.$resource().request((0, _assignIn2.default)({ method: method, path: options.path || '/' + name }, { data: data })).then(function (res) {
                 return _this3.$resource().hydrateModel(res);
               });
             };
@@ -264,7 +278,7 @@ ResourceSchema.defineSchema = function () {
     };
   };
 
-  return (0, _lodash.extend)({}, pointer({}));
+  return (0, _assignIn2.default)({}, pointer({}));
 };
 
 // ResourceSchema.generateMarkdown = function() {

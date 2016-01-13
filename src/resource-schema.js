@@ -1,14 +1,6 @@
 'use strict'
 
-import {map, each, filter, extend, last, isObject, isArray, isEmpty} from 'lodash';
-// var map =         require('lodash/collection/map');
-// var each =        require('lodash/collection/each');
-// var filter =      require('lodash/collection/filter');
-// var extend =      require('lodash/object/extend');
-// var last =        require('lodash/array/last');
-// var isObject =    require('lodash/lang/isObject');
-// var isArray =     require('lodash/lang/isArray');
-// var isEmpty =     require('lodash/lang/isEmpty');
+import {assignIn, map, each, filter, last, isObject, isArray, isEmpty} from 'lodash';
 
 import Resource from './resource';
 import * as models from './models';
@@ -177,7 +169,7 @@ ResourceSchema.defineSchema = function() {
             //console.log(`- adding collection action to ${parentPointer.current.key}:`, method, name);
 
             resourceClass.prototype['$' + name] = function(data = {}) {
-              return this.request(extend({ method: method, path: options.path || `/${name}`}, {data})).then((res) => {
+              return this.request(assignIn({ method: method, path: options.path || `/${name}`}, {data})).then((res) => {
                 if (isArray(res)) {
                   return this.hydrateCollection(res);
                 } else {
@@ -193,7 +185,7 @@ ResourceSchema.defineSchema = function() {
             //console.log(`- adding member action to ${parentPointer.current.key}:`, method, name);
 
             modelClass.prototype['$' + name] = function(data = {}) {
-              return this.$resource().request(extend({ method: method, path: options.path || `/${name}`}, {data})).then((res) => {
+              return this.$resource().request(assignIn({ method: method, path: options.path || `/${name}`}, {data})).then((res) => {
                 return this.$resource().hydrateModel(res);
               });
             }
@@ -225,7 +217,7 @@ ResourceSchema.defineSchema = function() {
     };
   };
 
-  return extend({}, pointer({}));
+  return assignIn({}, pointer({}));
 };
 
 // ResourceSchema.generateMarkdown = function() {

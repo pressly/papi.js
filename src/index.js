@@ -11,9 +11,7 @@ if (!global.fetch) {
 // parsing so we need to handle it separately.
 import qs from 'querystring';
 
-import {extend, isEmpty} from 'lodash';
-// var extend =      require('lodash/object/extend');
-// var isEmpty =     require('lodash/lang/isEmpty');
+import {assignIn, isEmpty} from 'lodash';
 
 function hasXDomain() {
   return typeof window !== 'undefined' && window.xdomain != null;
@@ -117,13 +115,13 @@ class Papi extends ResourceSchema {
 
       // Query params to be added to the url
       if (options.query) {
-        extend(req.query, options.query);
+        assignIn(req.query, options.query);
       }
 
       // Data to send (with get requests these are converted into query params)
       if (options.data) {
         if (method == 'get') {
-          extend(req.query, options.data);
+          assignIn(req.query, options.data);
         } else {
           req.body = JSON.stringify(options.data);
         }

@@ -2,11 +2,21 @@
 
 exports.__esModule = true;
 
+var _pick = require('lodash/pick');
+
+var _pick2 = _interopRequireDefault(_pick);
+
+var _isEmpty = require('lodash/isEmpty');
+
+var _isEmpty2 = _interopRequireDefault(_isEmpty);
+
+var _every = require('lodash/every');
+
+var _every2 = _interopRequireDefault(_every);
+
 var _model = require('../model');
 
 var _model2 = _interopRequireDefault(_model);
-
-var _lodash = require('lodash');
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -15,10 +25,6 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-// var every = require('lodash/collection/every');
-// var pick = require('lodash/object/pick');
-// var isEmpty = require('lodash/lang/isEmpty');
 
 var DISPLAY_STATES = {
   VISIBLE: 1,
@@ -57,7 +63,7 @@ var Asset = function (_Model) {
   };
 
   Asset.prototype.isOriginal = function isOriginal() {
-    return (0, _lodash.every)((0, _lodash.pick)(this.source, 'network', 'uid', 'url'), _lodash.isEmpty);
+    return (0, _every2.default)((0, _pick2.default)(this.source, 'network', 'uid', 'url'), _isEmpty2.default);
   };
 
   return Asset;

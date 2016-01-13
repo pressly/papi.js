@@ -1,16 +1,10 @@
 'use strict'
 
-import {extend, filter, pick, difference, keys, functions} from 'lodash';
-// var extend =      require('lodash/object/extend');
-// var keys =        require('lodash/object/keys');
-// var functions =   require('lodash/object/functions');
-// var pick =        require('lodash/object/pick');
-// var filter =      require('lodash/collection/filter');
-// var difference =  require('lodash/array/difference');
+import {assignIn, filter, pick, difference, keys, functions} from 'lodash';
 
 export default class Model {
   constructor(data, options = {}) {
-    extend(this, data);
+    assignIn(this, data);
 
     this.$newRecord = true;
   }
@@ -26,7 +20,7 @@ export default class Model {
       this.$newRecord = false;
       this.$resource().sync(res);
 
-      return extend(this, res);
+      return assignIn(this, res);
     });
   }
 

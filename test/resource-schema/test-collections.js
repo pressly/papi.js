@@ -5,7 +5,7 @@ import Papi from '../../src';
 import * as mock from '../api/mocks';
 import should from 'should';
 import * as models from '../../src/models';
-import _ from 'lodash';
+import {last} from 'lodash';
 
 const api = new Papi();
 
@@ -46,7 +46,7 @@ describe('Collections', function() {
   });
 
   it('should remove a model', function(done) {
-    var model = _.last(collection);
+    var model = last(collection);
 
     collection.$remove(model);
     should(collection.length).equal(mock.hubs.length);

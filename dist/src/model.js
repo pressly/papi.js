@@ -2,16 +2,33 @@
 
 exports.__esModule = true;
 
-var _lodash = require('lodash');
+var _pick = require('lodash/pick');
+
+var _pick2 = _interopRequireDefault(_pick);
+
+var _functions = require('lodash/functions');
+
+var _functions2 = _interopRequireDefault(_functions);
+
+var _keys = require('lodash/keys');
+
+var _keys2 = _interopRequireDefault(_keys);
+
+var _difference = require('lodash/difference');
+
+var _difference2 = _interopRequireDefault(_difference);
+
+var _filter = require('lodash/filter');
+
+var _filter2 = _interopRequireDefault(_filter);
+
+var _assignIn = require('lodash/assignIn');
+
+var _assignIn2 = _interopRequireDefault(_assignIn);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-// var extend =      require('lodash/object/extend');
-// var keys =        require('lodash/object/keys');
-// var functions =   require('lodash/object/functions');
-// var pick =        require('lodash/object/pick');
-// var filter =      require('lodash/collection/filter');
-// var difference =  require('lodash/array/difference');
 
 var Model = function () {
   function Model(data) {
@@ -19,7 +36,7 @@ var Model = function () {
 
     _classCallCheck(this, Model);
 
-    (0, _lodash.extend)(this, data);
+    (0, _assignIn2.default)(this, data);
 
     this.$newRecord = true;
   }
@@ -37,18 +54,18 @@ var Model = function () {
       _this.$newRecord = false;
       _this.$resource().sync(res);
 
-      return (0, _lodash.extend)(_this, res);
+      return (0, _assignIn2.default)(_this, res);
     });
   };
 
   Model.prototype.$attributes = function $attributes() {
-    return (0, _lodash.filter)((0, _lodash.difference)((0, _lodash.keys)(this), (0, _lodash.functions)(this)), function (x) {
+    return (0, _filter2.default)((0, _difference2.default)((0, _keys2.default)(this), (0, _functions2.default)(this)), function (x) {
       return x[0] != '$';
     });
   };
 
   Model.prototype.$data = function $data() {
-    return (0, _lodash.pick)(this, this.$attributes());
+    return (0, _pick2.default)(this, this.$attributes());
   };
 
   return Model;

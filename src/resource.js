@@ -1,16 +1,6 @@
 'use strict'
 
-import {map, each, filter, find, extend, clone, isEmpty, isArray, isObject, isNumber} from 'lodash';
-// var map =         require('lodash/collection/map');
-// var each =        require('lodash/collection/each');
-// var filter =       require('lodash/collection/filter');
-// var find =   require('lodash/collection/find');
-// var extend =      require('lodash/object/extend');
-// var clone =       require('lodash/lang/clone');
-// var isObject =    require('lodash/lang/isObject');
-// var isArray =     require('lodash/lang/isArray');
-// var isEmpty =     require('lodash/lang/isEmpty');
-// var isNumber =    require('lodash/lang/isNumber');
+import {assignIn, map, each, filter, find, clone, isEmpty, isArray, isObject, isNumber} from 'lodash';
 
 function deepClone(obj) {
   return JSON.parse(JSON.stringify(obj));
@@ -68,7 +58,7 @@ export default class Resource {
         parentParams[paramName] = value;
       });
 
-      extend(this.route.params, parentParams);
+      assignIn(this.route.params, parentParams);
 
       if (inherit) {
         this.route.queryParams = clone(parentResource.route.queryParams);
@@ -85,7 +75,7 @@ export default class Resource {
   }
 
   request(options = {}) {
-    return this.api.request(options.method || 'get', this.buildRoute(options.path), extend({}, this.options, { query: extend({}, this.route.queryParams, options.query), data: options.data })).then((res) => {
+    return this.api.request(options.method || 'get', this.buildRoute(options.path), assignIn({}, this.options, { query: assignIn({}, this.route.queryParams, options.query), data: options.data })).then((res) => {
       this.setResponse(res);
       return res.data;
     });
@@ -119,7 +109,7 @@ export default class Resource {
   }
 
   query(params) {
-    extend(this.route.queryParams, params);
+    assignIn(this.route.queryParams, params);
 
     return this;
   }
@@ -338,7 +328,7 @@ export default class Resource {
       }
     };
 
-    extend(collection, methods);
+    assignIn(collection, methods);
 
     return collection;
   }
