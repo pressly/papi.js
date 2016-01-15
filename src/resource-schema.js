@@ -35,13 +35,17 @@ var buildRoute = function(resource) {
   if (current.options.route) {
     path = current.options.route;
   } else {
+    // Build full path
     while (current) {
+      // Get param for this segment - default to 'id'
       var paramName = current.options.routeSegment ? parseRouteParams(current.options.routeSegment)[0] : current.options.paramName || 'id';
 
+      // If this segment is a parent segment prepend the param name with the segment name ie. 'id' -> 'hubId'
       if (current !== resource) {
         paramName = singularize(current.name) + capitalize(paramName);
       }
 
+      // Create route segment from custom routeSegment property or default to name/param
       var routeSegment = current.options.routeSegment ? current.options.routeSegment.replace(/\/:[^\/]+$/, `/:${paramName}`) : `/${current.name}/:${paramName}`;
 
       segments.unshift(routeSegment);
@@ -174,8 +178,14 @@ ResourceSchema.defineSchema = function() {
       },
 
       action: function(method, name, options) {
+        var action = { method, name, options };
+
+        if (action.options.routeSegment) {
+          action.options.paramName = parseRouteParams(action.options.routeSegment)[0];
+        }
+
         if (parentPointer && parentPointer.current) {
-          parentPointer.current.actions.push({ method, name, options });
+          parentPointer.current.actions.push(action);
         }
 
         if (options.on == 'resource') {
@@ -185,7 +195,7 @@ ResourceSchema.defineSchema = function() {
             //console.log(`- adding collection action to ${parentPointer.current.key}:`, method, name, options);
 
             resourceClass.prototype['$' + name] = function(data = {}) {
-              return this.request(extend({ method: method, path: options.path || `/${name}`}, {data})).then((res) => {
+              return this.request(extend({ method, action }, { data })).then((res) => {
                 if (isArray(res)) {
                   return this.hydrateCollection(res);
                 } else {
@@ -201,7 +211,7 @@ ResourceSchema.defineSchema = function() {
             //console.log(`- adding member action to ${parentPointer.current.key}:`, method, name, options);
 
             modelClass.prototype['$' + name] = function(data = {}) {
-              return this.$resource().request(extend({ method: method, path: options.path || `/${name}`}, {data})).then((res) => {
+              return this.$resource().request(extend({ method, action }, { data })).then((res) => {
                 return this.$resource().hydrateModel(res);
               });
             }

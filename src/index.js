@@ -232,7 +232,7 @@ Papi.defineSchema()
     .post('reject_invite', { on: 'member'})
 
     .resource('apps').open()
-      .get('current', { on: 'resource', path: '/current' })
+      .get('current', { on: 'resource' })
       .get('build',   { on: 'member', path: '/build_app' })
       .get('status',  { on: 'member' })
 

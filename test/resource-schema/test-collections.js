@@ -143,7 +143,7 @@ describe('Collections', function() {
 
   it('should have a member action', function(done) {
     mockRequest.get(`/invites/incoming`).reply(200, mock.invites);
-    mockRequest.post(`/invites/${mock.invites[0].id}/accept`).reply(200);
+    mockRequest.post(`/invites/${mock.invites[0].hash}/accept`).reply(200);
 
     api.$resource('invites').$incoming().then(function(res) {
       var invite = res[0];
