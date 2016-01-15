@@ -58,6 +58,15 @@ function classify(string) {
   }).join(''));
 }
 
+// Builds a route object based on the resource chain
+// ie: hubs > apps > styles =>
+//   {
+//     path: '/hubs/:hubId/apps/:appId/styles/:id',
+//     segments: [ '/hubs/:hubId', '/apps/:appId', '/styles/:id' ],
+//     segment: '/styles/:id',
+//     params: { hubId: null, appId: null, id: null },
+//     paramName: 'id'
+//   }
 var buildRoute = function buildRoute(resource) {
   var current = resource;
   var segments = [];
@@ -67,7 +76,6 @@ var buildRoute = function buildRoute(resource) {
   if (current.options.route) {
     path = current.options.route;
   } else {
-
     while (current) {
       var paramName = current.options.routeSegment ? parseRouteParams(current.options.routeSegment)[0] : current.options.paramName || 'id';
 
@@ -90,9 +98,16 @@ var buildRoute = function buildRoute(resource) {
     params[paramName] = null;
   });
 
-  return { path: path, segments: segments, segment: segments[segments.length - 1], params: params, paramName: resource.options.paramName || 'id' };
+  return {
+    path: path,
+    segments: segments,
+    segment: segments[segments.length - 1],
+    params: params,
+    paramName: resource.options.paramName || 'id'
+  };
 };
 
+// Parses params out of a route ie. /hubs/:hubId/apps/:appId/styles/:id => ['hubId', 'appId', 'id']
 var reRouteParams = /:[^\/]+/gi;
 var parseRouteParams = function parseRouteParams(route) {
   return (0, _map2.default)(route.match(reRouteParams), function (param) {
@@ -100,6 +115,7 @@ var parseRouteParams = function parseRouteParams(route) {
   });
 };
 
+// Builds a key based on resource names ie. hubs.apps for the hubs > apps resource
 var buildKey = function buildKey(resource, name) {
   var current = resource;
   var segments = [];
@@ -219,7 +235,7 @@ ResourceSchema.defineSchema = function () {
           var resourceClass = API.resourceClasses[parentPointer.current.key];
 
           if (!resourceClass.prototype.hasOwnProperty('$' + name)) {
-            //console.log(`- adding collection action to ${parentPointer.current.key}:`, method, name);
+            //console.log(`- adding collection action to ${parentPointer.current.key}:`, method, name, options);
 
             resourceClass.prototype['$' + name] = function () {
               var _this2 = this;
@@ -239,7 +255,7 @@ ResourceSchema.defineSchema = function () {
           var modelClass = API.resourceClasses[parentPointer.current.key].modelClass;
 
           if (!modelClass.prototype.hasOwnProperty('$' + name)) {
-            //console.log(`- adding member action to ${parentPointer.current.key}:`, method, name);
+            //console.log(`- adding member action to ${parentPointer.current.key}:`, method, name, options);
 
             modelClass.prototype['$' + name] = function () {
               var _this3 = this;
@@ -257,23 +273,23 @@ ResourceSchema.defineSchema = function () {
       },
 
       get: function get() {
-        return this.action.call(this, 'get', arguments[0], arguments[1]);
+        return this.action.apply(this, ['get'].concat(Array.prototype.slice.call(arguments)));
       },
 
       post: function post() {
-        return this.action.call(this, 'post', arguments[0], arguments[1]);
+        return this.action.apply(this, ['post'].concat(Array.prototype.slice.call(arguments)));
       },
 
       put: function put() {
-        return this.action.call(this, 'put', arguments[0], arguments[1]);
+        return this.action.apply(this, ['put'].concat(Array.prototype.slice.call(arguments)));
       },
 
       patch: function patch() {
-        return this.action.call(this, 'patch', arguments[0], arguments[1]);
+        return this.action.apply(this, ['patch'].concat(Array.prototype.slice.call(arguments)));
       },
 
       delete: function _delete() {
-        return this.action.call(this, 'delete', arguments[0], arguments[1]);
+        return this.action.apply(this, ['delete'].concat(Array.prototype.slice.call(arguments)));
       }
     };
   };
