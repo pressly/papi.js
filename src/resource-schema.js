@@ -17,6 +17,15 @@ function classify(string) {
   return singularize(map(string.split("_"), function(s) { return capitalize(s); }).join(''));
 }
 
+// Builds a route object based on the resource chain
+// ie: hubs > apps > styles =>
+//   {
+//     path: '/hubs/:hubId/apps/:appId/styles/:id',
+//     segments: [ '/hubs/:hubId', '/apps/:appId', '/styles/:id' ],
+//     segment: '/styles/:id',
+//     params: { hubId: null, appId: null, id: null },
+//     paramName: 'id'
+//   }
 var buildRoute = function(resource) {
   var current = resource;
   var segments = [];
@@ -26,7 +35,6 @@ var buildRoute = function(resource) {
   if (current.options.route) {
     path = current.options.route;
   } else {
-
     while (current) {
       var paramName = current.options.routeSegment ? parseRouteParams(current.options.routeSegment)[0] : current.options.paramName || 'id';
 
@@ -49,9 +57,16 @@ var buildRoute = function(resource) {
     params[paramName] = null;
   });
 
-  return { path: path, segments: segments, segment: segments[segments.length - 1], params: params, paramName: resource.options.paramName || 'id' };
+  return {
+    path: path,
+    segments: segments,
+    segment: segments[segments.length - 1],
+    params: params,
+    paramName: resource.options.paramName || 'id'
+  };
 };
 
+// Parses params out of a route ie. /hubs/:hubId/apps/:appId/styles/:id => ['hubId', 'appId', 'id']
 var reRouteParams = /:[^\/]+/gi;
 var parseRouteParams = function(route) {
   return map(route.match(reRouteParams), function(param) {
@@ -59,6 +74,7 @@ var parseRouteParams = function(route) {
   });
 };
 
+// Builds a key based on resource names ie. hubs.apps for the hubs > apps resource
 var buildKey = function(resource, name) {
   var current = resource;
   var segments = [];
@@ -166,7 +182,7 @@ ResourceSchema.defineSchema = function() {
           var resourceClass = API.resourceClasses[parentPointer.current.key];
 
           if (!resourceClass.prototype.hasOwnProperty('$' + name)) {
-            //console.log(`- adding collection action to ${parentPointer.current.key}:`, method, name);
+            //console.log(`- adding collection action to ${parentPointer.current.key}:`, method, name, options);
 
             resourceClass.prototype['$' + name] = function(data = {}) {
               return this.request(extend({ method: method, path: options.path || `/${name}`}, {data})).then((res) => {
@@ -182,7 +198,7 @@ ResourceSchema.defineSchema = function() {
           var modelClass = API.resourceClasses[parentPointer.current.key].modelClass;
 
           if (!modelClass.prototype.hasOwnProperty('$' + name)) {
-            //console.log(`- adding member action to ${parentPointer.current.key}:`, method, name);
+            //console.log(`- adding member action to ${parentPointer.current.key}:`, method, name, options);
 
             modelClass.prototype['$' + name] = function(data = {}) {
               return this.$resource().request(extend({ method: method, path: options.path || `/${name}`}, {data})).then((res) => {
@@ -196,23 +212,23 @@ ResourceSchema.defineSchema = function() {
       },
 
       get: function() {
-        return this.action.call(this, 'get', arguments[0], arguments[1]);
+        return this.action.apply(this, ['get', ...arguments]);
       },
 
       post: function() {
-        return this.action.call(this, 'post', arguments[0], arguments[1]);
+        return this.action.apply(this, ['post', ...arguments]);
       },
 
       put: function() {
-        return this.action.call(this, 'put', arguments[0], arguments[1]);
+        return this.action.apply(this, ['put', ...arguments]);
       },
 
       patch: function() {
-        return this.action.call(this, 'patch', arguments[0], arguments[1]);
+        return this.action.apply(this, ['patch', ...arguments]);
       },
 
       delete: function() {
-        return this.action.call(this, 'delete', arguments[0], arguments[1]);
+        return this.action.apply(this, ['delete', ...arguments]);
       }
     };
   };
