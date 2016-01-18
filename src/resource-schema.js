@@ -188,9 +188,9 @@ ResourceSchema.defineSchema = function() {
           parentPointer.current.actions.push(action);
         }
 
-        if (options.on == 'resource') {
-          var resourceClass = API.resourceClasses[parentPointer.current.key];
+        var resourceClass = API.resourceClasses[parentPointer.current.key];
 
+        if (options.on == 'resource') {
           if (!resourceClass.prototype.hasOwnProperty('$' + name)) {
             //console.log(`- adding collection action to ${parentPointer.current.key}:`, method, name, options);
 
@@ -203,18 +203,24 @@ ResourceSchema.defineSchema = function() {
                 }
               });
             };
+          } else {
+            throw `Attempted to create an action '${name}' that already exists.`;
           }
         } else if (options.on == 'member') {
-          var modelClass = API.resourceClasses[parentPointer.current.key].modelClass;
-
-          if (!modelClass.prototype.hasOwnProperty('$' + name)) {
+          if (!resourceClass.prototype.hasOwnProperty('$' + name)) {
             //console.log(`- adding member action to ${parentPointer.current.key}:`, method, name, options);
 
-            modelClass.prototype['$' + name] = function(data = {}) {
-              return this.$resource().request(extend({ method, action }, { data })).then((res) => {
-                return this.$resource().hydrateModel(res);
+            resourceClass.prototype['$' + name] = function(data = {}) {
+              return this.request(extend({ method, action }, { data })).then((res) => {
+                return this.hydrateModel(res);
               });
-            }
+            };
+
+            resourceClass.modelClass.prototype['$' + name] = function(data = {}) {
+              return this.$resource()['$' + name](data);
+            };
+          } else {
+            throw `Attempted to create an action '${name}' that already exists.`;
           }
         }
 
