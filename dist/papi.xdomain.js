@@ -1396,7 +1396,7 @@ if (Papi.defineSchema == undefined) {
   Papi.defineSchema = _resourceSchema2.default.defineSchema;
 }
 
-Papi.defineSchema().resource('accounts').open().get('available', { on: 'resource' }).post('become', { on: 'member' }).resource('users').resource('hubs', { link: 'hubs' }).close().resource('organizations').open().resource('users').resource('hubs').resource('invites').close().resource('activity').resource('posts', { routeSegment: '/stream/posts/:id' }).resource('hubs').open().get('search', { on: 'resource' }).post('upgrade', { on: 'member' }).post('accept_invite', { on: 'member' }).post('reject_invite', { on: 'member' }).resource('apps').open().get('current', { on: 'resource', path: '/current' }).get('build', { on: 'member', path: '/build_app' }).get('status', { on: 'member' }).resource('styles').close().resource('addons').open().resource('configs').close().resource('analytics').open().get('summary', { on: 'resource' }).get('visitors', { on: 'resource' }).get('pageviews', { on: 'resource' }).get('duration', { on: 'resource' }).close().resource('feeds').open().resource('assets', { modelName: 'FeedAsset' }).close().resource('invites').open().post('bulk_invite', { on: 'resource' }).post('resend', { on: 'member' }).post('accept', { on: 'member', routeSegment: '/invites/:hash' }).post('reject', { on: 'member', routeSegment: '/invites/:hash' }).close().resource('recommendations').resource('users').open().post('grant_access', { on: 'resource' }).delete('revoke_access', { on: 'member' }).close().resource('collections').open().put('reorder', { on: 'resource' }).close().resource('tags').resource('assets', { routeSegment: '/stream/:id' }).open().put('feature', { on: 'member' }).put('unfeature', { on: 'member' }).put('hide', { on: 'member' }).put('unhide', { on: 'member' }).put('lock', { on: 'member' }).put('unlock', { on: 'member' }).resource('likes').resource('comments').close().resource('drafts').open().put('publish', { on: 'member' }).close().close().resource('invites').open().get('incoming', { on: 'resource' }).get('outgoing', { on: 'resource' }).post('bulk_invite', { on: 'resource' }).post('resend', { on: 'member' }).post('accept', { on: 'member', routeSegment: '/invites/:hash' }).post('reject', { on: 'member', routeSegment: '/invites/:hash' }).close().resource('code_revisions').open().get('fetch_repo', { on: 'member' })
+Papi.defineSchema().resource('accounts').open().get('available', { on: 'resource' }).post('become', { on: 'member' }).resource('users').resource('hubs', { link: 'hubs' }).close().resource('organizations').open().resource('users').resource('hubs').resource('invites').open().post('bulk_invite', { on: 'resource' }).post('resend', { on: 'member' }).post('accept', { on: 'member', routeSegment: '/invites/:hash' }).post('reject', { on: 'member', routeSegment: '/invites/:hash' }).close().close().resource('activity').resource('posts', { routeSegment: '/stream/posts/:id' }).resource('hubs').open().get('search', { on: 'resource' }).post('upgrade', { on: 'member' }).post('accept_invite', { on: 'member' }).post('reject_invite', { on: 'member' }).resource('apps').open().get('current', { on: 'resource' }).get('build', { on: 'member', path: '/build_app' }).get('status', { on: 'member' }).resource('styles').close().resource('addons').open().resource('configs').close().resource('analytics').open().get('summary', { on: 'resource' }).get('visitors', { on: 'resource' }).get('pageviews', { on: 'resource' }).get('duration', { on: 'resource' }).close().resource('feeds').open().resource('assets', { modelName: 'FeedAsset' }).close().resource('invites').open().post('bulk_invite', { on: 'resource' }).post('resend', { on: 'member' }).post('accept', { on: 'member', routeSegment: '/invites/:hash' }).post('reject', { on: 'member', routeSegment: '/invites/:hash' }).close().resource('recommendations').resource('users').open().post('grant_access', { on: 'resource' }).delete('revoke_access', { on: 'member' }).close().resource('collections').open().put('reorder', { on: 'resource' }).close().resource('tags').resource('assets', { routeSegment: '/stream/:id' }).open().put('feature', { on: 'member' }).put('unfeature', { on: 'member' }).put('hide', { on: 'member' }).put('unhide', { on: 'member' }).put('lock', { on: 'member' }).put('unlock', { on: 'member' }).resource('likes').resource('comments').close().resource('drafts').open().put('publish', { on: 'member' }).close().close().resource('invites').open().get('incoming', { on: 'resource' }).get('outgoing', { on: 'resource' }).post('bulk_invite', { on: 'resource' }).post('resend', { on: 'member' }).post('accept', { on: 'member', routeSegment: '/invites/:hash' }).post('reject', { on: 'member', routeSegment: '/invites/:hash' }).close().resource('code_revisions').open().get('fetch_repo', { on: 'member' })
 
 // This resource links to the root hubs resource
 .resource('hubs', { link: 'hubs' }).close().resource('signup').open().get('account_uid_available', { on: 'member' }).get('account_email_available', { on: 'member' }).close().resource('users').open().get('roles', { on: 'resource' }).resource('hubs').resource('organizations').close().resource('discover').open().resource('users', { link: 'users' }).resource('organizations', { link: 'organizations' }).resource('hubs', { link: 'hubs' }).resource('posts').close().resource('stream').open().resource('following').close();
@@ -2278,13 +2278,17 @@ var buildRoute = function buildRoute(resource) {
   if (current.options.route) {
     path = current.options.route;
   } else {
+    // Build full path
     while (current) {
+      // Get param for this segment - default to 'id'
       var paramName = current.options.routeSegment ? parseRouteParams(current.options.routeSegment)[0] : current.options.paramName || 'id';
 
+      // If this segment is a parent segment prepend the param name with the segment name ie. 'id' -> 'hubId'
       if (current !== resource) {
         paramName = singularize(current.name) + capitalize(paramName);
       }
 
+      // Create route segment from custom routeSegment property or default to name/param
       var routeSegment = current.options.routeSegment ? current.options.routeSegment.replace(/\/:[^\/]+$/, '/:' + paramName) : '/' + current.name + '/:' + paramName;
 
       segments.unshift(routeSegment);
@@ -2429,13 +2433,19 @@ ResourceSchema.defineSchema = function () {
       },
 
       action: function action(method, name, options) {
-        if (parentPointer && parentPointer.current) {
-          parentPointer.current.actions.push({ method: method, name: name, options: options });
+        var action = { method: method, name: name, options: options };
+
+        if (action.options.routeSegment) {
+          action.options.paramName = parseRouteParams(action.options.routeSegment)[0];
         }
 
-        if (options.on == 'resource') {
-          var resourceClass = API.resourceClasses[parentPointer.current.key];
+        if (parentPointer && parentPointer.current) {
+          parentPointer.current.actions.push(action);
+        }
 
+        var resourceClass = API.resourceClasses[parentPointer.current.key];
+
+        if (options.on == 'resource') {
           if (!resourceClass.prototype.hasOwnProperty('$' + name)) {
             //console.log(`- adding collection action to ${parentPointer.current.key}:`, method, name, options);
 
@@ -2444,7 +2454,7 @@ ResourceSchema.defineSchema = function () {
 
               var data = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
 
-              return this.request((0, _extend2.default)({ method: method, path: options.path || '/' + name }, { data: data })).then(function (res) {
+              return this.request((0, _extend2.default)({ method: method, action: action }, { data: data })).then(function (res) {
                 if ((0, _isArray2.default)(res)) {
                   return _this2.hydrateCollection(res);
                 } else {
@@ -2452,22 +2462,30 @@ ResourceSchema.defineSchema = function () {
                 }
               });
             };
+          } else {
+            throw 'Attempted to create an action \'' + name + '\' that already exists.';
           }
         } else if (options.on == 'member') {
-          var modelClass = API.resourceClasses[parentPointer.current.key].modelClass;
-
-          if (!modelClass.prototype.hasOwnProperty('$' + name)) {
+          if (!resourceClass.prototype.hasOwnProperty('$' + name)) {
             //console.log(`- adding member action to ${parentPointer.current.key}:`, method, name, options);
 
-            modelClass.prototype['$' + name] = function () {
+            resourceClass.prototype['$' + name] = function () {
               var _this3 = this;
 
               var data = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
 
-              return this.$resource().request((0, _extend2.default)({ method: method, path: options.path || '/' + name }, { data: data })).then(function (res) {
-                return _this3.$resource().hydrateModel(res);
+              return this.request((0, _extend2.default)({ method: method, action: action }, { data: data })).then(function (res) {
+                return _this3.hydrateModel(res);
               });
             };
+
+            resourceClass.modelClass.prototype['$' + name] = function () {
+              var data = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+
+              return this.$resource()['$' + name](data);
+            };
+          } else {
+            throw 'Attempted to create an action \'' + name + '\' that already exists.';
           }
         }
 
@@ -2683,6 +2701,8 @@ var Resource = function () {
     this.route = deepClone(def.route);
     this.route.queryParams = {};
 
+    this.actions = deepClone(def.actions);
+
     // Prepare route params, extends the route params from the parentResource
     if (parentResource) {
       var parentParams = {};
@@ -2718,22 +2738,38 @@ var Resource = function () {
 
     var options = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
 
-    return this.api.request(options.method || 'get', this.buildRoute(options.path), (0, _extend2.default)({}, this.options, { query: (0, _extend2.default)({}, this.route.queryParams, options.query), data: options.data })).then(function (res) {
+    var path = options.action ? this.buildActionPath(options.action) : this.buildPath();
+
+    return this.api.request(options.method || 'get', path, (0, _extend2.default)({}, this.options, { query: (0, _extend2.default)({}, this.route.queryParams, options.query), data: options.data })).then(function (res) {
       _this2.setResponse(res);
       return res.data;
     });
   };
 
-  Resource.prototype.buildRoute = function buildRoute(appendPath) {
+  Resource.prototype.buildPath = function buildPath() {
     var route = this.route.segments.join('');
 
     (0, _each2.default)(this.route.params, function (value, paramName) {
       route = route.replace('/:' + paramName, value ? '/' + value : '');
     });
 
-    if (appendPath) {
-      route += appendPath;
+    return route;
+  };
+
+  Resource.prototype.buildActionPath = function buildActionPath(action) {
+    var segments = this.route.segments;
+
+    if (action.options.routeSegment) {
+      segments.splice(segments.length - 1, 1, action.options.routeSegment);
     }
+
+    var route = segments.join('');
+
+    (0, _each2.default)(this.route.params, function (value, paramName) {
+      route = route.replace('/:' + paramName, value ? '/' + value : '');
+    });
+
+    route += action.options.path ? action.options.path : '/' + action.name;
 
     return route;
   };
@@ -2816,15 +2852,22 @@ var Resource = function () {
   };
 
   Resource.prototype.sync = function sync(data) {
+    var _this4 = this;
+
     // Set route params based on data from the model
     // This is important step to take if the model queried from an all, queryParams, or action
     if (data[this.route.paramName]) {
       this.route.params[this.route.paramName] = data[this.route.paramName];
     }
+
+    // Update actions route params
+    (0, _each2.default)(this.actions, function (action) {
+      _this4.route.params[action.options.paramName] = data[action.options.paramName];
+    });
   };
 
   Resource.prototype.hydrateModel = function hydrateModel(data) {
-    var _this4 = this;
+    var _this5 = this;
 
     var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
 
@@ -2839,9 +2882,9 @@ var Resource = function () {
     // Set a reference to the resource on the model
     model.$resource = function (name) {
       if ((0, _isEmpty2.default)(name)) {
-        return _this4;
+        return _this5;
       } else {
-        return _this4.api.$resource(name, _this4);
+        return _this5.api.$resource(name, _this5);
       }
     };
 
@@ -2849,11 +2892,11 @@ var Resource = function () {
   };
 
   Resource.prototype.hydrateCollection = function hydrateCollection(data) {
-    var _this5 = this;
+    var _this6 = this;
 
     var collection = (0, _map2.default)(data, function (item) {
       // Models in a collection need a new resource created
-      var resource = _this5.createResource();
+      var resource = _this6.createResource();
 
       var model = resource.hydrateModel(item);
 
@@ -2863,15 +2906,15 @@ var Resource = function () {
     var getPage = function getPage(page) {
       var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
 
-      if (_this5.links.hasOwnProperty(page)) {
-        return _this5.api.request('get', _this5.links[page]).then(function (res) {
+      if (_this6.links.hasOwnProperty(page)) {
+        return _this6.api.request('get', _this6.links[page]).then(function (res) {
           if (options.append || options.prepend) {
-            _this5.setResponse(res);
+            _this6.setResponse(res);
 
             var method = options.append ? 'push' : 'unshift';
 
             (0, _each2.default)(res.data, function (item) {
-              collection[method](_this5.hydrateModel(item));
+              collection[method](_this6.hydrateModel(item));
             });
 
             return collection;
@@ -2886,7 +2929,7 @@ var Resource = function () {
 
     var methods = {
       $resource: function $resource() {
-        return _this5;
+        return _this6;
       },
 
       $nextPage: function $nextPage() {
@@ -2902,7 +2945,7 @@ var Resource = function () {
       },
 
       $hasPage: function $hasPage(name) {
-        return _this5.links.hasOwnProperty(name);
+        return _this6.links.hasOwnProperty(name);
       },
 
       $find: function $find(id) {
@@ -2922,7 +2965,7 @@ var Resource = function () {
       $create: function $create() {
         var data = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
 
-        var resource = _this5.createResource();
+        var resource = _this6.createResource();
         return resource.hydrateModel(data, { newRecord: true });
       },
 
@@ -2931,7 +2974,7 @@ var Resource = function () {
         var idx = arguments[1];
         var applySorting = arguments.length <= 2 || arguments[2] === undefined ? false : arguments[2];
 
-        if ((typeof model === 'undefined' ? 'undefined' : _typeof(model)) == 'object' && !(model instanceof _this5.constructor.modelClass)) {
+        if ((typeof model === 'undefined' ? 'undefined' : _typeof(model)) == 'object' && !(model instanceof _this6.constructor.modelClass)) {
           model = collection.$create(model);
         }
 
@@ -2962,7 +3005,7 @@ var Resource = function () {
         var idx;
         if ((0, _isNumber2.default)(arg)) {
           idx = arg;
-        } else if (arg instanceof _this5.constructor.modelClass) {
+        } else if (arg instanceof _this6.constructor.modelClass) {
           idx = collection.indexOf(arg);
         }
 
@@ -2986,7 +3029,7 @@ var Resource = function () {
       $delete: function $delete(model) {
         var params = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
 
-        if (model instanceof _this5.constructor.modelClass) {
+        if (model instanceof _this6.constructor.modelClass) {
           return model.$delete(params).then(function () {
             return collection.$remove(model);
           });

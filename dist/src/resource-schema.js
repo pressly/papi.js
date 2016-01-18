@@ -76,13 +76,17 @@ var buildRoute = function buildRoute(resource) {
   if (current.options.route) {
     path = current.options.route;
   } else {
+    // Build full path
     while (current) {
+      // Get param for this segment - default to 'id'
       var paramName = current.options.routeSegment ? parseRouteParams(current.options.routeSegment)[0] : current.options.paramName || 'id';
 
+      // If this segment is a parent segment prepend the param name with the segment name ie. 'id' -> 'hubId'
       if (current !== resource) {
         paramName = singularize(current.name) + capitalize(paramName);
       }
 
+      // Create route segment from custom routeSegment property or default to name/param
       var routeSegment = current.options.routeSegment ? current.options.routeSegment.replace(/\/:[^\/]+$/, '/:' + paramName) : '/' + current.name + '/:' + paramName;
 
       segments.unshift(routeSegment);
@@ -227,13 +231,19 @@ ResourceSchema.defineSchema = function () {
       },
 
       action: function action(method, name, options) {
-        if (parentPointer && parentPointer.current) {
-          parentPointer.current.actions.push({ method: method, name: name, options: options });
+        var action = { method: method, name: name, options: options };
+
+        if (action.options.routeSegment) {
+          action.options.paramName = parseRouteParams(action.options.routeSegment)[0];
         }
 
-        if (options.on == 'resource') {
-          var resourceClass = API.resourceClasses[parentPointer.current.key];
+        if (parentPointer && parentPointer.current) {
+          parentPointer.current.actions.push(action);
+        }
 
+        var resourceClass = API.resourceClasses[parentPointer.current.key];
+
+        if (options.on == 'resource') {
           if (!resourceClass.prototype.hasOwnProperty('$' + name)) {
             //console.log(`- adding collection action to ${parentPointer.current.key}:`, method, name, options);
 
@@ -242,7 +252,7 @@ ResourceSchema.defineSchema = function () {
 
               var data = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
 
-              return this.request((0, _extend2.default)({ method: method, path: options.path || '/' + name }, { data: data })).then(function (res) {
+              return this.request((0, _extend2.default)({ method: method, action: action }, { data: data })).then(function (res) {
                 if ((0, _isArray2.default)(res)) {
                   return _this2.hydrateCollection(res);
                 } else {
@@ -250,22 +260,30 @@ ResourceSchema.defineSchema = function () {
                 }
               });
             };
+          } else {
+            throw 'Attempted to create an action \'' + name + '\' that already exists.';
           }
         } else if (options.on == 'member') {
-          var modelClass = API.resourceClasses[parentPointer.current.key].modelClass;
-
-          if (!modelClass.prototype.hasOwnProperty('$' + name)) {
+          if (!resourceClass.prototype.hasOwnProperty('$' + name)) {
             //console.log(`- adding member action to ${parentPointer.current.key}:`, method, name, options);
 
-            modelClass.prototype['$' + name] = function () {
+            resourceClass.prototype['$' + name] = function () {
               var _this3 = this;
 
               var data = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
 
-              return this.$resource().request((0, _extend2.default)({ method: method, path: options.path || '/' + name }, { data: data })).then(function (res) {
-                return _this3.$resource().hydrateModel(res);
+              return this.request((0, _extend2.default)({ method: method, action: action }, { data: data })).then(function (res) {
+                return _this3.hydrateModel(res);
               });
             };
+
+            resourceClass.modelClass.prototype['$' + name] = function () {
+              var data = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+
+              return this.$resource()['$' + name](data);
+            };
+          } else {
+            throw 'Attempted to create an action \'' + name + '\' that already exists.';
           }
         }
 
