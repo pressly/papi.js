@@ -1,7 +1,5 @@
 'use strict';
 
-exports.__esModule = true;
-
 var _isArray = require('lodash/isArray');
 
 var _isArray2 = _interopRequireDefault(_isArray);
@@ -25,6 +23,8 @@ var _each2 = _interopRequireDefault(_each);
 var _map = require('lodash/map');
 
 var _map2 = _interopRequireDefault(_map);
+
+exports.__esModule = true;
 
 var _resource = require('./resource');
 
@@ -58,6 +58,15 @@ function classify(string) {
   }).join(''));
 }
 
+// Builds a route object based on the resource chain
+// ie: hubs > apps > styles =>
+//   {
+//     path: '/hubs/:hubId/apps/:appId/styles/:id',
+//     segments: [ '/hubs/:hubId', '/apps/:appId', '/styles/:id' ],
+//     segment: '/styles/:id',
+//     params: { hubId: null, appId: null, id: null },
+//     paramName: 'id'
+//   }
 var buildRoute = function buildRoute(resource) {
   var current = resource;
   var segments = [];
@@ -67,14 +76,17 @@ var buildRoute = function buildRoute(resource) {
   if (current.options.route) {
     path = current.options.route;
   } else {
-
+    // Build full path
     while (current) {
+      // Get param for this segment - default to 'id'
       var paramName = current.options.routeSegment ? parseRouteParams(current.options.routeSegment)[0] : current.options.paramName || 'id';
 
+      // If this segment is a parent segment prepend the param name with the segment name ie. 'id' -> 'hubId'
       if (current !== resource) {
         paramName = singularize(current.name) + capitalize(paramName);
       }
 
+      // Create route segment from custom routeSegment property or default to name/param
       var routeSegment = current.options.routeSegment ? current.options.routeSegment.replace(/\/:[^\/]+$/, '/:' + paramName) : '/' + current.name + '/:' + paramName;
 
       segments.unshift(routeSegment);
@@ -90,9 +102,16 @@ var buildRoute = function buildRoute(resource) {
     params[paramName] = null;
   });
 
-  return { path: path, segments: segments, segment: segments[segments.length - 1], params: params, paramName: resource.options.paramName || 'id' };
+  return {
+    path: path,
+    segments: segments,
+    segment: segments[segments.length - 1],
+    params: params,
+    paramName: resource.options.paramName || 'id'
+  };
 };
 
+// Parses params out of a route ie. /hubs/:hubId/apps/:appId/styles/:id => ['hubId', 'appId', 'id']
 var reRouteParams = /:[^\/]+/gi;
 var parseRouteParams = function parseRouteParams(route) {
   return (0, _map2.default)(route.match(reRouteParams), function (param) {
@@ -100,6 +119,7 @@ var parseRouteParams = function parseRouteParams(route) {
   });
 };
 
+// Builds a key based on resource names ie. hubs.apps for the hubs > apps resource
 var buildKey = function buildKey(resource, name) {
   var current = resource;
   var segments = [];
@@ -211,22 +231,29 @@ ResourceSchema.defineSchema = function () {
       },
 
       action: function action(method, name, options) {
-        if (parentPointer && parentPointer.current) {
-          parentPointer.current.actions.push({ method: method, name: name, options: options });
+        var action = { method: method, name: name, options: options };
+
+        if (action.options.routeSegment) {
+          action.options.paramName = parseRouteParams(action.options.routeSegment)[0];
         }
 
-        if (options.on == 'resource') {
-          var resourceClass = API.resourceClasses[parentPointer.current.key];
+        if (parentPointer && parentPointer.current) {
+          parentPointer.current.actions.push(action);
+        }
 
+        var resourceClass = API.resourceClasses[parentPointer.current.key];
+
+        if (options.on == 'resource') {
           if (!resourceClass.prototype.hasOwnProperty('$' + name)) {
-            //console.log(`- adding collection action to ${parentPointer.current.key}:`, method, name);
+            //console.log(`- adding collection action to ${parentPointer.current.key}:`, method, name, options);
 
             resourceClass.prototype['$' + name] = function () {
               var _this2 = this;
 
               var data = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
 
-              return this.request((0, _assignIn2.default)({ method: method, path: options.path || '/' + name }, { data: data })).then(function (res) {
+              return this.request((0, _assignIn2.default)({ method: method, action: action }, { data: data })).then(function (res) {
+
                 if ((0, _isArray2.default)(res)) {
                   return _this2.hydrateCollection(res);
                 } else {
@@ -234,22 +261,30 @@ ResourceSchema.defineSchema = function () {
                 }
               });
             };
+          } else {
+            throw 'Attempted to create an action \'' + name + '\' that already exists.';
           }
         } else if (options.on == 'member') {
-          var modelClass = API.resourceClasses[parentPointer.current.key].modelClass;
+          if (!resourceClass.prototype.hasOwnProperty('$' + name)) {
+            //console.log(`- adding member action to ${parentPointer.current.key}:`, method, name, options);
 
-          if (!modelClass.prototype.hasOwnProperty('$' + name)) {
-            //console.log(`- adding member action to ${parentPointer.current.key}:`, method, name);
-
-            modelClass.prototype['$' + name] = function () {
+            resourceClass.prototype['$' + name] = function () {
               var _this3 = this;
 
               var data = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
 
-              return this.$resource().request((0, _assignIn2.default)({ method: method, path: options.path || '/' + name }, { data: data })).then(function (res) {
-                return _this3.$resource().hydrateModel(res);
+              return this.request((0, _assignIn2.default)({ method: method, action: action }, { data: data })).then(function (res) {
+                return _this3.hydrateModel(res);
               });
             };
+
+            resourceClass.modelClass.prototype['$' + name] = function () {
+              var data = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+
+              return this.$resource()['$' + name](data);
+            };
+          } else {
+            throw 'Attempted to create an action \'' + name + '\' that already exists.';
           }
         }
 
@@ -257,23 +292,23 @@ ResourceSchema.defineSchema = function () {
       },
 
       get: function get() {
-        return this.action.call(this, 'get', arguments[0], arguments[1]);
+        return this.action.apply(this, ['get'].concat(Array.prototype.slice.call(arguments)));
       },
 
       post: function post() {
-        return this.action.call(this, 'post', arguments[0], arguments[1]);
+        return this.action.apply(this, ['post'].concat(Array.prototype.slice.call(arguments)));
       },
 
       put: function put() {
-        return this.action.call(this, 'put', arguments[0], arguments[1]);
+        return this.action.apply(this, ['put'].concat(Array.prototype.slice.call(arguments)));
       },
 
       patch: function patch() {
-        return this.action.call(this, 'patch', arguments[0], arguments[1]);
+        return this.action.apply(this, ['patch'].concat(Array.prototype.slice.call(arguments)));
       },
 
       delete: function _delete() {
-        return this.action.call(this, 'delete', arguments[0], arguments[1]);
+        return this.action.apply(this, ['delete'].concat(Array.prototype.slice.call(arguments)));
       }
     };
   };

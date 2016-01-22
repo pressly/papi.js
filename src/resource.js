@@ -46,6 +46,8 @@ export default class Resource {
     this.route = deepClone(def.route);
     this.route.queryParams = {};
 
+    this.actions = deepClone(def.actions);
+
     // Prepare route params, extends the route params from the parentResource
     if (parentResource) {
       var parentParams = {};
@@ -75,22 +77,38 @@ export default class Resource {
   }
 
   request(options = {}) {
-    return this.api.request(options.method || 'get', this.buildRoute(options.path), assignIn({}, this.options, { query: assignIn({}, this.route.queryParams, options.query), data: options.data })).then((res) => {
+    var path = options.action ? this.buildActionPath(options.action) : this.buildPath();
+
+    return this.api.request(options.method || 'get', path, assignIn({}, this.options, { query: assignIn({}, this.route.queryParams, options.query), data: options.data })).then((res) => {
       this.setResponse(res);
       return res.data;
     });
   }
 
-  buildRoute(appendPath) {
+  buildPath() {
     var route = this.route.segments.join('');
 
     each(this.route.params, (value, paramName) => {
       route = route.replace('/:' + paramName, value ? '/' + value : '');
     });
 
-    if (appendPath) {
-      route += appendPath;
+    return route;
+  }
+
+  buildActionPath(action) {
+    var segments = this.route.segments;
+
+    if (action.options.routeSegment) {
+      segments.splice(segments.length - 1, 1, action.options.routeSegment);
     }
+
+    var route = segments.join('');
+
+    each(this.route.params, (value, paramName) => {
+      route = route.replace('/:' + paramName, value ? '/' + value : '');
+    });
+
+    route += action.options.path ? action.options.path : `/${action.name}`;
 
     return route;
   }
@@ -174,6 +192,11 @@ export default class Resource {
     if (data[this.route.paramName]) {
       this.route.params[this.route.paramName] = data[this.route.paramName];
     }
+
+    // Update actions route params
+    each(this.actions, (action) => {
+      this.route.params[action.options.paramName] = data[action.options.paramName];
+    });
   }
 
   hydrateModel(data, options = {}) {

@@ -1,4 +1,5 @@
 import Model from '../model';
+
 import {every, pick, isEmpty} from 'lodash';
 
 var DISPLAY_STATES = {

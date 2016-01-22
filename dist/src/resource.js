@@ -1,9 +1,5 @@
 'use strict';
 
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
-
-exports.__esModule = true;
-
 var _isArray = require('lodash/isArray');
 
 var _isArray2 = _interopRequireDefault(_isArray);
@@ -43,6 +39,10 @@ var _each2 = _interopRequireDefault(_each);
 var _isEmpty = require('lodash/isEmpty');
 
 var _isEmpty2 = _interopRequireDefault(_isEmpty);
+
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
+
+exports.__esModule = true;
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -104,6 +104,8 @@ var Resource = function () {
     this.route = deepClone(def.route);
     this.route.queryParams = {};
 
+    this.actions = deepClone(def.actions);
+
     // Prepare route params, extends the route params from the parentResource
     if (parentResource) {
       var parentParams = {};
@@ -139,22 +141,38 @@ var Resource = function () {
 
     var options = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
 
-    return this.api.request(options.method || 'get', this.buildRoute(options.path), (0, _assignIn2.default)({}, this.options, { query: (0, _assignIn2.default)({}, this.route.queryParams, options.query), data: options.data })).then(function (res) {
+    var path = options.action ? this.buildActionPath(options.action) : this.buildPath();
+
+    return this.api.request(options.method || 'get', path, (0, _assignIn2.default)({}, this.options, { query: (0, _assignIn2.default)({}, this.route.queryParams, options.query), data: options.data })).then(function (res) {
       _this2.setResponse(res);
       return res.data;
     });
   };
 
-  Resource.prototype.buildRoute = function buildRoute(appendPath) {
+  Resource.prototype.buildPath = function buildPath() {
     var route = this.route.segments.join('');
 
     (0, _each2.default)(this.route.params, function (value, paramName) {
       route = route.replace('/:' + paramName, value ? '/' + value : '');
     });
 
-    if (appendPath) {
-      route += appendPath;
+    return route;
+  };
+
+  Resource.prototype.buildActionPath = function buildActionPath(action) {
+    var segments = this.route.segments;
+
+    if (action.options.routeSegment) {
+      segments.splice(segments.length - 1, 1, action.options.routeSegment);
     }
+
+    var route = segments.join('');
+
+    (0, _each2.default)(this.route.params, function (value, paramName) {
+      route = route.replace('/:' + paramName, value ? '/' + value : '');
+    });
+
+    route += action.options.path ? action.options.path : '/' + action.name;
 
     return route;
   };
@@ -237,15 +255,22 @@ var Resource = function () {
   };
 
   Resource.prototype.sync = function sync(data) {
+    var _this4 = this;
+
     // Set route params based on data from the model
     // This is important step to take if the model queried from an all, queryParams, or action
     if (data[this.route.paramName]) {
       this.route.params[this.route.paramName] = data[this.route.paramName];
     }
+
+    // Update actions route params
+    (0, _each2.default)(this.actions, function (action) {
+      _this4.route.params[action.options.paramName] = data[action.options.paramName];
+    });
   };
 
   Resource.prototype.hydrateModel = function hydrateModel(data) {
-    var _this4 = this;
+    var _this5 = this;
 
     var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
 
@@ -260,9 +285,9 @@ var Resource = function () {
     // Set a reference to the resource on the model
     model.$resource = function (name) {
       if ((0, _isEmpty2.default)(name)) {
-        return _this4;
+        return _this5;
       } else {
-        return _this4.api.$resource(name, _this4);
+        return _this5.api.$resource(name, _this5);
       }
     };
 
@@ -270,11 +295,11 @@ var Resource = function () {
   };
 
   Resource.prototype.hydrateCollection = function hydrateCollection(data) {
-    var _this5 = this;
+    var _this6 = this;
 
     var collection = (0, _map2.default)(data, function (item) {
       // Models in a collection need a new resource created
-      var resource = _this5.createResource();
+      var resource = _this6.createResource();
 
       var model = resource.hydrateModel(item);
 
@@ -284,15 +309,15 @@ var Resource = function () {
     var getPage = function getPage(page) {
       var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
 
-      if (_this5.links.hasOwnProperty(page)) {
-        return _this5.api.request('get', _this5.links[page]).then(function (res) {
+      if (_this6.links.hasOwnProperty(page)) {
+        return _this6.api.request('get', _this6.links[page]).then(function (res) {
           if (options.append || options.prepend) {
-            _this5.setResponse(res);
+            _this6.setResponse(res);
 
             var method = options.append ? 'push' : 'unshift';
 
             (0, _each2.default)(res.data, function (item) {
-              collection[method](_this5.hydrateModel(item));
+              collection[method](_this6.hydrateModel(item));
             });
 
             return collection;
@@ -307,7 +332,7 @@ var Resource = function () {
 
     var methods = {
       $resource: function $resource() {
-        return _this5;
+        return _this6;
       },
 
       $nextPage: function $nextPage() {
@@ -323,7 +348,7 @@ var Resource = function () {
       },
 
       $hasPage: function $hasPage(name) {
-        return _this5.links.hasOwnProperty(name);
+        return _this6.links.hasOwnProperty(name);
       },
 
       $find: function $find(id) {
@@ -343,7 +368,7 @@ var Resource = function () {
       $create: function $create() {
         var data = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
 
-        var resource = _this5.createResource();
+        var resource = _this6.createResource();
         return resource.hydrateModel(data, { newRecord: true });
       },
 
@@ -352,7 +377,7 @@ var Resource = function () {
         var idx = arguments[1];
         var applySorting = arguments.length <= 2 || arguments[2] === undefined ? false : arguments[2];
 
-        if ((typeof model === 'undefined' ? 'undefined' : _typeof(model)) == 'object' && !(model instanceof _this5.constructor.modelClass)) {
+        if ((typeof model === 'undefined' ? 'undefined' : _typeof(model)) == 'object' && !(model instanceof _this6.constructor.modelClass)) {
           model = collection.$create(model);
         }
 
@@ -383,7 +408,7 @@ var Resource = function () {
         var idx;
         if ((0, _isNumber2.default)(arg)) {
           idx = arg;
-        } else if (arg instanceof _this5.constructor.modelClass) {
+        } else if (arg instanceof _this6.constructor.modelClass) {
           idx = collection.indexOf(arg);
         }
 
@@ -407,7 +432,7 @@ var Resource = function () {
       $delete: function $delete(model) {
         var params = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
 
-        if (model instanceof _this5.constructor.modelClass) {
+        if (model instanceof _this6.constructor.modelClass) {
           return model.$delete(params).then(function () {
             return collection.$remove(model);
           });

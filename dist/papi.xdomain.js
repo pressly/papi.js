@@ -1396,15 +1396,13 @@ if (Papi.defineSchema == undefined) {
   Papi.defineSchema = _resourceSchema2.default.defineSchema;
 }
 
-Papi.defineSchema().resource('accounts').open().get('available', { on: 'resource' }).post('become', { on: 'member' }).resource('users').resource('hubs', { link: 'hubs' }).close().resource('organizations').open().resource('users').resource('hubs').resource('invites').close().resource('posts', { routeSegment: '/stream/posts/:id' }).resource('hubs').open().get('search', { on: 'resource' }).post('upgrade', { on: 'member' }).post('accept_invite', { on: 'member' }).post('reject_invite', { on: 'member' }).resource('apps').open().get('current', { on: 'resource', path: '/current' }).get('build', { on: 'member', path: '/build_app' }).get('status', { on: 'member' }).resource('styles').close().resource('addons').open().resource('configs').close().resource('analytics').open().get('summary', { on: 'resource' }).get('visitors', { on: 'resource' }).get('pageviews', { on: 'resource' }).get('duration', { on: 'resource' }).close().resource('feeds').open().resource('assets', { modelName: 'FeedAsset' }).close().resource('invites').open().post('bulk_invite', { on: 'resource' }).post('resend', { on: 'member' }).post('accept', { on: 'member', routeSegment: '/invites/:hash' }).post('reject', { on: 'member', routeSegment: '/invites/:hash' }).close().resource('recommendations').resource('users').open().post('grant_access', { on: 'resource' }).delete('revoke_access', { on: 'member' }).close().resource('collections').open().put('reorder', { on: 'resource' }).close().resource('tags').resource('assets', { routeSegment: '/stream/:id' }).open().put('feature', { on: 'member' }).put('unfeature', { on: 'member' }).put('hide', { on: 'member' }).put('unhide', { on: 'member' }).put('lock', { on: 'member' }).put('unlock', { on: 'member' }).resource('likes').resource('comments').close().resource('drafts').open().put('publish', { on: 'member' }).close().close().resource('invites').open().get('incoming', { on: 'resource' }).get('outgoing', { on: 'resource' }).post('bulk_invite', { on: 'resource' }).post('resend', { on: 'member' }).post('accept', { on: 'member', key: 'hash' }).post('reject', { on: 'member', key: 'hash' }).close().resource('code_revisions').open().get('fetch_repo', { on: 'member' })
+Papi.defineSchema().resource('accounts').open().get('available', { on: 'resource' }).post('become', { on: 'member' }).resource('users').resource('hubs', { link: 'hubs' }).close().resource('organizations').open().resource('users').resource('hubs').resource('invites').open().post('bulk_invite', { on: 'resource' }).post('resend', { on: 'member' }).post('accept', { on: 'member', routeSegment: '/invites/:hash' }).post('reject', { on: 'member', routeSegment: '/invites/:hash' }).close().close().resource('activity').resource('posts', { routeSegment: '/stream/posts/:id' }).resource('hubs').open().get('search', { on: 'resource' }).post('upgrade', { on: 'member' }).post('accept_invite', { on: 'member' }).post('reject_invite', { on: 'member' }).resource('apps').open().get('current', { on: 'resource' }).get('build', { on: 'member', path: '/build_app' }).get('status', { on: 'member' }).resource('styles').close().resource('addons').open().resource('configs').close().resource('analytics').open().get('summary', { on: 'resource' }).get('visitors', { on: 'resource' }).get('pageviews', { on: 'resource' }).get('duration', { on: 'resource' }).close().resource('feeds').open().resource('assets', { modelName: 'FeedAsset' }).close().resource('invites').open().post('bulk_invite', { on: 'resource' }).post('resend', { on: 'member' }).post('accept', { on: 'member', routeSegment: '/invites/:hash' }).post('reject', { on: 'member', routeSegment: '/invites/:hash' }).close().resource('recommendations').resource('users').open().post('grant_access', { on: 'resource' }).delete('revoke_access', { on: 'member' }).close().resource('collections').open().put('reorder', { on: 'resource' }).close().resource('tags').resource('assets', { routeSegment: '/stream/:id' }).open().put('feature', { on: 'member' }).put('unfeature', { on: 'member' }).put('hide', { on: 'member' }).put('unhide', { on: 'member' }).put('lock', { on: 'member' }).put('unlock', { on: 'member' }).resource('likes').resource('comments').close().resource('drafts').open().put('publish', { on: 'member' }).close().close().resource('invites').open().get('incoming', { on: 'resource' }).get('outgoing', { on: 'resource' }).post('bulk_invite', { on: 'resource' }).post('resend', { on: 'member' }).post('accept', { on: 'member', routeSegment: '/invites/:hash' }).post('reject', { on: 'member', routeSegment: '/invites/:hash' }).close().resource('code_revisions').open().get('fetch_repo', { on: 'member' })
 
 // This resource links to the root hubs resource
 .resource('hubs', { link: 'hubs' }).close().resource('signup').open().get('account_uid_available', { on: 'member' }).get('account_email_available', { on: 'member' }).close().resource('users').open().get('roles', { on: 'resource' }).resource('hubs').resource('organizations').close().resource('discover').open().resource('users', { link: 'users' }).resource('organizations', { link: 'organizations' }).resource('hubs', { link: 'hubs' }).resource('posts').close().resource('stream').open().resource('following').close();
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{"./resource-schema":21,"es6-promise":23,"isomorphic-fetch":24,"lodash/assignIn":25,"lodash/isEmpty":161,"querystring":186}],2:[function(require,module,exports){
 'use strict';
-
-exports.__esModule = true;
 
 var _pick = require('lodash/pick');
 
@@ -1429,6 +1427,8 @@ var _filter2 = _interopRequireDefault(_filter);
 var _assignIn = require('lodash/assignIn');
 
 var _assignIn2 = _interopRequireDefault(_assignIn);
+
+exports.__esModule = true;
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -1539,8 +1539,6 @@ exports.default = App;
 },{"../model":2}],5:[function(require,module,exports){
 'use strict';
 
-exports.__esModule = true;
-
 var _pick = require('lodash/pick');
 
 var _pick2 = _interopRequireDefault(_pick);
@@ -1552,6 +1550,8 @@ var _isEmpty2 = _interopRequireDefault(_isEmpty);
 var _every = require('lodash/every');
 
 var _every2 = _interopRequireDefault(_every);
+
+exports.__esModule = true;
 
 var _model = require('../model');
 
@@ -1829,7 +1829,7 @@ var _model = require('../model');
 Object.defineProperty(exports, 'Base', {
   enumerable: true,
   get: function get() {
-    return _model.default;
+    return _interopRequireDefault(_model).default;
   }
 });
 
@@ -1838,7 +1838,7 @@ var _account = require('./account');
 Object.defineProperty(exports, 'Account', {
   enumerable: true,
   get: function get() {
-    return _account.default;
+    return _interopRequireDefault(_account).default;
   }
 });
 
@@ -1847,7 +1847,7 @@ var _organization = require('./organization');
 Object.defineProperty(exports, 'Organization', {
   enumerable: true,
   get: function get() {
-    return _organization.default;
+    return _interopRequireDefault(_organization).default;
   }
 });
 
@@ -1856,7 +1856,7 @@ var _app = require('./app');
 Object.defineProperty(exports, 'App', {
   enumerable: true,
   get: function get() {
-    return _app.default;
+    return _interopRequireDefault(_app).default;
   }
 });
 
@@ -1865,7 +1865,7 @@ var _asset = require('./asset');
 Object.defineProperty(exports, 'Asset', {
   enumerable: true,
   get: function get() {
-    return _asset.default;
+    return _interopRequireDefault(_asset).default;
   }
 });
 
@@ -1874,7 +1874,7 @@ var _codeRevision = require('./code-revision');
 Object.defineProperty(exports, 'CodeRevision', {
   enumerable: true,
   get: function get() {
-    return _codeRevision.default;
+    return _interopRequireDefault(_codeRevision).default;
   }
 });
 
@@ -1883,7 +1883,7 @@ var _collection = require('./collection');
 Object.defineProperty(exports, 'Collection', {
   enumerable: true,
   get: function get() {
-    return _collection.default;
+    return _interopRequireDefault(_collection).default;
   }
 });
 
@@ -1892,7 +1892,7 @@ var _comment = require('./comment');
 Object.defineProperty(exports, 'Comment', {
   enumerable: true,
   get: function get() {
-    return _comment.default;
+    return _interopRequireDefault(_comment).default;
   }
 });
 
@@ -1901,7 +1901,7 @@ var _draft = require('./draft');
 Object.defineProperty(exports, 'Draft', {
   enumerable: true,
   get: function get() {
-    return _draft.default;
+    return _interopRequireDefault(_draft).default;
   }
 });
 
@@ -1910,7 +1910,7 @@ var _feed = require('./feed');
 Object.defineProperty(exports, 'Feed', {
   enumerable: true,
   get: function get() {
-    return _feed.default;
+    return _interopRequireDefault(_feed).default;
   }
 });
 
@@ -1919,7 +1919,7 @@ var _feedAsset = require('./feed-asset');
 Object.defineProperty(exports, 'FeedAsset', {
   enumerable: true,
   get: function get() {
-    return _feedAsset.default;
+    return _interopRequireDefault(_feedAsset).default;
   }
 });
 
@@ -1928,7 +1928,7 @@ var _hub = require('./hub');
 Object.defineProperty(exports, 'Hub', {
   enumerable: true,
   get: function get() {
-    return _hub.default;
+    return _interopRequireDefault(_hub).default;
   }
 });
 
@@ -1937,7 +1937,7 @@ var _invite = require('./invite');
 Object.defineProperty(exports, 'Invite', {
   enumerable: true,
   get: function get() {
-    return _invite.default;
+    return _interopRequireDefault(_invite).default;
   }
 });
 
@@ -1946,7 +1946,7 @@ var _like = require('./like');
 Object.defineProperty(exports, 'Like', {
   enumerable: true,
   get: function get() {
-    return _like.default;
+    return _interopRequireDefault(_like).default;
   }
 });
 
@@ -1955,7 +1955,7 @@ var _recommendation = require('./recommendation');
 Object.defineProperty(exports, 'Recommendation', {
   enumerable: true,
   get: function get() {
-    return _recommendation.default;
+    return _interopRequireDefault(_recommendation).default;
   }
 });
 
@@ -1964,7 +1964,7 @@ var _style = require('./style');
 Object.defineProperty(exports, 'Style', {
   enumerable: true,
   get: function get() {
-    return _style.default;
+    return _interopRequireDefault(_style).default;
   }
 });
 
@@ -1973,7 +1973,7 @@ var _tag = require('./tag');
 Object.defineProperty(exports, 'Tag', {
   enumerable: true,
   get: function get() {
-    return _tag.default;
+    return _interopRequireDefault(_tag).default;
   }
 });
 
@@ -1982,9 +1982,11 @@ var _user = require('./user');
 Object.defineProperty(exports, 'User', {
   enumerable: true,
   get: function get() {
-    return _user.default;
+    return _interopRequireDefault(_user).default;
   }
 });
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 },{"../model":2,"./account":3,"./app":4,"./asset":5,"./code-revision":6,"./collection":7,"./comment":8,"./draft":9,"./feed":11,"./feed-asset":10,"./hub":12,"./invite":14,"./like":15,"./organization":16,"./recommendation":17,"./style":18,"./tag":19,"./user":20}],14:[function(require,module,exports){
 'use strict';
 
@@ -2202,8 +2204,6 @@ exports.default = User;
 },{"../model":2}],21:[function(require,module,exports){
 'use strict';
 
-exports.__esModule = true;
-
 var _isArray = require('lodash/isArray');
 
 var _isArray2 = _interopRequireDefault(_isArray);
@@ -2227,6 +2227,8 @@ var _each2 = _interopRequireDefault(_each);
 var _map = require('lodash/map');
 
 var _map2 = _interopRequireDefault(_map);
+
+exports.__esModule = true;
 
 var _resource = require('./resource');
 
@@ -2260,6 +2262,15 @@ function classify(string) {
   }).join(''));
 }
 
+// Builds a route object based on the resource chain
+// ie: hubs > apps > styles =>
+//   {
+//     path: '/hubs/:hubId/apps/:appId/styles/:id',
+//     segments: [ '/hubs/:hubId', '/apps/:appId', '/styles/:id' ],
+//     segment: '/styles/:id',
+//     params: { hubId: null, appId: null, id: null },
+//     paramName: 'id'
+//   }
 var buildRoute = function buildRoute(resource) {
   var current = resource;
   var segments = [];
@@ -2269,14 +2280,17 @@ var buildRoute = function buildRoute(resource) {
   if (current.options.route) {
     path = current.options.route;
   } else {
-
+    // Build full path
     while (current) {
+      // Get param for this segment - default to 'id'
       var paramName = current.options.routeSegment ? parseRouteParams(current.options.routeSegment)[0] : current.options.paramName || 'id';
 
+      // If this segment is a parent segment prepend the param name with the segment name ie. 'id' -> 'hubId'
       if (current !== resource) {
         paramName = singularize(current.name) + capitalize(paramName);
       }
 
+      // Create route segment from custom routeSegment property or default to name/param
       var routeSegment = current.options.routeSegment ? current.options.routeSegment.replace(/\/:[^\/]+$/, '/:' + paramName) : '/' + current.name + '/:' + paramName;
 
       segments.unshift(routeSegment);
@@ -2292,9 +2306,16 @@ var buildRoute = function buildRoute(resource) {
     params[paramName] = null;
   });
 
-  return { path: path, segments: segments, segment: segments[segments.length - 1], params: params, paramName: resource.options.paramName || 'id' };
+  return {
+    path: path,
+    segments: segments,
+    segment: segments[segments.length - 1],
+    params: params,
+    paramName: resource.options.paramName || 'id'
+  };
 };
 
+// Parses params out of a route ie. /hubs/:hubId/apps/:appId/styles/:id => ['hubId', 'appId', 'id']
 var reRouteParams = /:[^\/]+/gi;
 var parseRouteParams = function parseRouteParams(route) {
   return (0, _map2.default)(route.match(reRouteParams), function (param) {
@@ -2302,6 +2323,7 @@ var parseRouteParams = function parseRouteParams(route) {
   });
 };
 
+// Builds a key based on resource names ie. hubs.apps for the hubs > apps resource
 var buildKey = function buildKey(resource, name) {
   var current = resource;
   var segments = [];
@@ -2413,22 +2435,29 @@ ResourceSchema.defineSchema = function () {
       },
 
       action: function action(method, name, options) {
-        if (parentPointer && parentPointer.current) {
-          parentPointer.current.actions.push({ method: method, name: name, options: options });
+        var action = { method: method, name: name, options: options };
+
+        if (action.options.routeSegment) {
+          action.options.paramName = parseRouteParams(action.options.routeSegment)[0];
         }
 
-        if (options.on == 'resource') {
-          var resourceClass = API.resourceClasses[parentPointer.current.key];
+        if (parentPointer && parentPointer.current) {
+          parentPointer.current.actions.push(action);
+        }
 
+        var resourceClass = API.resourceClasses[parentPointer.current.key];
+
+        if (options.on == 'resource') {
           if (!resourceClass.prototype.hasOwnProperty('$' + name)) {
-            //console.log(`- adding collection action to ${parentPointer.current.key}:`, method, name);
+            //console.log(`- adding collection action to ${parentPointer.current.key}:`, method, name, options);
 
             resourceClass.prototype['$' + name] = function () {
               var _this2 = this;
 
               var data = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
 
-              return this.request((0, _assignIn2.default)({ method: method, path: options.path || '/' + name }, { data: data })).then(function (res) {
+              return this.request((0, _assignIn2.default)({ method: method, action: action }, { data: data })).then(function (res) {
+
                 if ((0, _isArray2.default)(res)) {
                   return _this2.hydrateCollection(res);
                 } else {
@@ -2436,22 +2465,30 @@ ResourceSchema.defineSchema = function () {
                 }
               });
             };
+          } else {
+            throw 'Attempted to create an action \'' + name + '\' that already exists.';
           }
         } else if (options.on == 'member') {
-          var modelClass = API.resourceClasses[parentPointer.current.key].modelClass;
+          if (!resourceClass.prototype.hasOwnProperty('$' + name)) {
+            //console.log(`- adding member action to ${parentPointer.current.key}:`, method, name, options);
 
-          if (!modelClass.prototype.hasOwnProperty('$' + name)) {
-            //console.log(`- adding member action to ${parentPointer.current.key}:`, method, name);
-
-            modelClass.prototype['$' + name] = function () {
+            resourceClass.prototype['$' + name] = function () {
               var _this3 = this;
 
               var data = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
 
-              return this.$resource().request((0, _assignIn2.default)({ method: method, path: options.path || '/' + name }, { data: data })).then(function (res) {
-                return _this3.$resource().hydrateModel(res);
+              return this.request((0, _assignIn2.default)({ method: method, action: action }, { data: data })).then(function (res) {
+                return _this3.hydrateModel(res);
               });
             };
+
+            resourceClass.modelClass.prototype['$' + name] = function () {
+              var data = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+
+              return this.$resource()['$' + name](data);
+            };
+          } else {
+            throw 'Attempted to create an action \'' + name + '\' that already exists.';
           }
         }
 
@@ -2459,23 +2496,23 @@ ResourceSchema.defineSchema = function () {
       },
 
       get: function get() {
-        return this.action.call(this, 'get', arguments[0], arguments[1]);
+        return this.action.apply(this, ['get'].concat(Array.prototype.slice.call(arguments)));
       },
 
       post: function post() {
-        return this.action.call(this, 'post', arguments[0], arguments[1]);
+        return this.action.apply(this, ['post'].concat(Array.prototype.slice.call(arguments)));
       },
 
       put: function put() {
-        return this.action.call(this, 'put', arguments[0], arguments[1]);
+        return this.action.apply(this, ['put'].concat(Array.prototype.slice.call(arguments)));
       },
 
       patch: function patch() {
-        return this.action.call(this, 'patch', arguments[0], arguments[1]);
+        return this.action.apply(this, ['patch'].concat(Array.prototype.slice.call(arguments)));
       },
 
       delete: function _delete() {
-        return this.action.call(this, 'delete', arguments[0], arguments[1]);
+        return this.action.apply(this, ['delete'].concat(Array.prototype.slice.call(arguments)));
       }
     };
   };
@@ -2559,10 +2596,6 @@ ResourceSchema.defineSchema = function () {
 },{"./models":13,"./resource":22,"lodash/assignIn":25,"lodash/each":28,"lodash/isArray":158,"lodash/isObject":166,"lodash/last":173,"lodash/map":174}],22:[function(require,module,exports){
 'use strict';
 
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
-
-exports.__esModule = true;
-
 var _isArray = require('lodash/isArray');
 
 var _isArray2 = _interopRequireDefault(_isArray);
@@ -2602,6 +2635,10 @@ var _each2 = _interopRequireDefault(_each);
 var _isEmpty = require('lodash/isEmpty');
 
 var _isEmpty2 = _interopRequireDefault(_isEmpty);
+
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
+
+exports.__esModule = true;
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -2663,6 +2700,8 @@ var Resource = function () {
     this.route = deepClone(def.route);
     this.route.queryParams = {};
 
+    this.actions = deepClone(def.actions);
+
     // Prepare route params, extends the route params from the parentResource
     if (parentResource) {
       var parentParams = {};
@@ -2698,22 +2737,38 @@ var Resource = function () {
 
     var options = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
 
-    return this.api.request(options.method || 'get', this.buildRoute(options.path), (0, _assignIn2.default)({}, this.options, { query: (0, _assignIn2.default)({}, this.route.queryParams, options.query), data: options.data })).then(function (res) {
+    var path = options.action ? this.buildActionPath(options.action) : this.buildPath();
+
+    return this.api.request(options.method || 'get', path, (0, _assignIn2.default)({}, this.options, { query: (0, _assignIn2.default)({}, this.route.queryParams, options.query), data: options.data })).then(function (res) {
       _this2.setResponse(res);
       return res.data;
     });
   };
 
-  Resource.prototype.buildRoute = function buildRoute(appendPath) {
+  Resource.prototype.buildPath = function buildPath() {
     var route = this.route.segments.join('');
 
     (0, _each2.default)(this.route.params, function (value, paramName) {
       route = route.replace('/:' + paramName, value ? '/' + value : '');
     });
 
-    if (appendPath) {
-      route += appendPath;
+    return route;
+  };
+
+  Resource.prototype.buildActionPath = function buildActionPath(action) {
+    var segments = this.route.segments;
+
+    if (action.options.routeSegment) {
+      segments.splice(segments.length - 1, 1, action.options.routeSegment);
     }
+
+    var route = segments.join('');
+
+    (0, _each2.default)(this.route.params, function (value, paramName) {
+      route = route.replace('/:' + paramName, value ? '/' + value : '');
+    });
+
+    route += action.options.path ? action.options.path : '/' + action.name;
 
     return route;
   };
@@ -2796,15 +2851,22 @@ var Resource = function () {
   };
 
   Resource.prototype.sync = function sync(data) {
+    var _this4 = this;
+
     // Set route params based on data from the model
     // This is important step to take if the model queried from an all, queryParams, or action
     if (data[this.route.paramName]) {
       this.route.params[this.route.paramName] = data[this.route.paramName];
     }
+
+    // Update actions route params
+    (0, _each2.default)(this.actions, function (action) {
+      _this4.route.params[action.options.paramName] = data[action.options.paramName];
+    });
   };
 
   Resource.prototype.hydrateModel = function hydrateModel(data) {
-    var _this4 = this;
+    var _this5 = this;
 
     var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
 
@@ -2819,9 +2881,9 @@ var Resource = function () {
     // Set a reference to the resource on the model
     model.$resource = function (name) {
       if ((0, _isEmpty2.default)(name)) {
-        return _this4;
+        return _this5;
       } else {
-        return _this4.api.$resource(name, _this4);
+        return _this5.api.$resource(name, _this5);
       }
     };
 
@@ -2829,11 +2891,11 @@ var Resource = function () {
   };
 
   Resource.prototype.hydrateCollection = function hydrateCollection(data) {
-    var _this5 = this;
+    var _this6 = this;
 
     var collection = (0, _map2.default)(data, function (item) {
       // Models in a collection need a new resource created
-      var resource = _this5.createResource();
+      var resource = _this6.createResource();
 
       var model = resource.hydrateModel(item);
 
@@ -2843,15 +2905,15 @@ var Resource = function () {
     var getPage = function getPage(page) {
       var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
 
-      if (_this5.links.hasOwnProperty(page)) {
-        return _this5.api.request('get', _this5.links[page]).then(function (res) {
+      if (_this6.links.hasOwnProperty(page)) {
+        return _this6.api.request('get', _this6.links[page]).then(function (res) {
           if (options.append || options.prepend) {
-            _this5.setResponse(res);
+            _this6.setResponse(res);
 
             var method = options.append ? 'push' : 'unshift';
 
             (0, _each2.default)(res.data, function (item) {
-              collection[method](_this5.hydrateModel(item));
+              collection[method](_this6.hydrateModel(item));
             });
 
             return collection;
@@ -2866,7 +2928,7 @@ var Resource = function () {
 
     var methods = {
       $resource: function $resource() {
-        return _this5;
+        return _this6;
       },
 
       $nextPage: function $nextPage() {
@@ -2882,7 +2944,7 @@ var Resource = function () {
       },
 
       $hasPage: function $hasPage(name) {
-        return _this5.links.hasOwnProperty(name);
+        return _this6.links.hasOwnProperty(name);
       },
 
       $find: function $find(id) {
@@ -2902,7 +2964,7 @@ var Resource = function () {
       $create: function $create() {
         var data = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
 
-        var resource = _this5.createResource();
+        var resource = _this6.createResource();
         return resource.hydrateModel(data, { newRecord: true });
       },
 
@@ -2911,7 +2973,7 @@ var Resource = function () {
         var idx = arguments[1];
         var applySorting = arguments.length <= 2 || arguments[2] === undefined ? false : arguments[2];
 
-        if ((typeof model === 'undefined' ? 'undefined' : _typeof(model)) == 'object' && !(model instanceof _this5.constructor.modelClass)) {
+        if ((typeof model === 'undefined' ? 'undefined' : _typeof(model)) == 'object' && !(model instanceof _this6.constructor.modelClass)) {
           model = collection.$create(model);
         }
 
@@ -2942,7 +3004,7 @@ var Resource = function () {
         var idx;
         if ((0, _isNumber2.default)(arg)) {
           idx = arg;
-        } else if (arg instanceof _this5.constructor.modelClass) {
+        } else if (arg instanceof _this6.constructor.modelClass) {
           idx = collection.indexOf(arg);
         }
 
@@ -2966,7 +3028,7 @@ var Resource = function () {
       $delete: function $delete(model) {
         var params = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
 
-        if (model instanceof _this5.constructor.modelClass) {
+        if (model instanceof _this6.constructor.modelClass) {
           return model.$delete(params).then(function () {
             return collection.$remove(model);
           });
@@ -9086,7 +9148,7 @@ exports.decode = exports.parse = require('./decode');
 exports.encode = exports.stringify = require('./encode');
 
 },{"./decode":184,"./encode":185}],187:[function(require,module,exports){
-(function() {
+(function(self) {
   'use strict';
 
   if (self.fetch) {
@@ -9228,6 +9290,14 @@ exports.encode = exports.stringify = require('./encode');
       } else {
         throw new Error('unsupported BodyInit type')
       }
+
+      if (!this.headers.get('content-type')) {
+        if (typeof body === 'string') {
+          this.headers.set('content-type', 'text/plain;charset=UTF-8')
+        } else if (this._bodyBlob && this._bodyBlob.type) {
+          this.headers.set('content-type', this._bodyBlob.type)
+        }
+      }
     }
 
     if (support.blob) {
@@ -9364,13 +9434,13 @@ exports.encode = exports.stringify = require('./encode');
       options = {}
     }
 
-    this._initBody(bodyInit)
     this.type = 'default'
     this.status = options.status
     this.ok = this.status >= 200 && this.status < 300
     this.statusText = options.statusText
     this.headers = options.headers instanceof Headers ? options.headers : new Headers(options.headers)
     this.url = options.url || ''
+    this._initBody(bodyInit)
   }
 
   Body.call(Response.prototype)
@@ -9466,7 +9536,7 @@ exports.encode = exports.stringify = require('./encode');
     })
   }
   self.fetch.polyfill = true
-})();
+})(typeof self !== 'undefined' ? self : this);
 
 },{}]},{},[1])(1)
 });
