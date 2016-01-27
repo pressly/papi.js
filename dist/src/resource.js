@@ -253,8 +253,8 @@ var Resource = function () {
     this.status = res.status;
     this.headers = res.headers;
 
-    if (res.headers && res.headers.link) {
-      this.links = parseHTTPLinks(res.headers.link);
+    if (res.headers && res.headers.has('Link')) {
+      this.links = parseHTTPLinks(res.headers.get('Link'));
     }
   };
 
@@ -313,7 +313,7 @@ var Resource = function () {
     var getPage = function getPage(page) {
       var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
 
-      if (_this6.links.hasOwnProperty(page)) {
+      if (_this6.links && _this6.links.hasOwnProperty(page)) {
         return _this6.api.request('get', _this6.links[page]).then(function (res) {
           if (options.append || options.prepend) {
             _this6.setResponse(res);
@@ -326,9 +326,8 @@ var Resource = function () {
 
             return collection;
           } else {
-            // XXX Not implemented yet.
             // Should create a new resource and hydrate
-            return [];
+            return _this6.hydrateCollection(res);
           }
         });
       }
@@ -352,7 +351,7 @@ var Resource = function () {
       },
 
       $hasPage: function $hasPage(name) {
-        return _this6.links.hasOwnProperty(name);
+        return _this6.links && _this6.links.hasOwnProperty(name);
       },
 
       $find: function $find(id) {
