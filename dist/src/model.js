@@ -1,7 +1,5 @@
 'use strict';
 
-exports.__esModule = true;
-
 var _pick = require('lodash/object/pick');
 
 var _pick2 = _interopRequireDefault(_pick);
@@ -25,6 +23,8 @@ var _filter2 = _interopRequireDefault(_filter);
 var _extend = require('lodash/object/extend');
 
 var _extend2 = _interopRequireDefault(_extend);
+
+exports.__esModule = true;
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 

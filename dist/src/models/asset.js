@@ -1,7 +1,5 @@
 'use strict';
 
-exports.__esModule = true;
-
 var _pick = require('lodash/object/pick');
 
 var _pick2 = _interopRequireDefault(_pick);
@@ -13,6 +11,8 @@ var _isEmpty2 = _interopRequireDefault(_isEmpty);
 var _all = require('lodash/collection/all');
 
 var _all2 = _interopRequireDefault(_all);
+
+exports.__esModule = true;
 
 var _model = require('../model');
 

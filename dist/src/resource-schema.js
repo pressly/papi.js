@@ -1,7 +1,5 @@
 'use strict';
 
-exports.__esModule = true;
-
 var _isArray = require('lodash/lang/isArray');
 
 var _isArray2 = _interopRequireDefault(_isArray);
@@ -25,6 +23,8 @@ var _each2 = _interopRequireDefault(_each);
 var _map = require('lodash/collection/map');
 
 var _map2 = _interopRequireDefault(_map);
+
+exports.__esModule = true;
 
 var _resource = require('./resource');
 

@@ -30,6 +30,8 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 require('es6-promise').polyfill();
 
+var AbortablePromise = require('dodgy');
+
 if (!global.fetch) {
   global.fetch = _isomorphicFetch2.default;
 }
@@ -118,7 +120,7 @@ var Papi = function (_ResourceSchema) {
 
     var options = arguments.length <= 2 || arguments[2] === undefined ? {} : arguments[2];
 
-    return new Promise(function (resolve, reject) {
+    return new AbortablePromise(function (resolve, reject, onAbort) {
       var url = /^(https?:)?\/\//.test(path) ? path : _this2.options.host + path;
 
       var req = {
@@ -218,6 +220,8 @@ var Papi = function (_ResourceSchema) {
       var endResponse = function endResponse() {
         resolve(res);
       };
+
+      onAbort(function (why) {});
 
       beginRequest();
     });

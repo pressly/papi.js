@@ -2,6 +2,8 @@
 
 require('es6-promise').polyfill();
 
+let AbortablePromise = require('dodgy');
+
 import _fetch from 'isomorphic-fetch';
 if (!global.fetch) {
   global.fetch = _fetch;
@@ -85,7 +87,7 @@ class Papi extends ResourceSchema {
   }
 
   request(method, path, options = {}) {
-    return new Promise((resolve, reject) => {
+    return new AbortablePromise((resolve, reject, onAbort) => {
       var url = /^(https?:)?\/\//.test(path) ? path : this.options.host + path;
 
       var req = {
@@ -185,6 +187,8 @@ class Papi extends ResourceSchema {
       var endResponse = () => {
         resolve(res);
       };
+
+      onAbort((why) => {});
 
       beginRequest();
     });
