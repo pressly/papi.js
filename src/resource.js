@@ -181,8 +181,8 @@ export default class Resource {
     this.status = res.status;
     this.headers = res.headers;
 
-    if (res.headers && res.headers.link) {
-      this.links = parseHTTPLinks(res.headers.link);
+    if (res.headers && res.headers.has('Link')) {
+      this.links = parseHTTPLinks(res.headers.get('Link'));
     }
   }
 
@@ -232,7 +232,7 @@ export default class Resource {
 
 
     var getPage = (page, options = {}) => {
-      if (this.links.hasOwnProperty(page)) {
+      if (this.links && this.links.hasOwnProperty(page)) {
         return this.api.request('get', this.links[page]).then((res) => {
           if (options.append || options.prepend) {
             this.setResponse(res);
@@ -245,9 +245,8 @@ export default class Resource {
 
             return collection;
           } else {
-            // XXX Not implemented yet.
             // Should create a new resource and hydrate
-            return [];
+            return this.hydrateCollection(res);
           }
         });
       }
@@ -267,7 +266,7 @@ export default class Resource {
       },
 
       $hasPage: (name) => {
-        return this.links.hasOwnProperty(name);
+        return this.links && this.links.hasOwnProperty(name);
       },
 
       $find: (id) => {
