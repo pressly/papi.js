@@ -157,4 +157,18 @@ describe('Collections', function() {
       done(err);
     })
   });
+
+  it('should cancel a promise', function(done) {
+    mockRequest.get(`/invites`).reply(200, mock.invites);
+
+    var promise = api.$resource('invites').$all()
+    promise.abort("Cancelled");
+
+    promise.then((res) => {
+      done("Was not suppose to cancel");
+    })
+    .catch((err) => {
+      done(err);
+    });
+  });
 });
