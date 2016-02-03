@@ -8,6 +8,10 @@ var _extend = require('lodash/object/extend');
 
 var _extend2 = _interopRequireDefault(_extend);
 
+var _promiscuous = require('promiscuous');
+
+var _promiscuous2 = _interopRequireDefault(_promiscuous);
+
 var _isomorphicFetch = require('isomorphic-fetch');
 
 var _isomorphicFetch2 = _interopRequireDefault(_isomorphicFetch);
@@ -28,7 +32,9 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-require('es6-promise').polyfill();
+if (!global.Promise) {
+  global.Promise = _promiscuous2.default;
+}
 
 var AbortablePromise = require('dodgy');
 

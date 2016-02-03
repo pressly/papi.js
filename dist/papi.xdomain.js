@@ -1163,6 +1163,10 @@ var _extend = require('lodash/object/extend');
 
 var _extend2 = _interopRequireDefault(_extend);
 
+var _promiscuous = require('promiscuous');
+
+var _promiscuous2 = _interopRequireDefault(_promiscuous);
+
 var _isomorphicFetch = require('isomorphic-fetch');
 
 var _isomorphicFetch2 = _interopRequireDefault(_isomorphicFetch);
@@ -1183,7 +1187,9 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-require('es6-promise').polyfill();
+if (!global.Promise) {
+  global.Promise = _promiscuous2.default;
+}
 
 var AbortablePromise = require('dodgy');
 
@@ -1405,7 +1411,7 @@ Papi.defineSchema().resource('accounts').open().get('available', { on: 'resource
 // This resource links to the root hubs resource
 .resource('hubs', { link: 'hubs' }).close().resource('signup').open().get('account_uid_available', { on: 'member' }).get('account_email_available', { on: 'member' }).close().resource('users').open().get('roles', { on: 'resource' }).resource('hubs').resource('organizations').close().resource('discover').open().resource('users', { link: 'users' }).resource('organizations', { link: 'organizations' }).resource('hubs', { link: 'hubs' }).resource('posts').close().resource('stream').open().resource('following').close();
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./resource-schema":21,"dodgy":23,"es6-promise":24,"isomorphic-fetch":25,"lodash/lang/isEmpty":110,"lodash/object/extend":118,"querystring":129}],2:[function(require,module,exports){
+},{"./resource-schema":21,"dodgy":23,"isomorphic-fetch":24,"lodash/lang/isEmpty":109,"lodash/object/extend":117,"promiscuous":125,"querystring":128}],2:[function(require,module,exports){
 'use strict';
 
 var _pick = require('lodash/object/pick');
@@ -1480,7 +1486,7 @@ var Model = function () {
 }();
 
 exports.default = Model;
-},{"lodash/array/difference":26,"lodash/collection/filter":32,"lodash/object/extend":118,"lodash/object/functions":119,"lodash/object/keys":120,"lodash/object/pick":123}],3:[function(require,module,exports){
+},{"lodash/array/difference":25,"lodash/collection/filter":31,"lodash/object/extend":117,"lodash/object/functions":118,"lodash/object/keys":119,"lodash/object/pick":122}],3:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -1613,7 +1619,7 @@ var Asset = function (_Model) {
 }(_model2.default);
 
 exports.default = Asset;
-},{"../model":2,"lodash/collection/all":28,"lodash/lang/isEmpty":110,"lodash/object/pick":123}],6:[function(require,module,exports){
+},{"../model":2,"lodash/collection/all":27,"lodash/lang/isEmpty":109,"lodash/object/pick":122}],6:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -2596,7 +2602,7 @@ ResourceSchema.defineSchema = function () {
 //
 //   console.log(markdown);
 // };
-},{"./models":13,"./resource":22,"lodash/array/last":27,"lodash/collection/each":30,"lodash/collection/map":36,"lodash/lang/isArray":109,"lodash/lang/isObject":114,"lodash/object/extend":118}],22:[function(require,module,exports){
+},{"./models":13,"./resource":22,"lodash/array/last":26,"lodash/collection/each":29,"lodash/collection/map":35,"lodash/lang/isArray":108,"lodash/lang/isObject":113,"lodash/object/extend":117}],22:[function(require,module,exports){
 'use strict';
 
 var _isArray = require('lodash/lang/isArray');
@@ -3051,7 +3057,7 @@ var Resource = function () {
 }();
 
 exports.default = Resource;
-},{"lodash/collection/detect":29,"lodash/collection/each":30,"lodash/collection/findWhere":34,"lodash/collection/map":36,"lodash/collection/where":37,"lodash/lang/clone":107,"lodash/lang/isArray":109,"lodash/lang/isEmpty":110,"lodash/lang/isNumber":113,"lodash/lang/isObject":114,"lodash/object/extend":118}],23:[function(require,module,exports){
+},{"lodash/collection/detect":28,"lodash/collection/each":29,"lodash/collection/findWhere":33,"lodash/collection/map":35,"lodash/collection/where":36,"lodash/lang/clone":106,"lodash/lang/isArray":108,"lodash/lang/isEmpty":109,"lodash/lang/isNumber":112,"lodash/lang/isObject":113,"lodash/object/extend":117}],23:[function(require,module,exports){
 /*!
 Copyright (C) 2015 by Andrea Giammarchi - @WebReflection
 
@@ -3107,977 +3113,6 @@ function dodger(dog, resolvable, resolve, reject, abort) {
 module.exports = Dodgy;
 Dodgy.Promise = Dodgy;
 },{}],24:[function(require,module,exports){
-(function (process,global){
-/*!
- * @overview es6-promise - a tiny implementation of Promises/A+.
- * @copyright Copyright (c) 2014 Yehuda Katz, Tom Dale, Stefan Penner and contributors (Conversion to ES6 API by Jake Archibald)
- * @license   Licensed under MIT license
- *            See https://raw.githubusercontent.com/jakearchibald/es6-promise/master/LICENSE
- * @version   3.0.2
- */
-
-(function() {
-    "use strict";
-    function lib$es6$promise$utils$$objectOrFunction(x) {
-      return typeof x === 'function' || (typeof x === 'object' && x !== null);
-    }
-
-    function lib$es6$promise$utils$$isFunction(x) {
-      return typeof x === 'function';
-    }
-
-    function lib$es6$promise$utils$$isMaybeThenable(x) {
-      return typeof x === 'object' && x !== null;
-    }
-
-    var lib$es6$promise$utils$$_isArray;
-    if (!Array.isArray) {
-      lib$es6$promise$utils$$_isArray = function (x) {
-        return Object.prototype.toString.call(x) === '[object Array]';
-      };
-    } else {
-      lib$es6$promise$utils$$_isArray = Array.isArray;
-    }
-
-    var lib$es6$promise$utils$$isArray = lib$es6$promise$utils$$_isArray;
-    var lib$es6$promise$asap$$len = 0;
-    var lib$es6$promise$asap$$toString = {}.toString;
-    var lib$es6$promise$asap$$vertxNext;
-    var lib$es6$promise$asap$$customSchedulerFn;
-
-    var lib$es6$promise$asap$$asap = function asap(callback, arg) {
-      lib$es6$promise$asap$$queue[lib$es6$promise$asap$$len] = callback;
-      lib$es6$promise$asap$$queue[lib$es6$promise$asap$$len + 1] = arg;
-      lib$es6$promise$asap$$len += 2;
-      if (lib$es6$promise$asap$$len === 2) {
-        // If len is 2, that means that we need to schedule an async flush.
-        // If additional callbacks are queued before the queue is flushed, they
-        // will be processed by this flush that we are scheduling.
-        if (lib$es6$promise$asap$$customSchedulerFn) {
-          lib$es6$promise$asap$$customSchedulerFn(lib$es6$promise$asap$$flush);
-        } else {
-          lib$es6$promise$asap$$scheduleFlush();
-        }
-      }
-    }
-
-    function lib$es6$promise$asap$$setScheduler(scheduleFn) {
-      lib$es6$promise$asap$$customSchedulerFn = scheduleFn;
-    }
-
-    function lib$es6$promise$asap$$setAsap(asapFn) {
-      lib$es6$promise$asap$$asap = asapFn;
-    }
-
-    var lib$es6$promise$asap$$browserWindow = (typeof window !== 'undefined') ? window : undefined;
-    var lib$es6$promise$asap$$browserGlobal = lib$es6$promise$asap$$browserWindow || {};
-    var lib$es6$promise$asap$$BrowserMutationObserver = lib$es6$promise$asap$$browserGlobal.MutationObserver || lib$es6$promise$asap$$browserGlobal.WebKitMutationObserver;
-    var lib$es6$promise$asap$$isNode = typeof process !== 'undefined' && {}.toString.call(process) === '[object process]';
-
-    // test for web worker but not in IE10
-    var lib$es6$promise$asap$$isWorker = typeof Uint8ClampedArray !== 'undefined' &&
-      typeof importScripts !== 'undefined' &&
-      typeof MessageChannel !== 'undefined';
-
-    // node
-    function lib$es6$promise$asap$$useNextTick() {
-      // node version 0.10.x displays a deprecation warning when nextTick is used recursively
-      // see https://github.com/cujojs/when/issues/410 for details
-      return function() {
-        process.nextTick(lib$es6$promise$asap$$flush);
-      };
-    }
-
-    // vertx
-    function lib$es6$promise$asap$$useVertxTimer() {
-      return function() {
-        lib$es6$promise$asap$$vertxNext(lib$es6$promise$asap$$flush);
-      };
-    }
-
-    function lib$es6$promise$asap$$useMutationObserver() {
-      var iterations = 0;
-      var observer = new lib$es6$promise$asap$$BrowserMutationObserver(lib$es6$promise$asap$$flush);
-      var node = document.createTextNode('');
-      observer.observe(node, { characterData: true });
-
-      return function() {
-        node.data = (iterations = ++iterations % 2);
-      };
-    }
-
-    // web worker
-    function lib$es6$promise$asap$$useMessageChannel() {
-      var channel = new MessageChannel();
-      channel.port1.onmessage = lib$es6$promise$asap$$flush;
-      return function () {
-        channel.port2.postMessage(0);
-      };
-    }
-
-    function lib$es6$promise$asap$$useSetTimeout() {
-      return function() {
-        setTimeout(lib$es6$promise$asap$$flush, 1);
-      };
-    }
-
-    var lib$es6$promise$asap$$queue = new Array(1000);
-    function lib$es6$promise$asap$$flush() {
-      for (var i = 0; i < lib$es6$promise$asap$$len; i+=2) {
-        var callback = lib$es6$promise$asap$$queue[i];
-        var arg = lib$es6$promise$asap$$queue[i+1];
-
-        callback(arg);
-
-        lib$es6$promise$asap$$queue[i] = undefined;
-        lib$es6$promise$asap$$queue[i+1] = undefined;
-      }
-
-      lib$es6$promise$asap$$len = 0;
-    }
-
-    function lib$es6$promise$asap$$attemptVertx() {
-      try {
-        var r = require;
-        var vertx = r('vertx');
-        lib$es6$promise$asap$$vertxNext = vertx.runOnLoop || vertx.runOnContext;
-        return lib$es6$promise$asap$$useVertxTimer();
-      } catch(e) {
-        return lib$es6$promise$asap$$useSetTimeout();
-      }
-    }
-
-    var lib$es6$promise$asap$$scheduleFlush;
-    // Decide what async method to use to triggering processing of queued callbacks:
-    if (lib$es6$promise$asap$$isNode) {
-      lib$es6$promise$asap$$scheduleFlush = lib$es6$promise$asap$$useNextTick();
-    } else if (lib$es6$promise$asap$$BrowserMutationObserver) {
-      lib$es6$promise$asap$$scheduleFlush = lib$es6$promise$asap$$useMutationObserver();
-    } else if (lib$es6$promise$asap$$isWorker) {
-      lib$es6$promise$asap$$scheduleFlush = lib$es6$promise$asap$$useMessageChannel();
-    } else if (lib$es6$promise$asap$$browserWindow === undefined && typeof require === 'function') {
-      lib$es6$promise$asap$$scheduleFlush = lib$es6$promise$asap$$attemptVertx();
-    } else {
-      lib$es6$promise$asap$$scheduleFlush = lib$es6$promise$asap$$useSetTimeout();
-    }
-
-    function lib$es6$promise$$internal$$noop() {}
-
-    var lib$es6$promise$$internal$$PENDING   = void 0;
-    var lib$es6$promise$$internal$$FULFILLED = 1;
-    var lib$es6$promise$$internal$$REJECTED  = 2;
-
-    var lib$es6$promise$$internal$$GET_THEN_ERROR = new lib$es6$promise$$internal$$ErrorObject();
-
-    function lib$es6$promise$$internal$$selfFulfillment() {
-      return new TypeError("You cannot resolve a promise with itself");
-    }
-
-    function lib$es6$promise$$internal$$cannotReturnOwn() {
-      return new TypeError('A promises callback cannot return that same promise.');
-    }
-
-    function lib$es6$promise$$internal$$getThen(promise) {
-      try {
-        return promise.then;
-      } catch(error) {
-        lib$es6$promise$$internal$$GET_THEN_ERROR.error = error;
-        return lib$es6$promise$$internal$$GET_THEN_ERROR;
-      }
-    }
-
-    function lib$es6$promise$$internal$$tryThen(then, value, fulfillmentHandler, rejectionHandler) {
-      try {
-        then.call(value, fulfillmentHandler, rejectionHandler);
-      } catch(e) {
-        return e;
-      }
-    }
-
-    function lib$es6$promise$$internal$$handleForeignThenable(promise, thenable, then) {
-       lib$es6$promise$asap$$asap(function(promise) {
-        var sealed = false;
-        var error = lib$es6$promise$$internal$$tryThen(then, thenable, function(value) {
-          if (sealed) { return; }
-          sealed = true;
-          if (thenable !== value) {
-            lib$es6$promise$$internal$$resolve(promise, value);
-          } else {
-            lib$es6$promise$$internal$$fulfill(promise, value);
-          }
-        }, function(reason) {
-          if (sealed) { return; }
-          sealed = true;
-
-          lib$es6$promise$$internal$$reject(promise, reason);
-        }, 'Settle: ' + (promise._label || ' unknown promise'));
-
-        if (!sealed && error) {
-          sealed = true;
-          lib$es6$promise$$internal$$reject(promise, error);
-        }
-      }, promise);
-    }
-
-    function lib$es6$promise$$internal$$handleOwnThenable(promise, thenable) {
-      if (thenable._state === lib$es6$promise$$internal$$FULFILLED) {
-        lib$es6$promise$$internal$$fulfill(promise, thenable._result);
-      } else if (thenable._state === lib$es6$promise$$internal$$REJECTED) {
-        lib$es6$promise$$internal$$reject(promise, thenable._result);
-      } else {
-        lib$es6$promise$$internal$$subscribe(thenable, undefined, function(value) {
-          lib$es6$promise$$internal$$resolve(promise, value);
-        }, function(reason) {
-          lib$es6$promise$$internal$$reject(promise, reason);
-        });
-      }
-    }
-
-    function lib$es6$promise$$internal$$handleMaybeThenable(promise, maybeThenable) {
-      if (maybeThenable.constructor === promise.constructor) {
-        lib$es6$promise$$internal$$handleOwnThenable(promise, maybeThenable);
-      } else {
-        var then = lib$es6$promise$$internal$$getThen(maybeThenable);
-
-        if (then === lib$es6$promise$$internal$$GET_THEN_ERROR) {
-          lib$es6$promise$$internal$$reject(promise, lib$es6$promise$$internal$$GET_THEN_ERROR.error);
-        } else if (then === undefined) {
-          lib$es6$promise$$internal$$fulfill(promise, maybeThenable);
-        } else if (lib$es6$promise$utils$$isFunction(then)) {
-          lib$es6$promise$$internal$$handleForeignThenable(promise, maybeThenable, then);
-        } else {
-          lib$es6$promise$$internal$$fulfill(promise, maybeThenable);
-        }
-      }
-    }
-
-    function lib$es6$promise$$internal$$resolve(promise, value) {
-      if (promise === value) {
-        lib$es6$promise$$internal$$reject(promise, lib$es6$promise$$internal$$selfFulfillment());
-      } else if (lib$es6$promise$utils$$objectOrFunction(value)) {
-        lib$es6$promise$$internal$$handleMaybeThenable(promise, value);
-      } else {
-        lib$es6$promise$$internal$$fulfill(promise, value);
-      }
-    }
-
-    function lib$es6$promise$$internal$$publishRejection(promise) {
-      if (promise._onerror) {
-        promise._onerror(promise._result);
-      }
-
-      lib$es6$promise$$internal$$publish(promise);
-    }
-
-    function lib$es6$promise$$internal$$fulfill(promise, value) {
-      if (promise._state !== lib$es6$promise$$internal$$PENDING) { return; }
-
-      promise._result = value;
-      promise._state = lib$es6$promise$$internal$$FULFILLED;
-
-      if (promise._subscribers.length !== 0) {
-        lib$es6$promise$asap$$asap(lib$es6$promise$$internal$$publish, promise);
-      }
-    }
-
-    function lib$es6$promise$$internal$$reject(promise, reason) {
-      if (promise._state !== lib$es6$promise$$internal$$PENDING) { return; }
-      promise._state = lib$es6$promise$$internal$$REJECTED;
-      promise._result = reason;
-
-      lib$es6$promise$asap$$asap(lib$es6$promise$$internal$$publishRejection, promise);
-    }
-
-    function lib$es6$promise$$internal$$subscribe(parent, child, onFulfillment, onRejection) {
-      var subscribers = parent._subscribers;
-      var length = subscribers.length;
-
-      parent._onerror = null;
-
-      subscribers[length] = child;
-      subscribers[length + lib$es6$promise$$internal$$FULFILLED] = onFulfillment;
-      subscribers[length + lib$es6$promise$$internal$$REJECTED]  = onRejection;
-
-      if (length === 0 && parent._state) {
-        lib$es6$promise$asap$$asap(lib$es6$promise$$internal$$publish, parent);
-      }
-    }
-
-    function lib$es6$promise$$internal$$publish(promise) {
-      var subscribers = promise._subscribers;
-      var settled = promise._state;
-
-      if (subscribers.length === 0) { return; }
-
-      var child, callback, detail = promise._result;
-
-      for (var i = 0; i < subscribers.length; i += 3) {
-        child = subscribers[i];
-        callback = subscribers[i + settled];
-
-        if (child) {
-          lib$es6$promise$$internal$$invokeCallback(settled, child, callback, detail);
-        } else {
-          callback(detail);
-        }
-      }
-
-      promise._subscribers.length = 0;
-    }
-
-    function lib$es6$promise$$internal$$ErrorObject() {
-      this.error = null;
-    }
-
-    var lib$es6$promise$$internal$$TRY_CATCH_ERROR = new lib$es6$promise$$internal$$ErrorObject();
-
-    function lib$es6$promise$$internal$$tryCatch(callback, detail) {
-      try {
-        return callback(detail);
-      } catch(e) {
-        lib$es6$promise$$internal$$TRY_CATCH_ERROR.error = e;
-        return lib$es6$promise$$internal$$TRY_CATCH_ERROR;
-      }
-    }
-
-    function lib$es6$promise$$internal$$invokeCallback(settled, promise, callback, detail) {
-      var hasCallback = lib$es6$promise$utils$$isFunction(callback),
-          value, error, succeeded, failed;
-
-      if (hasCallback) {
-        value = lib$es6$promise$$internal$$tryCatch(callback, detail);
-
-        if (value === lib$es6$promise$$internal$$TRY_CATCH_ERROR) {
-          failed = true;
-          error = value.error;
-          value = null;
-        } else {
-          succeeded = true;
-        }
-
-        if (promise === value) {
-          lib$es6$promise$$internal$$reject(promise, lib$es6$promise$$internal$$cannotReturnOwn());
-          return;
-        }
-
-      } else {
-        value = detail;
-        succeeded = true;
-      }
-
-      if (promise._state !== lib$es6$promise$$internal$$PENDING) {
-        // noop
-      } else if (hasCallback && succeeded) {
-        lib$es6$promise$$internal$$resolve(promise, value);
-      } else if (failed) {
-        lib$es6$promise$$internal$$reject(promise, error);
-      } else if (settled === lib$es6$promise$$internal$$FULFILLED) {
-        lib$es6$promise$$internal$$fulfill(promise, value);
-      } else if (settled === lib$es6$promise$$internal$$REJECTED) {
-        lib$es6$promise$$internal$$reject(promise, value);
-      }
-    }
-
-    function lib$es6$promise$$internal$$initializePromise(promise, resolver) {
-      try {
-        resolver(function resolvePromise(value){
-          lib$es6$promise$$internal$$resolve(promise, value);
-        }, function rejectPromise(reason) {
-          lib$es6$promise$$internal$$reject(promise, reason);
-        });
-      } catch(e) {
-        lib$es6$promise$$internal$$reject(promise, e);
-      }
-    }
-
-    function lib$es6$promise$enumerator$$Enumerator(Constructor, input) {
-      var enumerator = this;
-
-      enumerator._instanceConstructor = Constructor;
-      enumerator.promise = new Constructor(lib$es6$promise$$internal$$noop);
-
-      if (enumerator._validateInput(input)) {
-        enumerator._input     = input;
-        enumerator.length     = input.length;
-        enumerator._remaining = input.length;
-
-        enumerator._init();
-
-        if (enumerator.length === 0) {
-          lib$es6$promise$$internal$$fulfill(enumerator.promise, enumerator._result);
-        } else {
-          enumerator.length = enumerator.length || 0;
-          enumerator._enumerate();
-          if (enumerator._remaining === 0) {
-            lib$es6$promise$$internal$$fulfill(enumerator.promise, enumerator._result);
-          }
-        }
-      } else {
-        lib$es6$promise$$internal$$reject(enumerator.promise, enumerator._validationError());
-      }
-    }
-
-    lib$es6$promise$enumerator$$Enumerator.prototype._validateInput = function(input) {
-      return lib$es6$promise$utils$$isArray(input);
-    };
-
-    lib$es6$promise$enumerator$$Enumerator.prototype._validationError = function() {
-      return new Error('Array Methods must be provided an Array');
-    };
-
-    lib$es6$promise$enumerator$$Enumerator.prototype._init = function() {
-      this._result = new Array(this.length);
-    };
-
-    var lib$es6$promise$enumerator$$default = lib$es6$promise$enumerator$$Enumerator;
-
-    lib$es6$promise$enumerator$$Enumerator.prototype._enumerate = function() {
-      var enumerator = this;
-
-      var length  = enumerator.length;
-      var promise = enumerator.promise;
-      var input   = enumerator._input;
-
-      for (var i = 0; promise._state === lib$es6$promise$$internal$$PENDING && i < length; i++) {
-        enumerator._eachEntry(input[i], i);
-      }
-    };
-
-    lib$es6$promise$enumerator$$Enumerator.prototype._eachEntry = function(entry, i) {
-      var enumerator = this;
-      var c = enumerator._instanceConstructor;
-
-      if (lib$es6$promise$utils$$isMaybeThenable(entry)) {
-        if (entry.constructor === c && entry._state !== lib$es6$promise$$internal$$PENDING) {
-          entry._onerror = null;
-          enumerator._settledAt(entry._state, i, entry._result);
-        } else {
-          enumerator._willSettleAt(c.resolve(entry), i);
-        }
-      } else {
-        enumerator._remaining--;
-        enumerator._result[i] = entry;
-      }
-    };
-
-    lib$es6$promise$enumerator$$Enumerator.prototype._settledAt = function(state, i, value) {
-      var enumerator = this;
-      var promise = enumerator.promise;
-
-      if (promise._state === lib$es6$promise$$internal$$PENDING) {
-        enumerator._remaining--;
-
-        if (state === lib$es6$promise$$internal$$REJECTED) {
-          lib$es6$promise$$internal$$reject(promise, value);
-        } else {
-          enumerator._result[i] = value;
-        }
-      }
-
-      if (enumerator._remaining === 0) {
-        lib$es6$promise$$internal$$fulfill(promise, enumerator._result);
-      }
-    };
-
-    lib$es6$promise$enumerator$$Enumerator.prototype._willSettleAt = function(promise, i) {
-      var enumerator = this;
-
-      lib$es6$promise$$internal$$subscribe(promise, undefined, function(value) {
-        enumerator._settledAt(lib$es6$promise$$internal$$FULFILLED, i, value);
-      }, function(reason) {
-        enumerator._settledAt(lib$es6$promise$$internal$$REJECTED, i, reason);
-      });
-    };
-    function lib$es6$promise$promise$all$$all(entries) {
-      return new lib$es6$promise$enumerator$$default(this, entries).promise;
-    }
-    var lib$es6$promise$promise$all$$default = lib$es6$promise$promise$all$$all;
-    function lib$es6$promise$promise$race$$race(entries) {
-      /*jshint validthis:true */
-      var Constructor = this;
-
-      var promise = new Constructor(lib$es6$promise$$internal$$noop);
-
-      if (!lib$es6$promise$utils$$isArray(entries)) {
-        lib$es6$promise$$internal$$reject(promise, new TypeError('You must pass an array to race.'));
-        return promise;
-      }
-
-      var length = entries.length;
-
-      function onFulfillment(value) {
-        lib$es6$promise$$internal$$resolve(promise, value);
-      }
-
-      function onRejection(reason) {
-        lib$es6$promise$$internal$$reject(promise, reason);
-      }
-
-      for (var i = 0; promise._state === lib$es6$promise$$internal$$PENDING && i < length; i++) {
-        lib$es6$promise$$internal$$subscribe(Constructor.resolve(entries[i]), undefined, onFulfillment, onRejection);
-      }
-
-      return promise;
-    }
-    var lib$es6$promise$promise$race$$default = lib$es6$promise$promise$race$$race;
-    function lib$es6$promise$promise$resolve$$resolve(object) {
-      /*jshint validthis:true */
-      var Constructor = this;
-
-      if (object && typeof object === 'object' && object.constructor === Constructor) {
-        return object;
-      }
-
-      var promise = new Constructor(lib$es6$promise$$internal$$noop);
-      lib$es6$promise$$internal$$resolve(promise, object);
-      return promise;
-    }
-    var lib$es6$promise$promise$resolve$$default = lib$es6$promise$promise$resolve$$resolve;
-    function lib$es6$promise$promise$reject$$reject(reason) {
-      /*jshint validthis:true */
-      var Constructor = this;
-      var promise = new Constructor(lib$es6$promise$$internal$$noop);
-      lib$es6$promise$$internal$$reject(promise, reason);
-      return promise;
-    }
-    var lib$es6$promise$promise$reject$$default = lib$es6$promise$promise$reject$$reject;
-
-    var lib$es6$promise$promise$$counter = 0;
-
-    function lib$es6$promise$promise$$needsResolver() {
-      throw new TypeError('You must pass a resolver function as the first argument to the promise constructor');
-    }
-
-    function lib$es6$promise$promise$$needsNew() {
-      throw new TypeError("Failed to construct 'Promise': Please use the 'new' operator, this object constructor cannot be called as a function.");
-    }
-
-    var lib$es6$promise$promise$$default = lib$es6$promise$promise$$Promise;
-    /**
-      Promise objects represent the eventual result of an asynchronous operation. The
-      primary way of interacting with a promise is through its `then` method, which
-      registers callbacks to receive either a promise's eventual value or the reason
-      why the promise cannot be fulfilled.
-
-      Terminology
-      -----------
-
-      - `promise` is an object or function with a `then` method whose behavior conforms to this specification.
-      - `thenable` is an object or function that defines a `then` method.
-      - `value` is any legal JavaScript value (including undefined, a thenable, or a promise).
-      - `exception` is a value that is thrown using the throw statement.
-      - `reason` is a value that indicates why a promise was rejected.
-      - `settled` the final resting state of a promise, fulfilled or rejected.
-
-      A promise can be in one of three states: pending, fulfilled, or rejected.
-
-      Promises that are fulfilled have a fulfillment value and are in the fulfilled
-      state.  Promises that are rejected have a rejection reason and are in the
-      rejected state.  A fulfillment value is never a thenable.
-
-      Promises can also be said to *resolve* a value.  If this value is also a
-      promise, then the original promise's settled state will match the value's
-      settled state.  So a promise that *resolves* a promise that rejects will
-      itself reject, and a promise that *resolves* a promise that fulfills will
-      itself fulfill.
-
-
-      Basic Usage:
-      ------------
-
-      ```js
-      var promise = new Promise(function(resolve, reject) {
-        // on success
-        resolve(value);
-
-        // on failure
-        reject(reason);
-      });
-
-      promise.then(function(value) {
-        // on fulfillment
-      }, function(reason) {
-        // on rejection
-      });
-      ```
-
-      Advanced Usage:
-      ---------------
-
-      Promises shine when abstracting away asynchronous interactions such as
-      `XMLHttpRequest`s.
-
-      ```js
-      function getJSON(url) {
-        return new Promise(function(resolve, reject){
-          var xhr = new XMLHttpRequest();
-
-          xhr.open('GET', url);
-          xhr.onreadystatechange = handler;
-          xhr.responseType = 'json';
-          xhr.setRequestHeader('Accept', 'application/json');
-          xhr.send();
-
-          function handler() {
-            if (this.readyState === this.DONE) {
-              if (this.status === 200) {
-                resolve(this.response);
-              } else {
-                reject(new Error('getJSON: `' + url + '` failed with status: [' + this.status + ']'));
-              }
-            }
-          };
-        });
-      }
-
-      getJSON('/posts.json').then(function(json) {
-        // on fulfillment
-      }, function(reason) {
-        // on rejection
-      });
-      ```
-
-      Unlike callbacks, promises are great composable primitives.
-
-      ```js
-      Promise.all([
-        getJSON('/posts'),
-        getJSON('/comments')
-      ]).then(function(values){
-        values[0] // => postsJSON
-        values[1] // => commentsJSON
-
-        return values;
-      });
-      ```
-
-      @class Promise
-      @param {function} resolver
-      Useful for tooling.
-      @constructor
-    */
-    function lib$es6$promise$promise$$Promise(resolver) {
-      this._id = lib$es6$promise$promise$$counter++;
-      this._state = undefined;
-      this._result = undefined;
-      this._subscribers = [];
-
-      if (lib$es6$promise$$internal$$noop !== resolver) {
-        if (!lib$es6$promise$utils$$isFunction(resolver)) {
-          lib$es6$promise$promise$$needsResolver();
-        }
-
-        if (!(this instanceof lib$es6$promise$promise$$Promise)) {
-          lib$es6$promise$promise$$needsNew();
-        }
-
-        lib$es6$promise$$internal$$initializePromise(this, resolver);
-      }
-    }
-
-    lib$es6$promise$promise$$Promise.all = lib$es6$promise$promise$all$$default;
-    lib$es6$promise$promise$$Promise.race = lib$es6$promise$promise$race$$default;
-    lib$es6$promise$promise$$Promise.resolve = lib$es6$promise$promise$resolve$$default;
-    lib$es6$promise$promise$$Promise.reject = lib$es6$promise$promise$reject$$default;
-    lib$es6$promise$promise$$Promise._setScheduler = lib$es6$promise$asap$$setScheduler;
-    lib$es6$promise$promise$$Promise._setAsap = lib$es6$promise$asap$$setAsap;
-    lib$es6$promise$promise$$Promise._asap = lib$es6$promise$asap$$asap;
-
-    lib$es6$promise$promise$$Promise.prototype = {
-      constructor: lib$es6$promise$promise$$Promise,
-
-    /**
-      The primary way of interacting with a promise is through its `then` method,
-      which registers callbacks to receive either a promise's eventual value or the
-      reason why the promise cannot be fulfilled.
-
-      ```js
-      findUser().then(function(user){
-        // user is available
-      }, function(reason){
-        // user is unavailable, and you are given the reason why
-      });
-      ```
-
-      Chaining
-      --------
-
-      The return value of `then` is itself a promise.  This second, 'downstream'
-      promise is resolved with the return value of the first promise's fulfillment
-      or rejection handler, or rejected if the handler throws an exception.
-
-      ```js
-      findUser().then(function (user) {
-        return user.name;
-      }, function (reason) {
-        return 'default name';
-      }).then(function (userName) {
-        // If `findUser` fulfilled, `userName` will be the user's name, otherwise it
-        // will be `'default name'`
-      });
-
-      findUser().then(function (user) {
-        throw new Error('Found user, but still unhappy');
-      }, function (reason) {
-        throw new Error('`findUser` rejected and we're unhappy');
-      }).then(function (value) {
-        // never reached
-      }, function (reason) {
-        // if `findUser` fulfilled, `reason` will be 'Found user, but still unhappy'.
-        // If `findUser` rejected, `reason` will be '`findUser` rejected and we're unhappy'.
-      });
-      ```
-      If the downstream promise does not specify a rejection handler, rejection reasons will be propagated further downstream.
-
-      ```js
-      findUser().then(function (user) {
-        throw new PedagogicalException('Upstream error');
-      }).then(function (value) {
-        // never reached
-      }).then(function (value) {
-        // never reached
-      }, function (reason) {
-        // The `PedgagocialException` is propagated all the way down to here
-      });
-      ```
-
-      Assimilation
-      ------------
-
-      Sometimes the value you want to propagate to a downstream promise can only be
-      retrieved asynchronously. This can be achieved by returning a promise in the
-      fulfillment or rejection handler. The downstream promise will then be pending
-      until the returned promise is settled. This is called *assimilation*.
-
-      ```js
-      findUser().then(function (user) {
-        return findCommentsByAuthor(user);
-      }).then(function (comments) {
-        // The user's comments are now available
-      });
-      ```
-
-      If the assimliated promise rejects, then the downstream promise will also reject.
-
-      ```js
-      findUser().then(function (user) {
-        return findCommentsByAuthor(user);
-      }).then(function (comments) {
-        // If `findCommentsByAuthor` fulfills, we'll have the value here
-      }, function (reason) {
-        // If `findCommentsByAuthor` rejects, we'll have the reason here
-      });
-      ```
-
-      Simple Example
-      --------------
-
-      Synchronous Example
-
-      ```javascript
-      var result;
-
-      try {
-        result = findResult();
-        // success
-      } catch(reason) {
-        // failure
-      }
-      ```
-
-      Errback Example
-
-      ```js
-      findResult(function(result, err){
-        if (err) {
-          // failure
-        } else {
-          // success
-        }
-      });
-      ```
-
-      Promise Example;
-
-      ```javascript
-      findResult().then(function(result){
-        // success
-      }, function(reason){
-        // failure
-      });
-      ```
-
-      Advanced Example
-      --------------
-
-      Synchronous Example
-
-      ```javascript
-      var author, books;
-
-      try {
-        author = findAuthor();
-        books  = findBooksByAuthor(author);
-        // success
-      } catch(reason) {
-        // failure
-      }
-      ```
-
-      Errback Example
-
-      ```js
-
-      function foundBooks(books) {
-
-      }
-
-      function failure(reason) {
-
-      }
-
-      findAuthor(function(author, err){
-        if (err) {
-          failure(err);
-          // failure
-        } else {
-          try {
-            findBoooksByAuthor(author, function(books, err) {
-              if (err) {
-                failure(err);
-              } else {
-                try {
-                  foundBooks(books);
-                } catch(reason) {
-                  failure(reason);
-                }
-              }
-            });
-          } catch(error) {
-            failure(err);
-          }
-          // success
-        }
-      });
-      ```
-
-      Promise Example;
-
-      ```javascript
-      findAuthor().
-        then(findBooksByAuthor).
-        then(function(books){
-          // found books
-      }).catch(function(reason){
-        // something went wrong
-      });
-      ```
-
-      @method then
-      @param {Function} onFulfilled
-      @param {Function} onRejected
-      Useful for tooling.
-      @return {Promise}
-    */
-      then: function(onFulfillment, onRejection) {
-        var parent = this;
-        var state = parent._state;
-
-        if (state === lib$es6$promise$$internal$$FULFILLED && !onFulfillment || state === lib$es6$promise$$internal$$REJECTED && !onRejection) {
-          return this;
-        }
-
-        var child = new this.constructor(lib$es6$promise$$internal$$noop);
-        var result = parent._result;
-
-        if (state) {
-          var callback = arguments[state - 1];
-          lib$es6$promise$asap$$asap(function(){
-            lib$es6$promise$$internal$$invokeCallback(state, child, callback, result);
-          });
-        } else {
-          lib$es6$promise$$internal$$subscribe(parent, child, onFulfillment, onRejection);
-        }
-
-        return child;
-      },
-
-    /**
-      `catch` is simply sugar for `then(undefined, onRejection)` which makes it the same
-      as the catch block of a try/catch statement.
-
-      ```js
-      function findAuthor(){
-        throw new Error('couldn't find that author');
-      }
-
-      // synchronous
-      try {
-        findAuthor();
-      } catch(reason) {
-        // something went wrong
-      }
-
-      // async with promises
-      findAuthor().catch(function(reason){
-        // something went wrong
-      });
-      ```
-
-      @method catch
-      @param {Function} onRejection
-      Useful for tooling.
-      @return {Promise}
-    */
-      'catch': function(onRejection) {
-        return this.then(null, onRejection);
-      }
-    };
-    function lib$es6$promise$polyfill$$polyfill() {
-      var local;
-
-      if (typeof global !== 'undefined') {
-          local = global;
-      } else if (typeof self !== 'undefined') {
-          local = self;
-      } else {
-          try {
-              local = Function('return this')();
-          } catch (e) {
-              throw new Error('polyfill failed because global object is unavailable in this environment');
-          }
-      }
-
-      var P = local.Promise;
-
-      if (P && Object.prototype.toString.call(P.resolve()) === '[object Promise]' && !P.cast) {
-        return;
-      }
-
-      local.Promise = lib$es6$promise$promise$$default;
-    }
-    var lib$es6$promise$polyfill$$default = lib$es6$promise$polyfill$$polyfill;
-
-    var lib$es6$promise$umd$$ES6Promise = {
-      'Promise': lib$es6$promise$promise$$default,
-      'polyfill': lib$es6$promise$polyfill$$default
-    };
-
-    /* global define:true module:true window: true */
-    if (typeof define === 'function' && define['amd']) {
-      define(function() { return lib$es6$promise$umd$$ES6Promise; });
-    } else if (typeof module !== 'undefined' && module['exports']) {
-      module['exports'] = lib$es6$promise$umd$$ES6Promise;
-    } else if (typeof this !== 'undefined') {
-      this['ES6Promise'] = lib$es6$promise$umd$$ES6Promise;
-    }
-
-    lib$es6$promise$polyfill$$default();
-}).call(this);
-
-
-}).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"_process":126}],25:[function(require,module,exports){
 // the whatwg-fetch polyfill installs the fetch() function
 // on the global object (window or self)
 //
@@ -4085,7 +3120,7 @@ Dodgy.Promise = Dodgy;
 require('whatwg-fetch');
 module.exports = self.fetch.bind(self);
 
-},{"whatwg-fetch":130}],26:[function(require,module,exports){
+},{"whatwg-fetch":129}],25:[function(require,module,exports){
 var baseDifference = require('../internal/baseDifference'),
     baseFlatten = require('../internal/baseFlatten'),
     isArrayLike = require('../internal/isArrayLike'),
@@ -4116,7 +3151,7 @@ var difference = restParam(function(array, values) {
 
 module.exports = difference;
 
-},{"../function/restParam":38,"../internal/baseDifference":52,"../internal/baseFlatten":58,"../internal/isArrayLike":95,"../internal/isObjectLike":100}],27:[function(require,module,exports){
+},{"../function/restParam":37,"../internal/baseDifference":51,"../internal/baseFlatten":57,"../internal/isArrayLike":94,"../internal/isObjectLike":99}],26:[function(require,module,exports){
 /**
  * Gets the last element of `array`.
  *
@@ -4137,16 +3172,16 @@ function last(array) {
 
 module.exports = last;
 
-},{}],28:[function(require,module,exports){
+},{}],27:[function(require,module,exports){
 module.exports = require('./every');
 
-},{"./every":31}],29:[function(require,module,exports){
+},{"./every":30}],28:[function(require,module,exports){
 module.exports = require('./find');
 
-},{"./find":33}],30:[function(require,module,exports){
+},{"./find":32}],29:[function(require,module,exports){
 module.exports = require('./forEach');
 
-},{"./forEach":35}],31:[function(require,module,exports){
+},{"./forEach":34}],30:[function(require,module,exports){
 var arrayEvery = require('../internal/arrayEvery'),
     baseCallback = require('../internal/baseCallback'),
     baseEvery = require('../internal/baseEvery'),
@@ -4214,7 +3249,7 @@ function every(collection, predicate, thisArg) {
 
 module.exports = every;
 
-},{"../internal/arrayEvery":42,"../internal/baseCallback":49,"../internal/baseEvery":54,"../internal/isIterateeCall":97,"../lang/isArray":109}],32:[function(require,module,exports){
+},{"../internal/arrayEvery":41,"../internal/baseCallback":48,"../internal/baseEvery":53,"../internal/isIterateeCall":96,"../lang/isArray":108}],31:[function(require,module,exports){
 var arrayFilter = require('../internal/arrayFilter'),
     baseCallback = require('../internal/baseCallback'),
     baseFilter = require('../internal/baseFilter'),
@@ -4277,7 +3312,7 @@ function filter(collection, predicate, thisArg) {
 
 module.exports = filter;
 
-},{"../internal/arrayFilter":43,"../internal/baseCallback":49,"../internal/baseFilter":55,"../lang/isArray":109}],33:[function(require,module,exports){
+},{"../internal/arrayFilter":42,"../internal/baseCallback":48,"../internal/baseFilter":54,"../lang/isArray":108}],32:[function(require,module,exports){
 var baseEach = require('../internal/baseEach'),
     createFind = require('../internal/createFind');
 
@@ -4335,7 +3370,7 @@ var find = createFind(baseEach);
 
 module.exports = find;
 
-},{"../internal/baseEach":53,"../internal/createFind":83}],34:[function(require,module,exports){
+},{"../internal/baseEach":52,"../internal/createFind":82}],33:[function(require,module,exports){
 var baseMatches = require('../internal/baseMatches'),
     find = require('./find');
 
@@ -4374,7 +3409,7 @@ function findWhere(collection, source) {
 
 module.exports = findWhere;
 
-},{"../internal/baseMatches":69,"./find":33}],35:[function(require,module,exports){
+},{"../internal/baseMatches":68,"./find":32}],34:[function(require,module,exports){
 var arrayEach = require('../internal/arrayEach'),
     baseEach = require('../internal/baseEach'),
     createForEach = require('../internal/createForEach');
@@ -4413,7 +3448,7 @@ var forEach = createForEach(arrayEach, baseEach);
 
 module.exports = forEach;
 
-},{"../internal/arrayEach":41,"../internal/baseEach":53,"../internal/createForEach":84}],36:[function(require,module,exports){
+},{"../internal/arrayEach":40,"../internal/baseEach":52,"../internal/createForEach":83}],35:[function(require,module,exports){
 var arrayMap = require('../internal/arrayMap'),
     baseCallback = require('../internal/baseCallback'),
     baseMap = require('../internal/baseMap'),
@@ -4483,7 +3518,7 @@ function map(collection, iteratee, thisArg) {
 
 module.exports = map;
 
-},{"../internal/arrayMap":44,"../internal/baseCallback":49,"../internal/baseMap":68,"../lang/isArray":109}],37:[function(require,module,exports){
+},{"../internal/arrayMap":43,"../internal/baseCallback":48,"../internal/baseMap":67,"../lang/isArray":108}],36:[function(require,module,exports){
 var baseMatches = require('../internal/baseMatches'),
     filter = require('./filter');
 
@@ -4522,7 +3557,7 @@ function where(collection, source) {
 
 module.exports = where;
 
-},{"../internal/baseMatches":69,"./filter":32}],38:[function(require,module,exports){
+},{"../internal/baseMatches":68,"./filter":31}],37:[function(require,module,exports){
 /** Used as the `TypeError` message for "Functions" methods. */
 var FUNC_ERROR_TEXT = 'Expected a function';
 
@@ -4582,7 +3617,7 @@ function restParam(func, start) {
 
 module.exports = restParam;
 
-},{}],39:[function(require,module,exports){
+},{}],38:[function(require,module,exports){
 (function (global){
 var cachePush = require('./cachePush'),
     getNative = require('./getNative');
@@ -4615,7 +3650,7 @@ SetCache.prototype.push = cachePush;
 module.exports = SetCache;
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./cachePush":78,"./getNative":90}],40:[function(require,module,exports){
+},{"./cachePush":77,"./getNative":89}],39:[function(require,module,exports){
 /**
  * Copies the values of `source` to `array`.
  *
@@ -4637,7 +3672,7 @@ function arrayCopy(source, array) {
 
 module.exports = arrayCopy;
 
-},{}],41:[function(require,module,exports){
+},{}],40:[function(require,module,exports){
 /**
  * A specialized version of `_.forEach` for arrays without support for callback
  * shorthands and `this` binding.
@@ -4661,7 +3696,7 @@ function arrayEach(array, iteratee) {
 
 module.exports = arrayEach;
 
-},{}],42:[function(require,module,exports){
+},{}],41:[function(require,module,exports){
 /**
  * A specialized version of `_.every` for arrays without support for callback
  * shorthands and `this` binding.
@@ -4686,7 +3721,7 @@ function arrayEvery(array, predicate) {
 
 module.exports = arrayEvery;
 
-},{}],43:[function(require,module,exports){
+},{}],42:[function(require,module,exports){
 /**
  * A specialized version of `_.filter` for arrays without support for callback
  * shorthands and `this` binding.
@@ -4713,7 +3748,7 @@ function arrayFilter(array, predicate) {
 
 module.exports = arrayFilter;
 
-},{}],44:[function(require,module,exports){
+},{}],43:[function(require,module,exports){
 /**
  * A specialized version of `_.map` for arrays without support for callback
  * shorthands and `this` binding.
@@ -4736,7 +3771,7 @@ function arrayMap(array, iteratee) {
 
 module.exports = arrayMap;
 
-},{}],45:[function(require,module,exports){
+},{}],44:[function(require,module,exports){
 /**
  * Appends the elements of `values` to `array`.
  *
@@ -4758,7 +3793,7 @@ function arrayPush(array, values) {
 
 module.exports = arrayPush;
 
-},{}],46:[function(require,module,exports){
+},{}],45:[function(require,module,exports){
 /**
  * A specialized version of `_.some` for arrays without support for callback
  * shorthands and `this` binding.
@@ -4783,7 +3818,7 @@ function arraySome(array, predicate) {
 
 module.exports = arraySome;
 
-},{}],47:[function(require,module,exports){
+},{}],46:[function(require,module,exports){
 var keys = require('../object/keys');
 
 /**
@@ -4817,7 +3852,7 @@ function assignWith(object, source, customizer) {
 
 module.exports = assignWith;
 
-},{"../object/keys":120}],48:[function(require,module,exports){
+},{"../object/keys":119}],47:[function(require,module,exports){
 var baseCopy = require('./baseCopy'),
     keys = require('../object/keys');
 
@@ -4838,7 +3873,7 @@ function baseAssign(object, source) {
 
 module.exports = baseAssign;
 
-},{"../object/keys":120,"./baseCopy":51}],49:[function(require,module,exports){
+},{"../object/keys":119,"./baseCopy":50}],48:[function(require,module,exports){
 var baseMatches = require('./baseMatches'),
     baseMatchesProperty = require('./baseMatchesProperty'),
     bindCallback = require('./bindCallback'),
@@ -4875,7 +3910,7 @@ function baseCallback(func, thisArg, argCount) {
 
 module.exports = baseCallback;
 
-},{"../utility/identity":124,"../utility/property":125,"./baseMatches":69,"./baseMatchesProperty":70,"./bindCallback":75}],50:[function(require,module,exports){
+},{"../utility/identity":123,"../utility/property":124,"./baseMatches":68,"./baseMatchesProperty":69,"./bindCallback":74}],49:[function(require,module,exports){
 var arrayCopy = require('./arrayCopy'),
     arrayEach = require('./arrayEach'),
     baseAssign = require('./baseAssign'),
@@ -5005,7 +4040,7 @@ function baseClone(value, isDeep, customizer, key, object, stackA, stackB) {
 
 module.exports = baseClone;
 
-},{"../lang/isArray":109,"../lang/isObject":114,"./arrayCopy":40,"./arrayEach":41,"./baseAssign":48,"./baseForOwn":61,"./initCloneArray":92,"./initCloneByTag":93,"./initCloneObject":94}],51:[function(require,module,exports){
+},{"../lang/isArray":108,"../lang/isObject":113,"./arrayCopy":39,"./arrayEach":40,"./baseAssign":47,"./baseForOwn":60,"./initCloneArray":91,"./initCloneByTag":92,"./initCloneObject":93}],50:[function(require,module,exports){
 /**
  * Copies properties of `source` to `object`.
  *
@@ -5030,7 +4065,7 @@ function baseCopy(source, props, object) {
 
 module.exports = baseCopy;
 
-},{}],52:[function(require,module,exports){
+},{}],51:[function(require,module,exports){
 var baseIndexOf = require('./baseIndexOf'),
     cacheIndexOf = require('./cacheIndexOf'),
     createCache = require('./createCache');
@@ -5087,7 +4122,7 @@ function baseDifference(array, values) {
 
 module.exports = baseDifference;
 
-},{"./baseIndexOf":64,"./cacheIndexOf":77,"./createCache":82}],53:[function(require,module,exports){
+},{"./baseIndexOf":63,"./cacheIndexOf":76,"./createCache":81}],52:[function(require,module,exports){
 var baseForOwn = require('./baseForOwn'),
     createBaseEach = require('./createBaseEach');
 
@@ -5104,7 +4139,7 @@ var baseEach = createBaseEach(baseForOwn);
 
 module.exports = baseEach;
 
-},{"./baseForOwn":61,"./createBaseEach":80}],54:[function(require,module,exports){
+},{"./baseForOwn":60,"./createBaseEach":79}],53:[function(require,module,exports){
 var baseEach = require('./baseEach');
 
 /**
@@ -5128,7 +4163,7 @@ function baseEvery(collection, predicate) {
 
 module.exports = baseEvery;
 
-},{"./baseEach":53}],55:[function(require,module,exports){
+},{"./baseEach":52}],54:[function(require,module,exports){
 var baseEach = require('./baseEach');
 
 /**
@@ -5152,7 +4187,7 @@ function baseFilter(collection, predicate) {
 
 module.exports = baseFilter;
 
-},{"./baseEach":53}],56:[function(require,module,exports){
+},{"./baseEach":52}],55:[function(require,module,exports){
 /**
  * The base implementation of `_.find`, `_.findLast`, `_.findKey`, and `_.findLastKey`,
  * without support for callback shorthands and `this` binding, which iterates
@@ -5179,7 +4214,7 @@ function baseFind(collection, predicate, eachFunc, retKey) {
 
 module.exports = baseFind;
 
-},{}],57:[function(require,module,exports){
+},{}],56:[function(require,module,exports){
 /**
  * The base implementation of `_.findIndex` and `_.findLastIndex` without
  * support for callback shorthands and `this` binding.
@@ -5204,7 +4239,7 @@ function baseFindIndex(array, predicate, fromRight) {
 
 module.exports = baseFindIndex;
 
-},{}],58:[function(require,module,exports){
+},{}],57:[function(require,module,exports){
 var arrayPush = require('./arrayPush'),
     isArguments = require('../lang/isArguments'),
     isArray = require('../lang/isArray'),
@@ -5247,7 +4282,7 @@ function baseFlatten(array, isDeep, isStrict, result) {
 
 module.exports = baseFlatten;
 
-},{"../lang/isArguments":108,"../lang/isArray":109,"./arrayPush":45,"./isArrayLike":95,"./isObjectLike":100}],59:[function(require,module,exports){
+},{"../lang/isArguments":107,"../lang/isArray":108,"./arrayPush":44,"./isArrayLike":94,"./isObjectLike":99}],58:[function(require,module,exports){
 var createBaseFor = require('./createBaseFor');
 
 /**
@@ -5266,7 +4301,7 @@ var baseFor = createBaseFor();
 
 module.exports = baseFor;
 
-},{"./createBaseFor":81}],60:[function(require,module,exports){
+},{"./createBaseFor":80}],59:[function(require,module,exports){
 var baseFor = require('./baseFor'),
     keysIn = require('../object/keysIn');
 
@@ -5285,7 +4320,7 @@ function baseForIn(object, iteratee) {
 
 module.exports = baseForIn;
 
-},{"../object/keysIn":121,"./baseFor":59}],61:[function(require,module,exports){
+},{"../object/keysIn":120,"./baseFor":58}],60:[function(require,module,exports){
 var baseFor = require('./baseFor'),
     keys = require('../object/keys');
 
@@ -5304,7 +4339,7 @@ function baseForOwn(object, iteratee) {
 
 module.exports = baseForOwn;
 
-},{"../object/keys":120,"./baseFor":59}],62:[function(require,module,exports){
+},{"../object/keys":119,"./baseFor":58}],61:[function(require,module,exports){
 var isFunction = require('../lang/isFunction');
 
 /**
@@ -5333,7 +4368,7 @@ function baseFunctions(object, props) {
 
 module.exports = baseFunctions;
 
-},{"../lang/isFunction":111}],63:[function(require,module,exports){
+},{"../lang/isFunction":110}],62:[function(require,module,exports){
 var toObject = require('./toObject');
 
 /**
@@ -5364,7 +4399,7 @@ function baseGet(object, path, pathKey) {
 
 module.exports = baseGet;
 
-},{"./toObject":105}],64:[function(require,module,exports){
+},{"./toObject":104}],63:[function(require,module,exports){
 var indexOfNaN = require('./indexOfNaN');
 
 /**
@@ -5393,7 +4428,7 @@ function baseIndexOf(array, value, fromIndex) {
 
 module.exports = baseIndexOf;
 
-},{"./indexOfNaN":91}],65:[function(require,module,exports){
+},{"./indexOfNaN":90}],64:[function(require,module,exports){
 var baseIsEqualDeep = require('./baseIsEqualDeep'),
     isObject = require('../lang/isObject'),
     isObjectLike = require('./isObjectLike');
@@ -5423,7 +4458,7 @@ function baseIsEqual(value, other, customizer, isLoose, stackA, stackB) {
 
 module.exports = baseIsEqual;
 
-},{"../lang/isObject":114,"./baseIsEqualDeep":66,"./isObjectLike":100}],66:[function(require,module,exports){
+},{"../lang/isObject":113,"./baseIsEqualDeep":65,"./isObjectLike":99}],65:[function(require,module,exports){
 var equalArrays = require('./equalArrays'),
     equalByTag = require('./equalByTag'),
     equalObjects = require('./equalObjects'),
@@ -5527,7 +4562,7 @@ function baseIsEqualDeep(object, other, equalFunc, customizer, isLoose, stackA, 
 
 module.exports = baseIsEqualDeep;
 
-},{"../lang/isArray":109,"../lang/isTypedArray":116,"./equalArrays":85,"./equalByTag":86,"./equalObjects":87}],67:[function(require,module,exports){
+},{"../lang/isArray":108,"../lang/isTypedArray":115,"./equalArrays":84,"./equalByTag":85,"./equalObjects":86}],66:[function(require,module,exports){
 var baseIsEqual = require('./baseIsEqual'),
     toObject = require('./toObject');
 
@@ -5581,7 +4616,7 @@ function baseIsMatch(object, matchData, customizer) {
 
 module.exports = baseIsMatch;
 
-},{"./baseIsEqual":65,"./toObject":105}],68:[function(require,module,exports){
+},{"./baseIsEqual":64,"./toObject":104}],67:[function(require,module,exports){
 var baseEach = require('./baseEach'),
     isArrayLike = require('./isArrayLike');
 
@@ -5606,7 +4641,7 @@ function baseMap(collection, iteratee) {
 
 module.exports = baseMap;
 
-},{"./baseEach":53,"./isArrayLike":95}],69:[function(require,module,exports){
+},{"./baseEach":52,"./isArrayLike":94}],68:[function(require,module,exports){
 var baseIsMatch = require('./baseIsMatch'),
     getMatchData = require('./getMatchData'),
     toObject = require('./toObject');
@@ -5638,7 +4673,7 @@ function baseMatches(source) {
 
 module.exports = baseMatches;
 
-},{"./baseIsMatch":67,"./getMatchData":89,"./toObject":105}],70:[function(require,module,exports){
+},{"./baseIsMatch":66,"./getMatchData":88,"./toObject":104}],69:[function(require,module,exports){
 var baseGet = require('./baseGet'),
     baseIsEqual = require('./baseIsEqual'),
     baseSlice = require('./baseSlice'),
@@ -5685,7 +4720,7 @@ function baseMatchesProperty(path, srcValue) {
 
 module.exports = baseMatchesProperty;
 
-},{"../array/last":27,"../lang/isArray":109,"./baseGet":63,"./baseIsEqual":65,"./baseSlice":73,"./isKey":98,"./isStrictComparable":101,"./toObject":105,"./toPath":106}],71:[function(require,module,exports){
+},{"../array/last":26,"../lang/isArray":108,"./baseGet":62,"./baseIsEqual":64,"./baseSlice":72,"./isKey":97,"./isStrictComparable":100,"./toObject":104,"./toPath":105}],70:[function(require,module,exports){
 /**
  * The base implementation of `_.property` without support for deep paths.
  *
@@ -5701,7 +4736,7 @@ function baseProperty(key) {
 
 module.exports = baseProperty;
 
-},{}],72:[function(require,module,exports){
+},{}],71:[function(require,module,exports){
 var baseGet = require('./baseGet'),
     toPath = require('./toPath');
 
@@ -5722,7 +4757,7 @@ function basePropertyDeep(path) {
 
 module.exports = basePropertyDeep;
 
-},{"./baseGet":63,"./toPath":106}],73:[function(require,module,exports){
+},{"./baseGet":62,"./toPath":105}],72:[function(require,module,exports){
 /**
  * The base implementation of `_.slice` without an iteratee call guard.
  *
@@ -5756,7 +4791,7 @@ function baseSlice(array, start, end) {
 
 module.exports = baseSlice;
 
-},{}],74:[function(require,module,exports){
+},{}],73:[function(require,module,exports){
 /**
  * Converts `value` to a string if it's not one. An empty string is returned
  * for `null` or `undefined` values.
@@ -5771,7 +4806,7 @@ function baseToString(value) {
 
 module.exports = baseToString;
 
-},{}],75:[function(require,module,exports){
+},{}],74:[function(require,module,exports){
 var identity = require('../utility/identity');
 
 /**
@@ -5812,7 +4847,7 @@ function bindCallback(func, thisArg, argCount) {
 
 module.exports = bindCallback;
 
-},{"../utility/identity":124}],76:[function(require,module,exports){
+},{"../utility/identity":123}],75:[function(require,module,exports){
 (function (global){
 /** Native method references. */
 var ArrayBuffer = global.ArrayBuffer,
@@ -5836,7 +4871,7 @@ function bufferClone(buffer) {
 module.exports = bufferClone;
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],77:[function(require,module,exports){
+},{}],76:[function(require,module,exports){
 var isObject = require('../lang/isObject');
 
 /**
@@ -5857,7 +4892,7 @@ function cacheIndexOf(cache, value) {
 
 module.exports = cacheIndexOf;
 
-},{"../lang/isObject":114}],78:[function(require,module,exports){
+},{"../lang/isObject":113}],77:[function(require,module,exports){
 var isObject = require('../lang/isObject');
 
 /**
@@ -5879,7 +4914,7 @@ function cachePush(value) {
 
 module.exports = cachePush;
 
-},{"../lang/isObject":114}],79:[function(require,module,exports){
+},{"../lang/isObject":113}],78:[function(require,module,exports){
 var bindCallback = require('./bindCallback'),
     isIterateeCall = require('./isIterateeCall'),
     restParam = require('../function/restParam');
@@ -5922,7 +4957,7 @@ function createAssigner(assigner) {
 
 module.exports = createAssigner;
 
-},{"../function/restParam":38,"./bindCallback":75,"./isIterateeCall":97}],80:[function(require,module,exports){
+},{"../function/restParam":37,"./bindCallback":74,"./isIterateeCall":96}],79:[function(require,module,exports){
 var getLength = require('./getLength'),
     isLength = require('./isLength'),
     toObject = require('./toObject');
@@ -5955,7 +4990,7 @@ function createBaseEach(eachFunc, fromRight) {
 
 module.exports = createBaseEach;
 
-},{"./getLength":88,"./isLength":99,"./toObject":105}],81:[function(require,module,exports){
+},{"./getLength":87,"./isLength":98,"./toObject":104}],80:[function(require,module,exports){
 var toObject = require('./toObject');
 
 /**
@@ -5984,7 +5019,7 @@ function createBaseFor(fromRight) {
 
 module.exports = createBaseFor;
 
-},{"./toObject":105}],82:[function(require,module,exports){
+},{"./toObject":104}],81:[function(require,module,exports){
 (function (global){
 var SetCache = require('./SetCache'),
     getNative = require('./getNative');
@@ -6009,7 +5044,7 @@ function createCache(values) {
 module.exports = createCache;
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./SetCache":39,"./getNative":90}],83:[function(require,module,exports){
+},{"./SetCache":38,"./getNative":89}],82:[function(require,module,exports){
 var baseCallback = require('./baseCallback'),
     baseFind = require('./baseFind'),
     baseFindIndex = require('./baseFindIndex'),
@@ -6036,7 +5071,7 @@ function createFind(eachFunc, fromRight) {
 
 module.exports = createFind;
 
-},{"../lang/isArray":109,"./baseCallback":49,"./baseFind":56,"./baseFindIndex":57}],84:[function(require,module,exports){
+},{"../lang/isArray":108,"./baseCallback":48,"./baseFind":55,"./baseFindIndex":56}],83:[function(require,module,exports){
 var bindCallback = require('./bindCallback'),
     isArray = require('../lang/isArray');
 
@@ -6058,7 +5093,7 @@ function createForEach(arrayFunc, eachFunc) {
 
 module.exports = createForEach;
 
-},{"../lang/isArray":109,"./bindCallback":75}],85:[function(require,module,exports){
+},{"../lang/isArray":108,"./bindCallback":74}],84:[function(require,module,exports){
 var arraySome = require('./arraySome');
 
 /**
@@ -6111,7 +5146,7 @@ function equalArrays(array, other, equalFunc, customizer, isLoose, stackA, stack
 
 module.exports = equalArrays;
 
-},{"./arraySome":46}],86:[function(require,module,exports){
+},{"./arraySome":45}],85:[function(require,module,exports){
 /** `Object#toString` result references. */
 var boolTag = '[object Boolean]',
     dateTag = '[object Date]',
@@ -6161,7 +5196,7 @@ function equalByTag(object, other, tag) {
 
 module.exports = equalByTag;
 
-},{}],87:[function(require,module,exports){
+},{}],86:[function(require,module,exports){
 var keys = require('../object/keys');
 
 /** Used for native method references. */
@@ -6230,7 +5265,7 @@ function equalObjects(object, other, equalFunc, customizer, isLoose, stackA, sta
 
 module.exports = equalObjects;
 
-},{"../object/keys":120}],88:[function(require,module,exports){
+},{"../object/keys":119}],87:[function(require,module,exports){
 var baseProperty = require('./baseProperty');
 
 /**
@@ -6247,7 +5282,7 @@ var getLength = baseProperty('length');
 
 module.exports = getLength;
 
-},{"./baseProperty":71}],89:[function(require,module,exports){
+},{"./baseProperty":70}],88:[function(require,module,exports){
 var isStrictComparable = require('./isStrictComparable'),
     pairs = require('../object/pairs');
 
@@ -6270,7 +5305,7 @@ function getMatchData(object) {
 
 module.exports = getMatchData;
 
-},{"../object/pairs":122,"./isStrictComparable":101}],90:[function(require,module,exports){
+},{"../object/pairs":121,"./isStrictComparable":100}],89:[function(require,module,exports){
 var isNative = require('../lang/isNative');
 
 /**
@@ -6288,7 +5323,7 @@ function getNative(object, key) {
 
 module.exports = getNative;
 
-},{"../lang/isNative":112}],91:[function(require,module,exports){
+},{"../lang/isNative":111}],90:[function(require,module,exports){
 /**
  * Gets the index at which the first occurrence of `NaN` is found in `array`.
  *
@@ -6313,7 +5348,7 @@ function indexOfNaN(array, fromIndex, fromRight) {
 
 module.exports = indexOfNaN;
 
-},{}],92:[function(require,module,exports){
+},{}],91:[function(require,module,exports){
 /** Used for native method references. */
 var objectProto = Object.prototype;
 
@@ -6341,7 +5376,7 @@ function initCloneArray(array) {
 
 module.exports = initCloneArray;
 
-},{}],93:[function(require,module,exports){
+},{}],92:[function(require,module,exports){
 var bufferClone = require('./bufferClone');
 
 /** `Object#toString` result references. */
@@ -6406,7 +5441,7 @@ function initCloneByTag(object, tag, isDeep) {
 
 module.exports = initCloneByTag;
 
-},{"./bufferClone":76}],94:[function(require,module,exports){
+},{"./bufferClone":75}],93:[function(require,module,exports){
 /**
  * Initializes an object clone.
  *
@@ -6424,7 +5459,7 @@ function initCloneObject(object) {
 
 module.exports = initCloneObject;
 
-},{}],95:[function(require,module,exports){
+},{}],94:[function(require,module,exports){
 var getLength = require('./getLength'),
     isLength = require('./isLength');
 
@@ -6441,7 +5476,7 @@ function isArrayLike(value) {
 
 module.exports = isArrayLike;
 
-},{"./getLength":88,"./isLength":99}],96:[function(require,module,exports){
+},{"./getLength":87,"./isLength":98}],95:[function(require,module,exports){
 /** Used to detect unsigned integer values. */
 var reIsUint = /^\d+$/;
 
@@ -6467,7 +5502,7 @@ function isIndex(value, length) {
 
 module.exports = isIndex;
 
-},{}],97:[function(require,module,exports){
+},{}],96:[function(require,module,exports){
 var isArrayLike = require('./isArrayLike'),
     isIndex = require('./isIndex'),
     isObject = require('../lang/isObject');
@@ -6497,7 +5532,7 @@ function isIterateeCall(value, index, object) {
 
 module.exports = isIterateeCall;
 
-},{"../lang/isObject":114,"./isArrayLike":95,"./isIndex":96}],98:[function(require,module,exports){
+},{"../lang/isObject":113,"./isArrayLike":94,"./isIndex":95}],97:[function(require,module,exports){
 var isArray = require('../lang/isArray'),
     toObject = require('./toObject');
 
@@ -6527,7 +5562,7 @@ function isKey(value, object) {
 
 module.exports = isKey;
 
-},{"../lang/isArray":109,"./toObject":105}],99:[function(require,module,exports){
+},{"../lang/isArray":108,"./toObject":104}],98:[function(require,module,exports){
 /**
  * Used as the [maximum length](http://ecma-international.org/ecma-262/6.0/#sec-number.max_safe_integer)
  * of an array-like value.
@@ -6549,7 +5584,7 @@ function isLength(value) {
 
 module.exports = isLength;
 
-},{}],100:[function(require,module,exports){
+},{}],99:[function(require,module,exports){
 /**
  * Checks if `value` is object-like.
  *
@@ -6563,7 +5598,7 @@ function isObjectLike(value) {
 
 module.exports = isObjectLike;
 
-},{}],101:[function(require,module,exports){
+},{}],100:[function(require,module,exports){
 var isObject = require('../lang/isObject');
 
 /**
@@ -6580,7 +5615,7 @@ function isStrictComparable(value) {
 
 module.exports = isStrictComparable;
 
-},{"../lang/isObject":114}],102:[function(require,module,exports){
+},{"../lang/isObject":113}],101:[function(require,module,exports){
 var toObject = require('./toObject');
 
 /**
@@ -6610,7 +5645,7 @@ function pickByArray(object, props) {
 
 module.exports = pickByArray;
 
-},{"./toObject":105}],103:[function(require,module,exports){
+},{"./toObject":104}],102:[function(require,module,exports){
 var baseForIn = require('./baseForIn');
 
 /**
@@ -6634,7 +5669,7 @@ function pickByCallback(object, predicate) {
 
 module.exports = pickByCallback;
 
-},{"./baseForIn":60}],104:[function(require,module,exports){
+},{"./baseForIn":59}],103:[function(require,module,exports){
 var isArguments = require('../lang/isArguments'),
     isArray = require('../lang/isArray'),
     isIndex = require('./isIndex'),
@@ -6677,7 +5712,7 @@ function shimKeys(object) {
 
 module.exports = shimKeys;
 
-},{"../lang/isArguments":108,"../lang/isArray":109,"../object/keysIn":121,"./isIndex":96,"./isLength":99}],105:[function(require,module,exports){
+},{"../lang/isArguments":107,"../lang/isArray":108,"../object/keysIn":120,"./isIndex":95,"./isLength":98}],104:[function(require,module,exports){
 var isObject = require('../lang/isObject');
 
 /**
@@ -6693,7 +5728,7 @@ function toObject(value) {
 
 module.exports = toObject;
 
-},{"../lang/isObject":114}],106:[function(require,module,exports){
+},{"../lang/isObject":113}],105:[function(require,module,exports){
 var baseToString = require('./baseToString'),
     isArray = require('../lang/isArray');
 
@@ -6723,7 +5758,7 @@ function toPath(value) {
 
 module.exports = toPath;
 
-},{"../lang/isArray":109,"./baseToString":74}],107:[function(require,module,exports){
+},{"../lang/isArray":108,"./baseToString":73}],106:[function(require,module,exports){
 var baseClone = require('../internal/baseClone'),
     bindCallback = require('../internal/bindCallback'),
     isIterateeCall = require('../internal/isIterateeCall');
@@ -6795,7 +5830,7 @@ function clone(value, isDeep, customizer, thisArg) {
 
 module.exports = clone;
 
-},{"../internal/baseClone":50,"../internal/bindCallback":75,"../internal/isIterateeCall":97}],108:[function(require,module,exports){
+},{"../internal/baseClone":49,"../internal/bindCallback":74,"../internal/isIterateeCall":96}],107:[function(require,module,exports){
 var isArrayLike = require('../internal/isArrayLike'),
     isObjectLike = require('../internal/isObjectLike');
 
@@ -6831,7 +5866,7 @@ function isArguments(value) {
 
 module.exports = isArguments;
 
-},{"../internal/isArrayLike":95,"../internal/isObjectLike":100}],109:[function(require,module,exports){
+},{"../internal/isArrayLike":94,"../internal/isObjectLike":99}],108:[function(require,module,exports){
 var getNative = require('../internal/getNative'),
     isLength = require('../internal/isLength'),
     isObjectLike = require('../internal/isObjectLike');
@@ -6873,7 +5908,7 @@ var isArray = nativeIsArray || function(value) {
 
 module.exports = isArray;
 
-},{"../internal/getNative":90,"../internal/isLength":99,"../internal/isObjectLike":100}],110:[function(require,module,exports){
+},{"../internal/getNative":89,"../internal/isLength":98,"../internal/isObjectLike":99}],109:[function(require,module,exports){
 var isArguments = require('./isArguments'),
     isArray = require('./isArray'),
     isArrayLike = require('../internal/isArrayLike'),
@@ -6922,7 +5957,7 @@ function isEmpty(value) {
 
 module.exports = isEmpty;
 
-},{"../internal/isArrayLike":95,"../internal/isObjectLike":100,"../object/keys":120,"./isArguments":108,"./isArray":109,"./isFunction":111,"./isString":115}],111:[function(require,module,exports){
+},{"../internal/isArrayLike":94,"../internal/isObjectLike":99,"../object/keys":119,"./isArguments":107,"./isArray":108,"./isFunction":110,"./isString":114}],110:[function(require,module,exports){
 var isObject = require('./isObject');
 
 /** `Object#toString` result references. */
@@ -6962,7 +5997,7 @@ function isFunction(value) {
 
 module.exports = isFunction;
 
-},{"./isObject":114}],112:[function(require,module,exports){
+},{"./isObject":113}],111:[function(require,module,exports){
 var isFunction = require('./isFunction'),
     isObjectLike = require('../internal/isObjectLike');
 
@@ -7012,7 +6047,7 @@ function isNative(value) {
 
 module.exports = isNative;
 
-},{"../internal/isObjectLike":100,"./isFunction":111}],113:[function(require,module,exports){
+},{"../internal/isObjectLike":99,"./isFunction":110}],112:[function(require,module,exports){
 var isObjectLike = require('../internal/isObjectLike');
 
 /** `Object#toString` result references. */
@@ -7055,7 +6090,7 @@ function isNumber(value) {
 
 module.exports = isNumber;
 
-},{"../internal/isObjectLike":100}],114:[function(require,module,exports){
+},{"../internal/isObjectLike":99}],113:[function(require,module,exports){
 /**
  * Checks if `value` is the [language type](https://es5.github.io/#x8) of `Object`.
  * (e.g. arrays, functions, objects, regexes, `new Number(0)`, and `new String('')`)
@@ -7085,7 +6120,7 @@ function isObject(value) {
 
 module.exports = isObject;
 
-},{}],115:[function(require,module,exports){
+},{}],114:[function(require,module,exports){
 var isObjectLike = require('../internal/isObjectLike');
 
 /** `Object#toString` result references. */
@@ -7122,7 +6157,7 @@ function isString(value) {
 
 module.exports = isString;
 
-},{"../internal/isObjectLike":100}],116:[function(require,module,exports){
+},{"../internal/isObjectLike":99}],115:[function(require,module,exports){
 var isLength = require('../internal/isLength'),
     isObjectLike = require('../internal/isObjectLike');
 
@@ -7198,7 +6233,7 @@ function isTypedArray(value) {
 
 module.exports = isTypedArray;
 
-},{"../internal/isLength":99,"../internal/isObjectLike":100}],117:[function(require,module,exports){
+},{"../internal/isLength":98,"../internal/isObjectLike":99}],116:[function(require,module,exports){
 var assignWith = require('../internal/assignWith'),
     baseAssign = require('../internal/baseAssign'),
     createAssigner = require('../internal/createAssigner');
@@ -7243,10 +6278,10 @@ var assign = createAssigner(function(object, source, customizer) {
 
 module.exports = assign;
 
-},{"../internal/assignWith":47,"../internal/baseAssign":48,"../internal/createAssigner":79}],118:[function(require,module,exports){
+},{"../internal/assignWith":46,"../internal/baseAssign":47,"../internal/createAssigner":78}],117:[function(require,module,exports){
 module.exports = require('./assign');
 
-},{"./assign":117}],119:[function(require,module,exports){
+},{"./assign":116}],118:[function(require,module,exports){
 var baseFunctions = require('../internal/baseFunctions'),
     keysIn = require('./keysIn');
 
@@ -7271,7 +6306,7 @@ function functions(object) {
 
 module.exports = functions;
 
-},{"../internal/baseFunctions":62,"./keysIn":121}],120:[function(require,module,exports){
+},{"../internal/baseFunctions":61,"./keysIn":120}],119:[function(require,module,exports){
 var getNative = require('../internal/getNative'),
     isArrayLike = require('../internal/isArrayLike'),
     isObject = require('../lang/isObject'),
@@ -7318,7 +6353,7 @@ var keys = !nativeKeys ? shimKeys : function(object) {
 
 module.exports = keys;
 
-},{"../internal/getNative":90,"../internal/isArrayLike":95,"../internal/shimKeys":104,"../lang/isObject":114}],121:[function(require,module,exports){
+},{"../internal/getNative":89,"../internal/isArrayLike":94,"../internal/shimKeys":103,"../lang/isObject":113}],120:[function(require,module,exports){
 var isArguments = require('../lang/isArguments'),
     isArray = require('../lang/isArray'),
     isIndex = require('../internal/isIndex'),
@@ -7384,7 +6419,7 @@ function keysIn(object) {
 
 module.exports = keysIn;
 
-},{"../internal/isIndex":96,"../internal/isLength":99,"../lang/isArguments":108,"../lang/isArray":109,"../lang/isObject":114}],122:[function(require,module,exports){
+},{"../internal/isIndex":95,"../internal/isLength":98,"../lang/isArguments":107,"../lang/isArray":108,"../lang/isObject":113}],121:[function(require,module,exports){
 var keys = require('./keys'),
     toObject = require('../internal/toObject');
 
@@ -7419,7 +6454,7 @@ function pairs(object) {
 
 module.exports = pairs;
 
-},{"../internal/toObject":105,"./keys":120}],123:[function(require,module,exports){
+},{"../internal/toObject":104,"./keys":119}],122:[function(require,module,exports){
 var baseFlatten = require('../internal/baseFlatten'),
     bindCallback = require('../internal/bindCallback'),
     pickByArray = require('../internal/pickByArray'),
@@ -7463,7 +6498,7 @@ var pick = restParam(function(object, props) {
 
 module.exports = pick;
 
-},{"../function/restParam":38,"../internal/baseFlatten":58,"../internal/bindCallback":75,"../internal/pickByArray":102,"../internal/pickByCallback":103}],124:[function(require,module,exports){
+},{"../function/restParam":37,"../internal/baseFlatten":57,"../internal/bindCallback":74,"../internal/pickByArray":101,"../internal/pickByCallback":102}],123:[function(require,module,exports){
 /**
  * This method returns the first argument provided to it.
  *
@@ -7485,7 +6520,7 @@ function identity(value) {
 
 module.exports = identity;
 
-},{}],125:[function(require,module,exports){
+},{}],124:[function(require,module,exports){
 var baseProperty = require('../internal/baseProperty'),
     basePropertyDeep = require('../internal/basePropertyDeep'),
     isKey = require('../internal/isKey');
@@ -7518,100 +6553,136 @@ function property(path) {
 
 module.exports = property;
 
-},{"../internal/baseProperty":71,"../internal/basePropertyDeep":72,"../internal/isKey":98}],126:[function(require,module,exports){
-// shim for using process in browser
+},{"../internal/baseProperty":70,"../internal/basePropertyDeep":71,"../internal/isKey":97}],125:[function(require,module,exports){
+/**@license MIT-promiscuous-©Ruben Verborgh*/
+(function (func, obj) {
+  // Type checking utility function
+  function is(type, item) { return (typeof item)[0] == type; }
 
-var process = module.exports = {};
-var queue = [];
-var draining = false;
-var currentQueue;
-var queueIndex = -1;
+  // Creates a promise, calling callback(resolve, reject), ignoring other parameters.
+  function Promise(callback, handler) {
+    // The `handler` variable points to the function that will
+    // 1) handle a .then(resolved, rejected) call
+    // 2) handle a resolve or reject call (if the first argument === `is`)
+    // Before 2), `handler` holds a queue of callbacks.
+    // After 2), `handler` is a finalized .then handler.
+    handler = function pendingHandler(resolved, rejected, value, queue, then, i) {
+      queue = pendingHandler.q;
 
-function cleanUpNextTick() {
-    draining = false;
-    if (currentQueue.length) {
-        queue = currentQueue.concat(queue);
-    } else {
-        queueIndex = -1;
-    }
-    if (queue.length) {
-        drainQueue();
-    }
-}
+      // Case 1) handle a .then(resolved, rejected) call
+      if (resolved != is) {
+        return Promise(function (resolve, reject) {
+          queue.push({ p: this, r: resolve, j: reject, 1: resolved, 0: rejected });
+        });
+      }
 
-function drainQueue() {
-    if (draining) {
-        return;
-    }
-    var timeout = setTimeout(cleanUpNextTick);
-    draining = true;
+      // Case 2) handle a resolve or reject call
+      // (`resolved` === `is` acts as a sentinel)
+      // The actual function signature is
+      // .re[ject|solve](<is>, success, value)
 
-    var len = queue.length;
-    while(len) {
-        currentQueue = queue;
-        queue = [];
-        while (++queueIndex < len) {
-            if (currentQueue) {
-                currentQueue[queueIndex].run();
-            }
+      // Check if the value is a promise and try to obtain its `then` method
+      if (value && (is(func, value) | is(obj, value))) {
+        try { then = value.then; }
+        catch (reason) { rejected = 0; value = reason; }
+      }
+      // If the value is a promise, take over its state
+      if (is(func, then)) {
+        function valueHandler(resolved) {
+          return function (value) { then && (then = 0, pendingHandler(is, resolved, value)); };
         }
-        queueIndex = -1;
-        len = queue.length;
-    }
-    currentQueue = null;
-    draining = false;
-    clearTimeout(timeout);
-}
-
-process.nextTick = function (fun) {
-    var args = new Array(arguments.length - 1);
-    if (arguments.length > 1) {
-        for (var i = 1; i < arguments.length; i++) {
-            args[i - 1] = arguments[i];
+        try { then.call(value, valueHandler(1), rejected = valueHandler(0)); }
+        catch (reason) { rejected(reason); }
+      }
+      // The value is not a promise; handle resolve/reject
+      else {
+        // Replace this handler with a finalized resolved/rejected handler
+        handler = function (Resolved, Rejected) {
+          // If the Resolved or Rejected parameter is not a function,
+          // return the original promise (now stored in the `callback` variable)
+          if (!is(func, (Resolved = rejected ? Resolved : Rejected)))
+            return callback;
+          // Otherwise, return a finalized promise, transforming the value with the function
+          return Promise(function (resolve, reject) { finalize(this, resolve, reject, value, Resolved); });
+        };
+        // Resolve/reject pending callbacks
+        i = 0;
+        while (i < queue.length) {
+          then = queue[i++];
+          // If no callback, just resolve/reject the promise
+          if (!is(func, resolved = then[rejected]))
+            (rejected ? then.r : then.j)(value);
+          // Otherwise, resolve/reject the promise with the result of the callback
+          else
+            finalize(then.p, then.r, then.j, value, resolved);
         }
-    }
-    queue.push(new Item(fun, args));
-    if (queue.length === 1 && !draining) {
-        setTimeout(drainQueue, 0);
-    }
-};
+      }
+    };
+    // The queue of pending callbacks; garbage-collected when handler is resolved/rejected
+    handler.q = [];
 
-// v8 likes predictible objects
-function Item(fun, array) {
-    this.fun = fun;
-    this.array = array;
-}
-Item.prototype.run = function () {
-    this.fun.apply(null, this.array);
-};
-process.title = 'browser';
-process.browser = true;
-process.env = {};
-process.argv = [];
-process.version = ''; // empty string to avoid regexp issues
-process.versions = {};
+    // Create and return the promise (reusing the callback variable)
+    callback.call(callback = { then:  function (resolved, rejected) { return handler(resolved, rejected); },
+                               catch: function (rejected)           { return handler(0,        rejected); } },
+                  function (value)  { handler(is, 1,  value); },
+                  function (reason) { handler(is, 0, reason); });
+    return callback;
+  }
 
-function noop() {}
+  // Finalizes the promise by resolving/rejecting it with the transformed value
+  function finalize(promise, resolve, reject, value, transform) {
+    setImmediate(function () {
+      try {
+        // Transform the value through and check whether it's a promise
+        value = transform(value);
+        transform = value && (is(obj, value) | is(func, value)) && value.then;
+        // Return the result if it's not a promise
+        if (!is(func, transform))
+          resolve(value);
+        // If it's a promise, make sure it's not circular
+        else if (value == promise)
+          reject(TypeError());
+        // Take over the promise's state
+        else
+          transform.call(value, resolve, reject);
+      }
+      catch (error) { reject(error); }
+    });
+  }
 
-process.on = noop;
-process.addListener = noop;
-process.once = noop;
-process.off = noop;
-process.removeListener = noop;
-process.removeAllListeners = noop;
-process.emit = noop;
+  // Export the main module
+  module.exports = Promise;
 
-process.binding = function (name) {
-    throw new Error('process.binding is not supported');
-};
+  // Creates a resolved promise
+  Promise.resolve = ResolvedPromise;
+  function ResolvedPromise(value) { return Promise(function (resolve) { resolve(value); }); }
 
-process.cwd = function () { return '/' };
-process.chdir = function (dir) {
-    throw new Error('process.chdir is not supported');
-};
-process.umask = function() { return 0; };
+  // Creates a rejected promise
+  Promise.reject = function (reason) { return Promise(function (resolve, reject) { reject(reason); }); };
 
-},{}],127:[function(require,module,exports){
+  // Transforms an array of promises into a promise for an array
+  Promise.all = function (promises) {
+    return Promise(function (resolve, reject, count, values) {
+      // Array of collected values
+      values = [];
+      // Resolve immediately if there are no promises
+      count = promises.length || resolve(values);
+      // Transform all elements (`map` is shorter than `forEach`)
+      promises.map(function (promise, index) {
+        ResolvedPromise(promise).then(
+          // Store the value and resolve if it was the last
+          function (value) {
+            values[index] = value;
+            --count || resolve(values);
+          },
+          // Reject if one element fails
+          reject);
+      });
+    });
+  };
+})('f', 'o');
+
+},{}],126:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -7697,7 +6768,7 @@ var isArray = Array.isArray || function (xs) {
   return Object.prototype.toString.call(xs) === '[object Array]';
 };
 
-},{}],128:[function(require,module,exports){
+},{}],127:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -7784,13 +6855,13 @@ var objectKeys = Object.keys || function (obj) {
   return res;
 };
 
-},{}],129:[function(require,module,exports){
+},{}],128:[function(require,module,exports){
 'use strict';
 
 exports.decode = exports.parse = require('./decode');
 exports.encode = exports.stringify = require('./encode');
 
-},{"./decode":127,"./encode":128}],130:[function(require,module,exports){
+},{"./decode":126,"./encode":127}],129:[function(require,module,exports){
 (function(self) {
   'use strict';
 
