@@ -16,11 +16,11 @@
   "license": "MIT",
   "homepage": "https://github.com/pressly/papi.js",
   "dependencies": {
-    "es6-promise": "^3.0.2",
+    "dodgy": "1.1.0",
     "isomorphic-fetch": "2.2.0",
     "lodash": "3.10.1",
-    "querystring": "0.2.0",
-    "dodgy": "^1.1.0"
+    "promiscuous": "0.6.0",
+    "querystring": "0.2.0"
   },
   "devDependencies": {
     "babel-istanbul": "^0.5.9",

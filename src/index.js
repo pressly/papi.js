@@ -1,6 +1,9 @@
 'use strict';
 
-require('es6-promise').polyfill();
+import _Promise from 'promiscuous';
+if (!global.Promise) {
+  global.Promise = _Promise;
+}
 
 let AbortablePromise = require('dodgy');
 
