@@ -34,7 +34,7 @@ mockRequest.configure({host: api.options.host});
 describe('Auth', function () {
   describe('Login', function() {
     it('should return 401 when given incorrect email or password', function (done) {
-      mockRequest.post('/auth/login', { email: 'incorrect-email', password: 'incorrect-password', }).reply(401);
+      mockRequest.post('/auth', { email: 'incorrect-email', password: 'incorrect-password', }).reply(401);
 
       api.auth.login('incorrect-email', 'incorrect-password').then(() => {
         throw new Error('login was successfull');
@@ -48,7 +48,7 @@ describe('Auth', function () {
     });
 
     it('should return 200 with proper email and password', function (done) {
-      mockRequest.post('/auth/login', { email: mock.session.email, password: mock.session.password }).reply(200, mock.session);
+      mockRequest.post('/auth', { email: mock.session.email, password: mock.session.password }).reply(200, mock.session);
 
       api.auth.login('alex.vitiuk@pressly.com', 'betame').then((res) => {
         res.id.should.be.exactly(mock.session.id);
@@ -64,7 +64,7 @@ describe('Auth', function () {
     });
 
     it('should set jwt', function (done) {
-      mockRequest.post('/auth/login', { email: mock.session.email, password: mock.session.password }).reply(200, mock.session);
+      mockRequest.post('/auth', { email: mock.session.email, password: mock.session.password }).reply(200, mock.session);
 
       api.auth.login('alex.vitiuk@pressly.com', 'betame').then((res) => {
         if (!api.auth.session.jwt) {
@@ -116,7 +116,7 @@ describe('Auth', function () {
     });
 
     it('should return currentUser', function (done) {
-      mockRequest.post('/auth/login', { email: mock.session.email, password: mock.session.password }).reply(200, mock.session);
+      mockRequest.post('/auth', { email: mock.session.email, password: mock.session.password }).reply(200, mock.session);
       mockRequest.get('/session').reply(200, mock.session);
 
       api.auth.login('alex.vitiuk@pressly.com', 'betame').then((session) => {
