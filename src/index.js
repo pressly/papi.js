@@ -80,9 +80,10 @@ class Papi extends ResourceSchema {
       },
 
       logout: () => {
-        return this.request('delete', '/session').then((res) => {
-          this.auth.session = null;
+        // Clear session immediately even if server fails to respond
+        this.auth.session = null;
 
+        return this.request('delete', '/session').then((res) => {
           return res;
         });
       }
