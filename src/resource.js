@@ -246,7 +246,7 @@ export default class Resource {
             return collection;
           } else {
             // Should create a new resource and hydrate
-            return this.hydrateCollection(res);
+            return this.hydrateCollection(res.data);
           }
         });
       }
