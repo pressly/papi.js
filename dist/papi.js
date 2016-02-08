@@ -103,19 +103,20 @@ var Papi = function (_ResourceSchema) {
       },
 
       login: function login(email, password) {
-        return _this.request('post', '/auth/login', { data: { email: email, password: password } }).then(function (res) {
+        return _this.request('post', '/auth', { data: { email: email, password: password } }).then(function (res) {
           return _this.auth.set(res.data);
         });
       },
 
       requestPasswordReset: function requestPasswordReset(email) {
-        return _this.request('post', '/auth/password_reset/send', { data: { email: email } });
+        return _this.request('post', '/auth/password_reset', { data: { email: email } });
       },
 
       logout: function logout() {
-        return _this.request('delete', '/session').then(function (res) {
-          _this.auth.session = null;
+        // Clear session immediately even if server fails to respond
+        _this.auth.session = null;
 
+        return _this.request('delete', '/session').then(function (res) {
           return res;
         });
       }
@@ -1704,6 +1705,7 @@ var Resource = function () {
   Resource.prototype.setResponse = function setResponse(res) {
     this.status = res.status;
     this.headers = res.headers;
+    this.links = {};
 
     if (res.headers && res.headers.has('Link')) {
       this.links = parseHTTPLinks(res.headers.get('Link'));
@@ -1778,8 +1780,10 @@ var Resource = function () {
 
             return collection;
           } else {
+            _this6.setResponse(res);
+
             // Should create a new resource and hydrate
-            return _this6.hydrateCollection(res);
+            return _this6.hydrateCollection(res.data);
           }
         });
       }

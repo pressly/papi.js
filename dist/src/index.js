@@ -101,19 +101,20 @@ var Papi = function (_ResourceSchema) {
       },
 
       login: function login(email, password) {
-        return _this.request('post', '/auth/login', { data: { email: email, password: password } }).then(function (res) {
+        return _this.request('post', '/auth', { data: { email: email, password: password } }).then(function (res) {
           return _this.auth.set(res.data);
         });
       },
 
       requestPasswordReset: function requestPasswordReset(email) {
-        return _this.request('post', '/auth/password_reset/send', { data: { email: email } });
+        return _this.request('post', '/auth/password_reset', { data: { email: email } });
       },
 
       logout: function logout() {
-        return _this.request('delete', '/session').then(function (res) {
-          _this.auth.session = null;
+        // Clear session immediately even if server fails to respond
+        _this.auth.session = null;
 
+        return _this.request('delete', '/session').then(function (res) {
           return res;
         });
       }

@@ -252,6 +252,7 @@ var Resource = function () {
   Resource.prototype.setResponse = function setResponse(res) {
     this.status = res.status;
     this.headers = res.headers;
+    this.links = {};
 
     if (res.headers && res.headers.has('Link')) {
       this.links = parseHTTPLinks(res.headers.get('Link'));
@@ -326,8 +327,10 @@ var Resource = function () {
 
             return collection;
           } else {
+            _this6.setResponse(res);
+
             // Should create a new resource and hydrate
-            return _this6.hydrateCollection(res);
+            return _this6.hydrateCollection(res.data);
           }
         });
       }

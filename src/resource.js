@@ -180,6 +180,7 @@ export default class Resource {
   setResponse(res) {
     this.status = res.status;
     this.headers = res.headers;
+    this.links = {};
 
     if (res.headers && res.headers.has('Link')) {
       this.links = parseHTTPLinks(res.headers.get('Link'));
@@ -245,6 +246,8 @@ export default class Resource {
 
             return collection;
           } else {
+            this.setResponse(res);
+
             // Should create a new resource and hydrate
             return this.hydrateCollection(res.data);
           }

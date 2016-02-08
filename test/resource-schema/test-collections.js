@@ -171,4 +171,36 @@ describe('Collections', function() {
       done(err);
     });
   });
+
+  it('should have HTTP Link header', function(done) {
+    mockRequest.get('/hubs').reply(200, [1, 2, 3], {
+      'Link': '<https://api.pressly.com/hubs?page=2>;rel="next"'
+    });
+
+    mockRequest.get('/hubs?page=2').reply(200, [4, 5, 6], {
+      'Link': '<https://api.pressly.com/hubs?page=3>;rel="next"'
+    });
+
+    mockRequest.get('/hubs?page=3').reply(200, [7, 8]);
+
+    api.$resource('hubs').$all().then((hubs) => {
+      should(hubs.$hasPage('next')).equal(true);
+      should(hubs.length).equal(3);
+
+      // Test append mode
+      hubs.$nextPage({append: true}).then((hubs) => {
+        should(hubs.$hasPage('next')).equal(true);
+        should(hubs.length).equal(6);
+
+        // Test non append mode
+        hubs.$nextPage({append: false}).then((hubs) => {
+          should(hubs.$hasPage('next')).equal(false);
+          should(hubs.length).equal(2);
+
+          done();
+        }).catch(done);
+
+      }).catch(done);
+    }).catch(done);
+  });
 });
