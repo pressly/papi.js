@@ -239,8 +239,10 @@ Papi.defineSchema()
   .resource('posts', { routeSegment: '/stream/posts/:id'})
 
   .resource('hubs').open()
-    .get('search',    { on: 'resource' })
-    .post('upgrade',  { on: 'member' })
+    .get('search',      { on: 'resource' })
+    .post('upgrade',    { on: 'member' })
+    .post('follow',     { on: 'member' })
+    .delete('unfollow', { on: 'member' })
 
     .resource('apps').open()
       .get('current', { on: 'resource' })
