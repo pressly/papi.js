@@ -1,5 +1,7 @@
 'use strict';
 
+exports.__esModule = true;
+
 var _isArray = require('lodash/lang/isArray');
 
 var _isArray2 = _interopRequireDefault(_isArray);
@@ -45,8 +47,6 @@ var _isEmpty = require('lodash/lang/isEmpty');
 var _isEmpty2 = _interopRequireDefault(_isEmpty);
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
-
-exports.__esModule = true;
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 

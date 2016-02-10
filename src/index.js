@@ -1,6 +1,6 @@
 'use strict';
 
-import _Promise from 'promiscuous';
+import _Promise from 'promiz';
 if (!global.Promise) {
   global.Promise = _Promise;
 }

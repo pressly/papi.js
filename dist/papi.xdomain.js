@@ -1155,265 +1155,13 @@ if (typeof this.define === "function" && this.define.amd) {
 (function (global){
 'use strict';
 
-var _isEmpty = require('lodash/lang/isEmpty');
+var _last = require('lodash/array/last');
 
-var _isEmpty2 = _interopRequireDefault(_isEmpty);
+var _last2 = _interopRequireDefault(_last);
 
-var _extend = require('lodash/object/extend');
+var _all = require('lodash/collection/all');
 
-var _extend2 = _interopRequireDefault(_extend);
-
-var _promiscuous = require('promiscuous');
-
-var _promiscuous2 = _interopRequireDefault(_promiscuous);
-
-var _isomorphicFetch = require('isomorphic-fetch');
-
-var _isomorphicFetch2 = _interopRequireDefault(_isomorphicFetch);
-
-var _querystring = require('querystring');
-
-var _querystring2 = _interopRequireDefault(_querystring);
-
-var _resourceSchema = require('./resource-schema');
-
-var _resourceSchema2 = _interopRequireDefault(_resourceSchema);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-if (!global.Promise) {
-  global.Promise = _promiscuous2.default;
-}
-
-var AbortablePromise = require('dodgy');
-
-if (!global.fetch) {
-  global.fetch = _isomorphicFetch2.default;
-}
-
-// Query string parser and stringifier -- fetch does not support any query string
-// parsing so we need to handle it separately.
-
-function hasXDomain() {
-  return typeof window !== 'undefined' && window.xdomain != null;
-}
-
-var Papi = function (_ResourceSchema) {
-  _inherits(Papi, _ResourceSchema);
-
-  function Papi() {
-    var options = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
-
-    _classCallCheck(this, Papi);
-
-    var _this = _possibleConstructorReturn(this, _ResourceSchema.apply(this, arguments));
-
-    _this.options = options;
-    _this.options.host = options.host || 'https://api.pressly.com';
-
-    if (hasXDomain()) {
-      var slaves = {};
-      slaves[_this.options.host] = '/proxy.html';
-      window.xdomain.slaves(slaves);
-    }
-
-    _this.requestMiddlewares = [];
-    _this.responseMiddlewares = [];
-
-    _this.auth = {
-      session: null,
-
-      get: function get() {
-        return _this.request('get', '/session').then(function (res) {
-          return _this.auth.set(res.data);
-        });
-      },
-
-      set: function set(session) {
-        if (!session.jwt) {
-          throw new Error('Papi:Auth: Invalid session response - missing jwt');
-        }
-
-        _this.auth.session = session;
-
-        return _this.auth.session;
-      },
-
-      isLoggedIn: function isLoggedIn() {
-        return !!_this.auth.session && !_this.auth.isExpired();
-      },
-
-      isExpired: function isExpired() {
-        // XXX this should be using a jwt lib to figure out if the token has expired
-        // XXX We do not currently include an expiry param in our tokens so just return false.
-        return false;
-      },
-
-      login: function login(email, password) {
-        return _this.request('post', '/auth', { data: { email: email, password: password } }).then(function (res) {
-          return _this.auth.set(res.data);
-        });
-      },
-
-      requestPasswordReset: function requestPasswordReset(email) {
-        return _this.request('post', '/auth/password_reset', { data: { email: email } });
-      },
-
-      logout: function logout() {
-        // Clear session immediately even if server fails to respond
-        _this.auth.session = null;
-
-        return _this.request('delete', '/session').then(function (res) {
-          return res;
-        });
-      }
-    };
-    return _this;
-  }
-
-  Papi.prototype.request = function request(method, path) {
-    var _this2 = this;
-
-    var options = arguments.length <= 2 || arguments[2] === undefined ? {} : arguments[2];
-
-    return new AbortablePromise(function (resolve, reject, onAbort) {
-      var url = /^(https?:)?\/\//.test(path) ? path : _this2.options.host + path;
-
-      var req = {
-        url: url,
-        method: method,
-        headers: {},
-        query: {}
-      };
-
-      req.headers['Content-Type'] = 'application/json';
-
-      // if (options.timeout || this.options.timeout) {
-      //   req.timeout(options.timeout || this.options.timeout);
-      // }
-
-      // Allow sending cookies from origin
-      if (typeof req.withCredentials == 'function' && !hasXDomain()) {
-        req.credentials = 'include';
-      }
-
-      // Send Authorization header when we have a JSON Web Token set in the session
-      if (_this2.auth.session && _this2.auth.session.jwt) {
-        req.headers['Authorization'] = 'Bearer ' + _this2.auth.session.jwt;
-      }
-
-      req.headers['Accept'] = 'application/vnd.pressly.v0.12+json';
-
-      // Query params to be added to the url
-      if (options.query) {
-        (0, _extend2.default)(req.query, options.query);
-      }
-
-      // Data to send (with get requests these are converted into query params)
-      if (options.data) {
-        if (method == 'get') {
-          (0, _extend2.default)(req.query, options.data);
-        } else {
-          req.body = JSON.stringify(options.data);
-        }
-      }
-
-      if (!(0, _isEmpty2.default)(req.query)) {
-        req.url += '?' + _querystring2.default.stringify(req.query);
-      }
-
-      var res = {};
-
-      var beginRequest = function beginRequest() {
-        if (_this2.requestMiddlewares.length) {
-          var offset = 0;
-          var next = function next() {
-            var layer = _this2.requestMiddlewares[++offset] || endRequest;
-            return layer(req, res, next, resolve, reject);
-          };
-
-          _this2.requestMiddlewares[0](req, res, next, resolve, reject);
-        } else {
-          endRequest();
-        }
-      };
-
-      var endRequest = function endRequest() {
-        // XXX this is where the request will be made
-        fetch(req.url, req).then(function (response) {
-          if (response.status >= 200 && response.status < 300) {
-            res = response;
-
-            response.json().then(function (data) {
-              res.data = data || {};
-            }).catch(function (err) {
-              res.data = {};
-            }).then(function () {
-              beginResponse();
-            });
-          } else {
-            return reject(response);
-          }
-        }).catch(function (err) {
-          return reject(err);
-        });
-      };
-
-      var beginResponse = function beginResponse() {
-        if (_this2.responseMiddlewares.length) {
-          var offset = 0;
-          var next = function next() {
-            var layer = _this2.responseMiddlewares[++offset] || endResponse;
-            return layer(req, res, next, resolve, reject);
-          };
-
-          _this2.responseMiddlewares[0](req, res, next, resolve, reject);
-        } else {
-          endResponse();
-        }
-      };
-
-      var endResponse = function endResponse() {
-        resolve(res);
-      };
-
-      onAbort(function (why) {});
-
-      beginRequest();
-    });
-  };
-
-  Papi.prototype.before = function before(middleware) {
-    this.requestMiddlewares.push(middleware);
-  };
-
-  Papi.prototype.after = function after(middleware) {
-    this.responseMiddlewares.push(middleware);
-  };
-
-  return Papi;
-}(_resourceSchema2.default);
-
-module.exports = Papi;
-
-// <= IE10, does not support static method inheritance
-if (Papi.defineSchema == undefined) {
-  Papi.defineSchema = _resourceSchema2.default.defineSchema;
-}
-
-Papi.defineSchema().resource('accounts').open().get('available', { on: 'resource' }).post('become', { on: 'member' }).resource('users').resource('hubs', { link: 'hubs' }).close().resource('organizations').open().resource('users').resource('hubs').resource('invites').open().post('bulk_invite', { on: 'resource' }).post('resend', { on: 'member' }).put('accept', { on: 'member', routeSegment: '/invites/:hash' }).put('reject', { on: 'member', routeSegment: '/invites/:hash' }).close().close().resource('activity').resource('posts', { routeSegment: '/stream/posts/:id' }).resource('hubs').open().get('search', { on: 'resource' }).post('upgrade', { on: 'member' }).resource('apps').open().get('current', { on: 'resource' }).get('build', { on: 'member', path: '/build_app' }).get('status', { on: 'member' }).resource('styles').close().resource('addons').open().resource('configs').close().resource('analytics').open().get('summary', { on: 'resource' }).get('visitors', { on: 'resource' }).get('pageviews', { on: 'resource' }).get('duration', { on: 'resource' }).close().resource('feeds').open().resource('assets', { modelName: 'FeedAsset' }).close().resource('invites').open().post('bulk_invite', { on: 'resource' }).post('resend', { on: 'member' }).put('accept', { on: 'member', routeSegment: '/invites/:hash' }).put('reject', { on: 'member', routeSegment: '/invites/:hash' }).close().resource('recommendations').resource('users').open().post('grant_access', { on: 'resource' }).delete('revoke_access', { on: 'member' }).close().resource('collections').open().put('reorder', { on: 'resource' }).close().resource('tags').resource('assets', { routeSegment: '/stream/:id' }).open().put('feature', { on: 'member' }).put('unfeature', { on: 'member' }).put('hide', { on: 'member' }).put('unhide', { on: 'member' }).put('lock', { on: 'member' }).put('unlock', { on: 'member' }).resource('likes').resource('comments').close().resource('drafts').open().put('publish', { on: 'member' }).close().close().resource('invites').open().get('incoming', { on: 'resource' }).get('outgoing', { on: 'resource' }).post('bulk_invite', { on: 'resource' }).post('resend', { on: 'member' }).put('accept', { on: 'member', routeSegment: '/invites/:hash' }).put('reject', { on: 'member', routeSegment: '/invites/:hash' }).close().resource('code_revisions').open().get('fetch_repo', { on: 'member' })
-
-// This resource links to the root hubs resource
-.resource('hubs', { link: 'hubs' }).close().resource('signup').open().get('account_uid_available', { on: 'member' }).get('account_email_available', { on: 'member' }).close().resource('users').open().get('roles', { on: 'resource' }).resource('hubs').resource('organizations').close().resource('discover').open().resource('users', { link: 'users' }).resource('organizations', { link: 'organizations' }).resource('hubs', { link: 'hubs' }).resource('posts').close().resource('stream').open().resource('following').close();
-}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./resource-schema":21,"dodgy":23,"isomorphic-fetch":24,"lodash/lang/isEmpty":109,"lodash/object/extend":117,"promiscuous":125,"querystring":128}],2:[function(require,module,exports){
-'use strict';
+var _all2 = _interopRequireDefault(_all);
 
 var _pick = require('lodash/object/pick');
 
@@ -1434,1177 +1182,6 @@ var _difference2 = _interopRequireDefault(_difference);
 var _filter = require('lodash/collection/filter');
 
 var _filter2 = _interopRequireDefault(_filter);
-
-var _extend = require('lodash/object/extend');
-
-var _extend2 = _interopRequireDefault(_extend);
-
-exports.__esModule = true;
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-var Model = function () {
-  function Model(data) {
-    var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
-
-    _classCallCheck(this, Model);
-
-    (0, _extend2.default)(this, data);
-
-    this.$newRecord = true;
-  }
-
-  Model.prototype.$delete = function $delete(params) {
-    return this.$resource().request({ method: 'delete', query: params });
-  };
-
-  Model.prototype.$save = function $save(params) {
-    var _this = this;
-
-    var method = this.$newRecord ? 'post' : 'put';
-
-    return this.$resource().request({ method: method, data: this, query: params }).then(function (res) {
-      _this.$newRecord = false;
-      _this.$resource().sync(res);
-
-      return (0, _extend2.default)(_this, res);
-    });
-  };
-
-  Model.prototype.$attributes = function $attributes() {
-    return (0, _filter2.default)((0, _difference2.default)((0, _keys2.default)(this), (0, _functions2.default)(this)), function (x) {
-      return x[0] != '$';
-    });
-  };
-
-  Model.prototype.$data = function $data() {
-    return (0, _pick2.default)(this, this.$attributes());
-  };
-
-  return Model;
-}();
-
-exports.default = Model;
-},{"lodash/array/difference":25,"lodash/collection/filter":31,"lodash/object/extend":117,"lodash/object/functions":118,"lodash/object/keys":119,"lodash/object/pick":122}],3:[function(require,module,exports){
-'use strict';
-
-exports.__esModule = true;
-
-var _model = require('../model');
-
-var _model2 = _interopRequireDefault(_model);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-var Account = function (_Model) {
-  _inherits(Account, _Model);
-
-  function Account() {
-    _classCallCheck(this, Account);
-
-    return _possibleConstructorReturn(this, _Model.apply(this, arguments));
-  }
-
-  return Account;
-}(_model2.default);
-
-exports.default = Account;
-},{"../model":2}],4:[function(require,module,exports){
-'use strict';
-
-exports.__esModule = true;
-
-var _model = require('../model');
-
-var _model2 = _interopRequireDefault(_model);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-var App = function (_Model) {
-  _inherits(App, _Model);
-
-  function App() {
-    _classCallCheck(this, App);
-
-    return _possibleConstructorReturn(this, _Model.apply(this, arguments));
-  }
-
-  return App;
-}(_model2.default);
-
-exports.default = App;
-},{"../model":2}],5:[function(require,module,exports){
-'use strict';
-
-var _pick = require('lodash/object/pick');
-
-var _pick2 = _interopRequireDefault(_pick);
-
-var _isEmpty = require('lodash/lang/isEmpty');
-
-var _isEmpty2 = _interopRequireDefault(_isEmpty);
-
-var _all = require('lodash/collection/all');
-
-var _all2 = _interopRequireDefault(_all);
-
-exports.__esModule = true;
-
-var _model = require('../model');
-
-var _model2 = _interopRequireDefault(_model);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-var DISPLAY_STATES = {
-  VISIBLE: 1,
-  FEATURED: 2,
-  HIGHLIGHTED: 4,
-  LOCKED: 8
-};
-
-var Asset = function (_Model) {
-  _inherits(Asset, _Model);
-
-  function Asset() {
-    _classCallCheck(this, Asset);
-
-    return _possibleConstructorReturn(this, _Model.apply(this, arguments));
-  }
-
-  Asset.prototype.isVisible = function isVisible() {
-    return (this.display_state & DISPLAY_STATES.VISIBLE) === DISPLAY_STATES.VISIBLE;
-  };
-
-  Asset.prototype.isHidden = function isHidden() {
-    return (this.display_state & DISPLAY_STATES.VISIBLE) !== DISPLAY_STATES.VISIBLE;
-  };
-
-  Asset.prototype.isFeatured = function isFeatured() {
-    return (this.display_state & DISPLAY_STATES.FEATURED) === DISPLAY_STATES.FEATURED;
-  };
-
-  Asset.prototype.isHighlighted = function isHighlighted() {
-    return (this.display_state & DISPLAY_STATES.HIGHLIGHTED) === DISPLAY_STATES.HIGHLIGHTED;
-  };
-
-  Asset.prototype.isLocked = function isLocked() {
-    return (this.display_state & DISPLAY_STATES.LOCKED) === DISPLAY_STATES.LOCKED;
-  };
-
-  Asset.prototype.isOriginal = function isOriginal() {
-    return (0, _all2.default)((0, _pick2.default)(this.source, 'network', 'uid', 'url'), _isEmpty2.default);
-  };
-
-  return Asset;
-}(_model2.default);
-
-exports.default = Asset;
-},{"../model":2,"lodash/collection/all":27,"lodash/lang/isEmpty":109,"lodash/object/pick":122}],6:[function(require,module,exports){
-'use strict';
-
-exports.__esModule = true;
-
-var _model = require('../model');
-
-var _model2 = _interopRequireDefault(_model);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-var CodeRevision = function (_Model) {
-  _inherits(CodeRevision, _Model);
-
-  function CodeRevision() {
-    _classCallCheck(this, CodeRevision);
-
-    return _possibleConstructorReturn(this, _Model.apply(this, arguments));
-  }
-
-  return CodeRevision;
-}(_model2.default);
-
-exports.default = CodeRevision;
-},{"../model":2}],7:[function(require,module,exports){
-'use strict';
-
-exports.__esModule = true;
-
-var _model = require('../model');
-
-var _model2 = _interopRequireDefault(_model);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-var Collection = function (_Model) {
-  _inherits(Collection, _Model);
-
-  function Collection() {
-    _classCallCheck(this, Collection);
-
-    return _possibleConstructorReturn(this, _Model.apply(this, arguments));
-  }
-
-  return Collection;
-}(_model2.default);
-
-exports.default = Collection;
-},{"../model":2}],8:[function(require,module,exports){
-'use strict';
-
-exports.__esModule = true;
-
-var _model = require('../model');
-
-var _model2 = _interopRequireDefault(_model);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-var Comment = function (_Model) {
-  _inherits(Comment, _Model);
-
-  function Comment() {
-    _classCallCheck(this, Comment);
-
-    return _possibleConstructorReturn(this, _Model.apply(this, arguments));
-  }
-
-  return Comment;
-}(_model2.default);
-
-exports.default = Comment;
-},{"../model":2}],9:[function(require,module,exports){
-'use strict';
-
-exports.__esModule = true;
-
-var _model = require('../model');
-
-var _model2 = _interopRequireDefault(_model);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-var Draft = function (_Model) {
-  _inherits(Draft, _Model);
-
-  function Draft() {
-    _classCallCheck(this, Draft);
-
-    return _possibleConstructorReturn(this, _Model.apply(this, arguments));
-  }
-
-  return Draft;
-}(_model2.default);
-
-exports.default = Draft;
-},{"../model":2}],10:[function(require,module,exports){
-'use strict';
-
-exports.__esModule = true;
-
-var _model = require('../model');
-
-var _model2 = _interopRequireDefault(_model);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-var FeedAsset = function (_Model) {
-  _inherits(FeedAsset, _Model);
-
-  function FeedAsset() {
-    _classCallCheck(this, FeedAsset);
-
-    return _possibleConstructorReturn(this, _Model.apply(this, arguments));
-  }
-
-  return FeedAsset;
-}(_model2.default);
-
-exports.default = FeedAsset;
-},{"../model":2}],11:[function(require,module,exports){
-'use strict';
-
-exports.__esModule = true;
-
-var _model = require('../model');
-
-var _model2 = _interopRequireDefault(_model);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-var Feed = function (_Model) {
-  _inherits(Feed, _Model);
-
-  function Feed() {
-    _classCallCheck(this, Feed);
-
-    return _possibleConstructorReturn(this, _Model.apply(this, arguments));
-  }
-
-  return Feed;
-}(_model2.default);
-
-exports.default = Feed;
-},{"../model":2}],12:[function(require,module,exports){
-'use strict';
-
-exports.__esModule = true;
-
-var _model = require('../model');
-
-var _model2 = _interopRequireDefault(_model);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-var Hub = function (_Model) {
-  _inherits(Hub, _Model);
-
-  function Hub() {
-    _classCallCheck(this, Hub);
-
-    return _possibleConstructorReturn(this, _Model.apply(this, arguments));
-  }
-
-  return Hub;
-}(_model2.default);
-
-exports.default = Hub;
-},{"../model":2}],13:[function(require,module,exports){
-'use strict';
-
-exports.__esModule = true;
-
-var _model = require('../model');
-
-Object.defineProperty(exports, 'Base', {
-  enumerable: true,
-  get: function get() {
-    return _interopRequireDefault(_model).default;
-  }
-});
-
-var _account = require('./account');
-
-Object.defineProperty(exports, 'Account', {
-  enumerable: true,
-  get: function get() {
-    return _interopRequireDefault(_account).default;
-  }
-});
-
-var _organization = require('./organization');
-
-Object.defineProperty(exports, 'Organization', {
-  enumerable: true,
-  get: function get() {
-    return _interopRequireDefault(_organization).default;
-  }
-});
-
-var _app = require('./app');
-
-Object.defineProperty(exports, 'App', {
-  enumerable: true,
-  get: function get() {
-    return _interopRequireDefault(_app).default;
-  }
-});
-
-var _asset = require('./asset');
-
-Object.defineProperty(exports, 'Asset', {
-  enumerable: true,
-  get: function get() {
-    return _interopRequireDefault(_asset).default;
-  }
-});
-
-var _codeRevision = require('./code-revision');
-
-Object.defineProperty(exports, 'CodeRevision', {
-  enumerable: true,
-  get: function get() {
-    return _interopRequireDefault(_codeRevision).default;
-  }
-});
-
-var _collection = require('./collection');
-
-Object.defineProperty(exports, 'Collection', {
-  enumerable: true,
-  get: function get() {
-    return _interopRequireDefault(_collection).default;
-  }
-});
-
-var _comment = require('./comment');
-
-Object.defineProperty(exports, 'Comment', {
-  enumerable: true,
-  get: function get() {
-    return _interopRequireDefault(_comment).default;
-  }
-});
-
-var _draft = require('./draft');
-
-Object.defineProperty(exports, 'Draft', {
-  enumerable: true,
-  get: function get() {
-    return _interopRequireDefault(_draft).default;
-  }
-});
-
-var _feed = require('./feed');
-
-Object.defineProperty(exports, 'Feed', {
-  enumerable: true,
-  get: function get() {
-    return _interopRequireDefault(_feed).default;
-  }
-});
-
-var _feedAsset = require('./feed-asset');
-
-Object.defineProperty(exports, 'FeedAsset', {
-  enumerable: true,
-  get: function get() {
-    return _interopRequireDefault(_feedAsset).default;
-  }
-});
-
-var _hub = require('./hub');
-
-Object.defineProperty(exports, 'Hub', {
-  enumerable: true,
-  get: function get() {
-    return _interopRequireDefault(_hub).default;
-  }
-});
-
-var _invite = require('./invite');
-
-Object.defineProperty(exports, 'Invite', {
-  enumerable: true,
-  get: function get() {
-    return _interopRequireDefault(_invite).default;
-  }
-});
-
-var _like = require('./like');
-
-Object.defineProperty(exports, 'Like', {
-  enumerable: true,
-  get: function get() {
-    return _interopRequireDefault(_like).default;
-  }
-});
-
-var _recommendation = require('./recommendation');
-
-Object.defineProperty(exports, 'Recommendation', {
-  enumerable: true,
-  get: function get() {
-    return _interopRequireDefault(_recommendation).default;
-  }
-});
-
-var _style = require('./style');
-
-Object.defineProperty(exports, 'Style', {
-  enumerable: true,
-  get: function get() {
-    return _interopRequireDefault(_style).default;
-  }
-});
-
-var _tag = require('./tag');
-
-Object.defineProperty(exports, 'Tag', {
-  enumerable: true,
-  get: function get() {
-    return _interopRequireDefault(_tag).default;
-  }
-});
-
-var _user = require('./user');
-
-Object.defineProperty(exports, 'User', {
-  enumerable: true,
-  get: function get() {
-    return _interopRequireDefault(_user).default;
-  }
-});
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-},{"../model":2,"./account":3,"./app":4,"./asset":5,"./code-revision":6,"./collection":7,"./comment":8,"./draft":9,"./feed":11,"./feed-asset":10,"./hub":12,"./invite":14,"./like":15,"./organization":16,"./recommendation":17,"./style":18,"./tag":19,"./user":20}],14:[function(require,module,exports){
-'use strict';
-
-exports.__esModule = true;
-
-var _model = require('../model');
-
-var _model2 = _interopRequireDefault(_model);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-var Invite = function (_Model) {
-  _inherits(Invite, _Model);
-
-  function Invite() {
-    _classCallCheck(this, Invite);
-
-    return _possibleConstructorReturn(this, _Model.apply(this, arguments));
-  }
-
-  return Invite;
-}(_model2.default);
-
-exports.default = Invite;
-},{"../model":2}],15:[function(require,module,exports){
-'use strict';
-
-exports.__esModule = true;
-
-var _model = require('../model');
-
-var _model2 = _interopRequireDefault(_model);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-var Like = function (_Model) {
-  _inherits(Like, _Model);
-
-  function Like() {
-    _classCallCheck(this, Like);
-
-    return _possibleConstructorReturn(this, _Model.apply(this, arguments));
-  }
-
-  return Like;
-}(_model2.default);
-
-exports.default = Like;
-},{"../model":2}],16:[function(require,module,exports){
-'use strict';
-
-exports.__esModule = true;
-
-var _model = require('../model');
-
-var _model2 = _interopRequireDefault(_model);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-var Organization = function (_Model) {
-  _inherits(Organization, _Model);
-
-  function Organization() {
-    _classCallCheck(this, Organization);
-
-    return _possibleConstructorReturn(this, _Model.apply(this, arguments));
-  }
-
-  return Organization;
-}(_model2.default);
-
-exports.default = Organization;
-},{"../model":2}],17:[function(require,module,exports){
-'use strict';
-
-exports.__esModule = true;
-
-var _model = require('../model');
-
-var _model2 = _interopRequireDefault(_model);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-var Recommendation = function (_Model) {
-  _inherits(Recommendation, _Model);
-
-  function Recommendation() {
-    _classCallCheck(this, Recommendation);
-
-    return _possibleConstructorReturn(this, _Model.apply(this, arguments));
-  }
-
-  return Recommendation;
-}(_model2.default);
-
-exports.default = Recommendation;
-},{"../model":2}],18:[function(require,module,exports){
-'use strict';
-
-exports.__esModule = true;
-
-var _model = require('../model');
-
-var _model2 = _interopRequireDefault(_model);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-var Style = function (_Model) {
-  _inherits(Style, _Model);
-
-  function Style() {
-    _classCallCheck(this, Style);
-
-    return _possibleConstructorReturn(this, _Model.apply(this, arguments));
-  }
-
-  return Style;
-}(_model2.default);
-
-exports.default = Style;
-},{"../model":2}],19:[function(require,module,exports){
-'use strict';
-
-exports.__esModule = true;
-
-var _model = require('../model');
-
-var _model2 = _interopRequireDefault(_model);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-var Tag = function (_Model) {
-  _inherits(Tag, _Model);
-
-  function Tag() {
-    _classCallCheck(this, Tag);
-
-    return _possibleConstructorReturn(this, _Model.apply(this, arguments));
-  }
-
-  return Tag;
-}(_model2.default);
-
-exports.default = Tag;
-},{"../model":2}],20:[function(require,module,exports){
-'use strict';
-
-exports.__esModule = true;
-
-var _model = require('../model');
-
-var _model2 = _interopRequireDefault(_model);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-var User = function (_Model) {
-  _inherits(User, _Model);
-
-  function User() {
-    _classCallCheck(this, User);
-
-    return _possibleConstructorReturn(this, _Model.apply(this, arguments));
-  }
-
-  User.prototype.hasAccess = function hasAccess() {
-    return this.access.status === 0;
-  };
-
-  return User;
-}(_model2.default);
-
-exports.default = User;
-},{"../model":2}],21:[function(require,module,exports){
-'use strict';
-
-var _isArray = require('lodash/lang/isArray');
-
-var _isArray2 = _interopRequireDefault(_isArray);
-
-var _extend = require('lodash/object/extend');
-
-var _extend2 = _interopRequireDefault(_extend);
-
-var _isObject = require('lodash/lang/isObject');
-
-var _isObject2 = _interopRequireDefault(_isObject);
-
-var _last = require('lodash/array/last');
-
-var _last2 = _interopRequireDefault(_last);
-
-var _each = require('lodash/collection/each');
-
-var _each2 = _interopRequireDefault(_each);
-
-var _map = require('lodash/collection/map');
-
-var _map2 = _interopRequireDefault(_map);
-
-exports.__esModule = true;
-
-var _resource = require('./resource');
-
-var _resource2 = _interopRequireDefault(_resource);
-
-var _models = require('./models');
-
-var models = _interopRequireWildcard(_models);
-
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function singularize(string) {
-  return string.replace(/s$/, '');
-}
-
-function capitalize(string) {
-  return string.charAt(0).toUpperCase() + string.slice(1);
-}
-
-function classify(string) {
-  return singularize((0, _map2.default)(string.split("_"), function (s) {
-    return capitalize(s);
-  }).join(''));
-}
-
-// Builds a route object based on the resource chain
-// ie: hubs > apps > styles =>
-//   {
-//     path: '/hubs/:hubId/apps/:appId/styles/:id',
-//     segments: [ '/hubs/:hubId', '/apps/:appId', '/styles/:id' ],
-//     segment: '/styles/:id',
-//     params: { hubId: null, appId: null, id: null },
-//     paramName: 'id'
-//   }
-var buildRoute = function buildRoute(resource) {
-  var current = resource;
-  var segments = [];
-
-  var path;
-
-  if (current.options.route) {
-    path = current.options.route;
-  } else {
-    // Build full path
-    while (current) {
-      // Get param for this segment - default to 'id'
-      var paramName = current.options.routeSegment ? parseRouteParams(current.options.routeSegment)[0] : current.options.paramName || 'id';
-
-      // If this segment is a parent segment prepend the param name with the segment name ie. 'id' -> 'hubId'
-      if (current !== resource) {
-        paramName = singularize(current.name) + capitalize(paramName);
-      }
-
-      // Create route segment from custom routeSegment property or default to name/param
-      var routeSegment = current.options.routeSegment ? current.options.routeSegment.replace(/\/:[^\/]+$/, '/:' + paramName) : '/' + current.name + '/:' + paramName;
-
-      segments.unshift(routeSegment);
-
-      current = current.parent;
-    }
-
-    path = segments.join('');
-  }
-
-  var params = {};
-  (0, _each2.default)(parseRouteParams(path), function (paramName) {
-    params[paramName] = null;
-  });
-
-  return {
-    path: path,
-    segments: segments,
-    segment: segments[segments.length - 1],
-    params: params,
-    paramName: resource.options.paramName || 'id'
-  };
-};
-
-// Parses params out of a route ie. /hubs/:hubId/apps/:appId/styles/:id => ['hubId', 'appId', 'id']
-var reRouteParams = /:[^\/]+/gi;
-var parseRouteParams = function parseRouteParams(route) {
-  return (0, _map2.default)(route.match(reRouteParams), function (param) {
-    return param.slice(1);
-  });
-};
-
-// Builds a key based on resource names ie. hubs.apps for the hubs > apps resource
-var buildKey = function buildKey(resource, name) {
-  var current = resource;
-  var segments = [];
-
-  while (current) {
-    segments.unshift(current.name);
-    current = current.parent;
-  }
-
-  return segments.join('.');
-};
-
-var ResourceSchema = function () {
-  function ResourceSchema() {
-    _classCallCheck(this, ResourceSchema);
-  }
-
-  /*
-    Resource selector
-     $resource();
-    $resource(key);
-    $resource(key, params);
-    $resource(name, parentResource);
-    $resource(name, params, parentResource);
-  */
-
-  ResourceSchema.prototype.$resource = function $resource() {
-    var key = arguments[0];
-
-    if (typeof key == 'undefined') {
-      throw new Error("$resource: key is undefined");
-    }
-
-    var name = (0, _last2.default)(key.split('.'));
-    var params = (0, _isObject2.default)(arguments[1]) && !(arguments[1] instanceof _resource2.default) ? arguments[1] : undefined;
-    var parentResource = arguments[2] || !params && arguments[1] || undefined;
-
-    if (parentResource) {
-      if (parentResource.children.indexOf(name) == -1) {
-        throw new Error("$resource: key not found in parent resource.");
-      }
-
-      key = parentResource.key + '.' + name;
-    }
-
-    return new this.constructor.resourceClasses[key](this, parentResource).includeParams(params);
-  };
-
-  return ResourceSchema;
-}();
-
-exports.default = ResourceSchema;
-;
-
-ResourceSchema.defineSchema = function () {
-  var API = this;
-
-  API.models = models;
-  API.resourceClasses = {};
-
-  var pointer = function pointer(bucket, parentPointer) {
-    return {
-      current: null,
-
-      resource: function resource(name, options) {
-        options = options || {};
-        var parent = parentPointer ? parentPointer.current : null;
-
-        var def = { name: name, parent: parent, children: {}, options: options };
-
-        if (options.link) {
-          def.link = options.link;
-        }
-
-        def.key = buildKey(def);
-        def.route = buildRoute(def);
-        def.actions = [];
-        def.modelName = options.modelName || classify(name);
-
-        this.current = bucket[name] = def;
-
-        // create a class for this specific resource and assign the definition
-        var resourceClass = function (_Resource) {
-          _inherits(resourceClass, _Resource);
-
-          function resourceClass() {
-            _classCallCheck(this, resourceClass);
-
-            return _possibleConstructorReturn(this, _Resource.apply(this, arguments));
-          }
-
-          return resourceClass;
-        }(_resource2.default);
-
-        resourceClass.definition = def;
-        resourceClass.modelClass = models[def.modelName] || models.Base;
-
-        API.resourceClasses[def.key] = resourceClass;
-
-        return this;
-      },
-
-      open: function open() {
-        return pointer(this.current.children, this);
-      },
-
-      close: function close() {
-        return parentPointer;
-      },
-
-      action: function action(method, name, options) {
-        var action = { method: method, name: name, options: options };
-
-        if (action.options.routeSegment) {
-          action.options.paramName = parseRouteParams(action.options.routeSegment)[0];
-        }
-
-        if (parentPointer && parentPointer.current) {
-          parentPointer.current.actions.push(action);
-        }
-
-        var resourceClass = API.resourceClasses[parentPointer.current.key];
-
-        if (options.on == 'resource') {
-          if (!resourceClass.prototype.hasOwnProperty('$' + name)) {
-            //console.log(`- adding collection action to ${parentPointer.current.key}:`, method, name, options);
-
-            resourceClass.prototype['$' + name] = function () {
-              var _this2 = this;
-
-              var data = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
-
-              return this.request((0, _extend2.default)({ method: method, action: action }, { data: data })).then(function (res) {
-                if ((0, _isArray2.default)(res)) {
-                  return _this2.hydrateCollection(res);
-                } else {
-                  return _this2.hydrateModel(res);
-                }
-              });
-            };
-          } else {
-            throw 'Attempted to create an action \'' + name + '\' that already exists.';
-          }
-        } else if (options.on == 'member') {
-          if (!resourceClass.prototype.hasOwnProperty('$' + name)) {
-            //console.log(`- adding member action to ${parentPointer.current.key}:`, method, name, options);
-
-            resourceClass.prototype['$' + name] = function () {
-              var _this3 = this;
-
-              var data = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
-
-              return this.request((0, _extend2.default)({ method: method, action: action }, { data: data })).then(function (res) {
-                return _this3.hydrateModel(res);
-              });
-            };
-
-            resourceClass.modelClass.prototype['$' + name] = function () {
-              var data = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
-
-              return this.$resource()['$' + name](data);
-            };
-          } else {
-            throw 'Attempted to create an action \'' + name + '\' that already exists.';
-          }
-        }
-
-        return this;
-      },
-
-      get: function get() {
-        return this.action.apply(this, ['get'].concat(Array.prototype.slice.call(arguments)));
-      },
-
-      post: function post() {
-        return this.action.apply(this, ['post'].concat(Array.prototype.slice.call(arguments)));
-      },
-
-      put: function put() {
-        return this.action.apply(this, ['put'].concat(Array.prototype.slice.call(arguments)));
-      },
-
-      patch: function patch() {
-        return this.action.apply(this, ['patch'].concat(Array.prototype.slice.call(arguments)));
-      },
-
-      delete: function _delete() {
-        return this.action.apply(this, ['delete'].concat(Array.prototype.slice.call(arguments)));
-      }
-    };
-  };
-
-  return (0, _extend2.default)({}, pointer({}));
-};
-
-// ResourceSchema.generateMarkdown = function() {
-//   var API = this;
-//   let markdown = "";
-//
-//   each(API.resourceClasses, (resourceClass) => {
-//     var def = resourceClass.definition;
-//
-//     markdown += `###${def.modelName}\n\n`;
-//     markdown += `**\`${def.key}\`**\n\n`;
-//
-//     if (def.parent) {
-//       markdown += '#####Parent\n\n';
-//       markdown += `- [${def.parent.modelName}](#${def.parent.modelName.toLowerCase()}) \`${def.parent.key}\`\n\n`;
-//     }
-//
-//     if (!isEmpty(def.children)) {
-//       markdown += '#####Children\n\n';
-//       each(def.children, (child) => {
-//         markdown += `- [${child.modelName}](#${child.modelName.toLowerCase()}) \`${child.key}\`\n`;
-//       });
-//     }
-//
-//     markdown += '\n\n';
-//
-//     if (def.link) {
-//       let link = API.resourceClasses[def.link].definition;
-//       markdown += `See [${link.modelName}](#${link.modelName.toLowerCase()}) \`${link.key}\`\n\n`;
-//     }
-//
-//     let pathRoot = def.route.path.replace(/\/:.+$/, '');
-//
-//     markdown += '#####REST Endpoints\n\n';
-//
-//     markdown += `- \`GET\` ${pathRoot}\n`;
-//     markdown += `- \`POST\` ${pathRoot}\n`;
-//     markdown += `- \`GET\` ${def.route.path}\n`;
-//     markdown += `- \`PUT\` ${def.route.path}\n`;
-//     markdown += `- \`DELETE\` ${def.route.path}\n\n`;
-//
-//     if (!isEmpty(def.actions)) {
-//       let memberActions = select(def.actions, (action) => {
-//         return action.options.on == 'member';
-//       });
-//
-//       let collectionActions = select(def.actions, (action) => {
-//         return action.options.on == 'collection';
-//       });
-//
-//
-//       if (!isEmpty(collectionActions)) {
-//         markdown += "*Collection Actions*\n\n";
-//
-//         each(collectionActions, (action) => {
-//           markdown += `- \`${action.method.toUpperCase()}\` ${pathRoot}/${action.name}\n`
-//         });
-//       }
-//
-//       markdown += "\n\n";
-//
-//       if (!isEmpty(memberActions)) {
-//         markdown += "*Member Actions*\n\n";
-//
-//         each(memberActions, (action) => {
-//           markdown += `- \`${action.method.toUpperCase()}\` ${def.route.path}/${action.name}\n`
-//         });
-//       }
-//     }
-//
-//     markdown += "\n\n";
-//   });
-//
-//   console.log(markdown);
-// };
-},{"./models":13,"./resource":22,"lodash/array/last":26,"lodash/collection/each":29,"lodash/collection/map":35,"lodash/lang/isArray":108,"lodash/lang/isObject":113,"lodash/object/extend":117}],22:[function(require,module,exports){
-'use strict';
 
 var _isArray = require('lodash/lang/isArray');
 
@@ -2652,9 +1229,23 @@ var _isEmpty2 = _interopRequireDefault(_isEmpty);
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
 
-exports.__esModule = true;
+var _promiz = require('promiz');
+
+var _promiz2 = _interopRequireDefault(_promiz);
+
+var _isomorphicFetch = require('isomorphic-fetch');
+
+var _isomorphicFetch2 = _interopRequireDefault(_isomorphicFetch);
+
+var _querystring = require('querystring');
+
+var _querystring2 = _interopRequireDefault(_querystring);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -2662,7 +1253,7 @@ function deepClone(obj) {
   return JSON.parse(JSON.stringify(obj));
 }
 
-function singularize(string) {
+function singularize$1(string) {
   return string.replace(/s$/, '');
 }
 
@@ -2722,7 +1313,7 @@ var Resource = function () {
 
       (0, _each2.default)(parentResource.route.params, function (value, paramName) {
         if (parentResource.key != _this.key && paramName == 'id') {
-          paramName = singularize(parentResource.name) + 'Id';
+          paramName = singularize$1(parentResource.name) + 'Id';
         }
 
         parentParams[paramName] = value;
@@ -3060,8 +1651,875 @@ var Resource = function () {
   return Resource;
 }();
 
-exports.default = Resource;
-},{"lodash/collection/detect":28,"lodash/collection/each":29,"lodash/collection/findWhere":33,"lodash/collection/map":35,"lodash/collection/where":36,"lodash/lang/clone":106,"lodash/lang/isArray":108,"lodash/lang/isEmpty":109,"lodash/lang/isNumber":112,"lodash/lang/isObject":113,"lodash/object/extend":117}],23:[function(require,module,exports){
+var Model = function () {
+  function Model(data) {
+    var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+
+    _classCallCheck(this, Model);
+
+    (0, _extend2.default)(this, data);
+
+    this.$newRecord = true;
+  }
+
+  Model.prototype.$delete = function $delete(params) {
+    return this.$resource().request({ method: 'delete', query: params });
+  };
+
+  Model.prototype.$save = function $save(params) {
+    var _this7 = this;
+
+    var method = this.$newRecord ? 'post' : 'put';
+
+    return this.$resource().request({ method: method, data: this, query: params }).then(function (res) {
+      _this7.$newRecord = false;
+      _this7.$resource().sync(res);
+
+      return (0, _extend2.default)(_this7, res);
+    });
+  };
+
+  Model.prototype.$attributes = function $attributes() {
+    return (0, _filter2.default)((0, _difference2.default)((0, _keys2.default)(this), (0, _functions2.default)(this)), function (x) {
+      return x[0] != '$';
+    });
+  };
+
+  Model.prototype.$data = function $data() {
+    return (0, _pick2.default)(this, this.$attributes());
+  };
+
+  return Model;
+}();
+
+var Account = function (_Model) {
+  _inherits(Account, _Model);
+
+  function Account() {
+    _classCallCheck(this, Account);
+
+    return _possibleConstructorReturn(this, _Model.apply(this, arguments));
+  }
+
+  return Account;
+}(Model);
+
+var Organization = function (_Model2) {
+  _inherits(Organization, _Model2);
+
+  function Organization() {
+    _classCallCheck(this, Organization);
+
+    return _possibleConstructorReturn(this, _Model2.apply(this, arguments));
+  }
+
+  return Organization;
+}(Model);
+
+var App = function (_Model3) {
+  _inherits(App, _Model3);
+
+  function App() {
+    _classCallCheck(this, App);
+
+    return _possibleConstructorReturn(this, _Model3.apply(this, arguments));
+  }
+
+  return App;
+}(Model);
+
+var DISPLAY_STATES = {
+  VISIBLE: 1,
+  FEATURED: 2,
+  HIGHLIGHTED: 4,
+  LOCKED: 8
+};
+
+var Asset = function (_Model4) {
+  _inherits(Asset, _Model4);
+
+  function Asset() {
+    _classCallCheck(this, Asset);
+
+    return _possibleConstructorReturn(this, _Model4.apply(this, arguments));
+  }
+
+  Asset.prototype.isVisible = function isVisible() {
+    return (this.display_state & DISPLAY_STATES.VISIBLE) === DISPLAY_STATES.VISIBLE;
+  };
+
+  Asset.prototype.isHidden = function isHidden() {
+    return (this.display_state & DISPLAY_STATES.VISIBLE) !== DISPLAY_STATES.VISIBLE;
+  };
+
+  Asset.prototype.isFeatured = function isFeatured() {
+    return (this.display_state & DISPLAY_STATES.FEATURED) === DISPLAY_STATES.FEATURED;
+  };
+
+  Asset.prototype.isHighlighted = function isHighlighted() {
+    return (this.display_state & DISPLAY_STATES.HIGHLIGHTED) === DISPLAY_STATES.HIGHLIGHTED;
+  };
+
+  Asset.prototype.isLocked = function isLocked() {
+    return (this.display_state & DISPLAY_STATES.LOCKED) === DISPLAY_STATES.LOCKED;
+  };
+
+  Asset.prototype.isOriginal = function isOriginal() {
+    return (0, _all2.default)((0, _pick2.default)(this.source, 'network', 'uid', 'url'), _isEmpty2.default);
+  };
+
+  return Asset;
+}(Model);
+
+var CodeRevision = function (_Model5) {
+  _inherits(CodeRevision, _Model5);
+
+  function CodeRevision() {
+    _classCallCheck(this, CodeRevision);
+
+    return _possibleConstructorReturn(this, _Model5.apply(this, arguments));
+  }
+
+  return CodeRevision;
+}(Model);
+
+var Collection = function (_Model6) {
+  _inherits(Collection, _Model6);
+
+  function Collection() {
+    _classCallCheck(this, Collection);
+
+    return _possibleConstructorReturn(this, _Model6.apply(this, arguments));
+  }
+
+  return Collection;
+}(Model);
+
+var Comment = function (_Model7) {
+  _inherits(Comment, _Model7);
+
+  function Comment() {
+    _classCallCheck(this, Comment);
+
+    return _possibleConstructorReturn(this, _Model7.apply(this, arguments));
+  }
+
+  return Comment;
+}(Model);
+
+var Draft = function (_Model8) {
+  _inherits(Draft, _Model8);
+
+  function Draft() {
+    _classCallCheck(this, Draft);
+
+    return _possibleConstructorReturn(this, _Model8.apply(this, arguments));
+  }
+
+  return Draft;
+}(Model);
+
+var Feed = function (_Model9) {
+  _inherits(Feed, _Model9);
+
+  function Feed() {
+    _classCallCheck(this, Feed);
+
+    return _possibleConstructorReturn(this, _Model9.apply(this, arguments));
+  }
+
+  return Feed;
+}(Model);
+
+var FeedAsset = function (_Model10) {
+  _inherits(FeedAsset, _Model10);
+
+  function FeedAsset() {
+    _classCallCheck(this, FeedAsset);
+
+    return _possibleConstructorReturn(this, _Model10.apply(this, arguments));
+  }
+
+  return FeedAsset;
+}(Model);
+
+var Hub = function (_Model11) {
+  _inherits(Hub, _Model11);
+
+  function Hub() {
+    _classCallCheck(this, Hub);
+
+    return _possibleConstructorReturn(this, _Model11.apply(this, arguments));
+  }
+
+  return Hub;
+}(Model);
+
+var Invite = function (_Model12) {
+  _inherits(Invite, _Model12);
+
+  function Invite() {
+    _classCallCheck(this, Invite);
+
+    return _possibleConstructorReturn(this, _Model12.apply(this, arguments));
+  }
+
+  return Invite;
+}(Model);
+
+var Like = function (_Model13) {
+  _inherits(Like, _Model13);
+
+  function Like() {
+    _classCallCheck(this, Like);
+
+    return _possibleConstructorReturn(this, _Model13.apply(this, arguments));
+  }
+
+  return Like;
+}(Model);
+
+var Recommendation = function (_Model14) {
+  _inherits(Recommendation, _Model14);
+
+  function Recommendation() {
+    _classCallCheck(this, Recommendation);
+
+    return _possibleConstructorReturn(this, _Model14.apply(this, arguments));
+  }
+
+  return Recommendation;
+}(Model);
+
+var Style = function (_Model15) {
+  _inherits(Style, _Model15);
+
+  function Style() {
+    _classCallCheck(this, Style);
+
+    return _possibleConstructorReturn(this, _Model15.apply(this, arguments));
+  }
+
+  return Style;
+}(Model);
+
+var Tag = function (_Model16) {
+  _inherits(Tag, _Model16);
+
+  function Tag() {
+    _classCallCheck(this, Tag);
+
+    return _possibleConstructorReturn(this, _Model16.apply(this, arguments));
+  }
+
+  return Tag;
+}(Model);
+
+var User = function (_Model17) {
+  _inherits(User, _Model17);
+
+  function User() {
+    _classCallCheck(this, User);
+
+    return _possibleConstructorReturn(this, _Model17.apply(this, arguments));
+  }
+
+  User.prototype.hasAccess = function hasAccess() {
+    return this.access.status === 0;
+  };
+
+  return User;
+}(Model);
+
+var models = Object.freeze({
+  Base: Model,
+  Account: Account,
+  Organization: Organization,
+  App: App,
+  Asset: Asset,
+  CodeRevision: CodeRevision,
+  Collection: Collection,
+  Comment: Comment,
+  Draft: Draft,
+  Feed: Feed,
+  FeedAsset: FeedAsset,
+  Hub: Hub,
+  Invite: Invite,
+  Like: Like,
+  Recommendation: Recommendation,
+  Style: Style,
+  Tag: Tag,
+  User: User
+});
+
+function singularize(string) {
+  return string.replace(/s$/, '');
+}
+
+function capitalize(string) {
+  return string.charAt(0).toUpperCase() + string.slice(1);
+}
+
+function classify(string) {
+  return singularize((0, _map2.default)(string.split("_"), function (s) {
+    return capitalize(s);
+  }).join(''));
+}
+
+// Builds a route object based on the resource chain
+// ie: hubs > apps > styles =>
+//   {
+//     path: '/hubs/:hubId/apps/:appId/styles/:id',
+//     segments: [ '/hubs/:hubId', '/apps/:appId', '/styles/:id' ],
+//     segment: '/styles/:id',
+//     params: { hubId: null, appId: null, id: null },
+//     paramName: 'id'
+//   }
+var buildRoute = function buildRoute(resource) {
+  var current = resource;
+  var segments = [];
+
+  var path;
+
+  if (current.options.route) {
+    path = current.options.route;
+  } else {
+    // Build full path
+    while (current) {
+      // Get param for this segment - default to 'id'
+      var paramName = current.options.routeSegment ? parseRouteParams(current.options.routeSegment)[0] : current.options.paramName || 'id';
+
+      // If this segment is a parent segment prepend the param name with the segment name ie. 'id' -> 'hubId'
+      if (current !== resource) {
+        paramName = singularize(current.name) + capitalize(paramName);
+      }
+
+      // Create route segment from custom routeSegment property or default to name/param
+      var routeSegment = current.options.routeSegment ? current.options.routeSegment.replace(/\/:[^\/]+$/, '/:' + paramName) : '/' + current.name + '/:' + paramName;
+
+      segments.unshift(routeSegment);
+
+      current = current.parent;
+    }
+
+    path = segments.join('');
+  }
+
+  var params = {};
+  (0, _each2.default)(parseRouteParams(path), function (paramName) {
+    params[paramName] = null;
+  });
+
+  return {
+    path: path,
+    segments: segments,
+    segment: segments[segments.length - 1],
+    params: params,
+    paramName: resource.options.paramName || 'id'
+  };
+};
+
+// Parses params out of a route ie. /hubs/:hubId/apps/:appId/styles/:id => ['hubId', 'appId', 'id']
+var reRouteParams = /:[^\/]+/gi;
+var parseRouteParams = function parseRouteParams(route) {
+  return (0, _map2.default)(route.match(reRouteParams), function (param) {
+    return param.slice(1);
+  });
+};
+
+// Builds a key based on resource names ie. hubs.apps for the hubs > apps resource
+var buildKey = function buildKey(resource, name) {
+  var current = resource;
+  var segments = [];
+
+  while (current) {
+    segments.unshift(current.name);
+    current = current.parent;
+  }
+
+  return segments.join('.');
+};
+
+var ResourceSchema = function () {
+  function ResourceSchema() {
+    _classCallCheck(this, ResourceSchema);
+  }
+
+  /*
+    Resource selector
+     $resource();
+    $resource(key);
+    $resource(key, params);
+    $resource(name, parentResource);
+    $resource(name, params, parentResource);
+  */
+
+
+  ResourceSchema.prototype.$resource = function $resource() {
+    var key = arguments[0];
+
+    if (typeof key == 'undefined') {
+      throw new Error("$resource: key is undefined");
+    }
+
+    var name = (0, _last2.default)(key.split('.'));
+    var params = (0, _isObject2.default)(arguments[1]) && !(arguments[1] instanceof Resource) ? arguments[1] : undefined;
+    var parentResource = arguments[2] || !params && arguments[1] || undefined;
+
+    if (parentResource) {
+      if (parentResource.children.indexOf(name) == -1) {
+        throw new Error("$resource: key not found in parent resource.");
+      }
+
+      key = parentResource.key + '.' + name;
+    }
+
+    return new this.constructor.resourceClasses[key](this, parentResource).includeParams(params);
+  };
+
+  return ResourceSchema;
+}();
+
+;
+
+ResourceSchema.defineSchema = function () {
+  var API = this;
+
+  API.models = models;
+  API.resourceClasses = {};
+
+  var pointer = function pointer(bucket, parentPointer) {
+    return {
+      current: null,
+
+      resource: function resource(name, options) {
+        options = options || {};
+        var parent = parentPointer ? parentPointer.current : null;
+
+        var def = { name: name, parent: parent, children: {}, options: options };
+
+        if (options.link) {
+          def.link = options.link;
+        }
+
+        def.key = buildKey(def);
+        def.route = buildRoute(def);
+        def.actions = [];
+        def.modelName = options.modelName || classify(name);
+
+        this.current = bucket[name] = def;
+
+        // create a class for this specific resource and assign the definition
+        var resourceClass = function (_Resource) {
+          _inherits(resourceClass, _Resource);
+
+          function resourceClass() {
+            _classCallCheck(this, resourceClass);
+
+            return _possibleConstructorReturn(this, _Resource.apply(this, arguments));
+          }
+
+          return resourceClass;
+        }(Resource);
+
+        resourceClass.definition = def;
+        resourceClass.modelClass = models[def.modelName] || Model;
+
+        API.resourceClasses[def.key] = resourceClass;
+
+        return this;
+      },
+
+      open: function open() {
+        return pointer(this.current.children, this);
+      },
+
+      close: function close() {
+        return parentPointer;
+      },
+
+      action: function action(method, name, options) {
+        var action = { method: method, name: name, options: options };
+
+        if (action.options.routeSegment) {
+          action.options.paramName = parseRouteParams(action.options.routeSegment)[0];
+        }
+
+        if (parentPointer && parentPointer.current) {
+          parentPointer.current.actions.push(action);
+        }
+
+        var resourceClass = API.resourceClasses[parentPointer.current.key];
+
+        if (options.on == 'resource') {
+          if (!resourceClass.prototype.hasOwnProperty('$' + name)) {
+            //console.log(`- adding collection action to ${parentPointer.current.key}:`, method, name, options);
+
+            resourceClass.prototype['$' + name] = function () {
+              var _this26 = this;
+
+              var data = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+
+              return this.request((0, _extend2.default)({ method: method, action: action }, { data: data })).then(function (res) {
+                if ((0, _isArray2.default)(res)) {
+                  return _this26.hydrateCollection(res);
+                } else {
+                  return _this26.hydrateModel(res);
+                }
+              });
+            };
+          } else {
+            throw 'Attempted to create an action \'' + name + '\' that already exists.';
+          }
+        } else if (options.on == 'member') {
+          if (!resourceClass.prototype.hasOwnProperty('$' + name)) {
+            //console.log(`- adding member action to ${parentPointer.current.key}:`, method, name, options);
+
+            resourceClass.prototype['$' + name] = function () {
+              var _this27 = this;
+
+              var data = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+
+              return this.request((0, _extend2.default)({ method: method, action: action }, { data: data })).then(function (res) {
+                return _this27.hydrateModel(res);
+              });
+            };
+
+            resourceClass.modelClass.prototype['$' + name] = function () {
+              var data = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+
+              return this.$resource()['$' + name](data);
+            };
+          } else {
+            throw 'Attempted to create an action \'' + name + '\' that already exists.';
+          }
+        }
+
+        return this;
+      },
+
+      get: function get() {
+        return this.action.apply(this, ['get'].concat(Array.prototype.slice.call(arguments)));
+      },
+
+      post: function post() {
+        return this.action.apply(this, ['post'].concat(Array.prototype.slice.call(arguments)));
+      },
+
+      put: function put() {
+        return this.action.apply(this, ['put'].concat(Array.prototype.slice.call(arguments)));
+      },
+
+      patch: function patch() {
+        return this.action.apply(this, ['patch'].concat(Array.prototype.slice.call(arguments)));
+      },
+
+      delete: function _delete() {
+        return this.action.apply(this, ['delete'].concat(Array.prototype.slice.call(arguments)));
+      }
+    };
+  };
+
+  return (0, _extend2.default)({}, pointer({}));
+};
+
+// ResourceSchema.generateMarkdown = function() {
+//   var API = this;
+//   let markdown = "";
+//
+//   each(API.resourceClasses, (resourceClass) => {
+//     var def = resourceClass.definition;
+//
+//     markdown += `###${def.modelName}\n\n`;
+//     markdown += `**\`${def.key}\`**\n\n`;
+//
+//     if (def.parent) {
+//       markdown += '#####Parent\n\n';
+//       markdown += `- [${def.parent.modelName}](#${def.parent.modelName.toLowerCase()}) \`${def.parent.key}\`\n\n`;
+//     }
+//
+//     if (!isEmpty(def.children)) {
+//       markdown += '#####Children\n\n';
+//       each(def.children, (child) => {
+//         markdown += `- [${child.modelName}](#${child.modelName.toLowerCase()}) \`${child.key}\`\n`;
+//       });
+//     }
+//
+//     markdown += '\n\n';
+//
+//     if (def.link) {
+//       let link = API.resourceClasses[def.link].definition;
+//       markdown += `See [${link.modelName}](#${link.modelName.toLowerCase()}) \`${link.key}\`\n\n`;
+//     }
+//
+//     let pathRoot = def.route.path.replace(/\/:.+$/, '');
+//
+//     markdown += '#####REST Endpoints\n\n';
+//
+//     markdown += `- \`GET\` ${pathRoot}\n`;
+//     markdown += `- \`POST\` ${pathRoot}\n`;
+//     markdown += `- \`GET\` ${def.route.path}\n`;
+//     markdown += `- \`PUT\` ${def.route.path}\n`;
+//     markdown += `- \`DELETE\` ${def.route.path}\n\n`;
+//
+//     if (!isEmpty(def.actions)) {
+//       let memberActions = select(def.actions, (action) => {
+//         return action.options.on == 'member';
+//       });
+//
+//       let collectionActions = select(def.actions, (action) => {
+//         return action.options.on == 'collection';
+//       });
+//
+//
+//       if (!isEmpty(collectionActions)) {
+//         markdown += "*Collection Actions*\n\n";
+//
+//         each(collectionActions, (action) => {
+//           markdown += `- \`${action.method.toUpperCase()}\` ${pathRoot}/${action.name}\n`
+//         });
+//       }
+//
+//       markdown += "\n\n";
+//
+//       if (!isEmpty(memberActions)) {
+//         markdown += "*Member Actions*\n\n";
+//
+//         each(memberActions, (action) => {
+//           markdown += `- \`${action.method.toUpperCase()}\` ${def.route.path}/${action.name}\n`
+//         });
+//       }
+//     }
+//
+//     markdown += "\n\n";
+//   });
+//
+//   console.log(markdown);
+// };
+
+if (!global.Promise) {
+  global.Promise = _promiz2.default;
+}
+
+var AbortablePromise = require('dodgy');
+
+if (!global.fetch) {
+  global.fetch = _isomorphicFetch2.default;
+}
+
+function hasXDomain() {
+  return typeof window !== 'undefined' && window.xdomain != null;
+}
+
+var Papi = function (_ResourceSchema) {
+  _inherits(Papi, _ResourceSchema);
+
+  function Papi() {
+    var options = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+
+    _classCallCheck(this, Papi);
+
+    var _this28 = _possibleConstructorReturn(this, _ResourceSchema.apply(this, arguments));
+
+    _this28.options = options;
+    _this28.options.host = options.host || 'https://api.pressly.com';
+
+    if (hasXDomain()) {
+      var slaves = {};
+      slaves[_this28.options.host] = '/proxy.html';
+      window.xdomain.slaves(slaves);
+    }
+
+    _this28.requestMiddlewares = [];
+    _this28.responseMiddlewares = [];
+
+    _this28.auth = {
+      session: null,
+
+      get: function get() {
+        return _this28.request('get', '/session').then(function (res) {
+          return _this28.auth.set(res.data);
+        });
+      },
+
+      set: function set(session) {
+        if (!session.jwt) {
+          throw new Error('Papi:Auth: Invalid session response - missing jwt');
+        }
+
+        _this28.auth.session = session;
+
+        return _this28.auth.session;
+      },
+
+      isLoggedIn: function isLoggedIn() {
+        return !!_this28.auth.session && !_this28.auth.isExpired();
+      },
+
+      isExpired: function isExpired() {
+        // XXX this should be using a jwt lib to figure out if the token has expired
+        // XXX We do not currently include an expiry param in our tokens so just return false.
+        return false;
+      },
+
+      login: function login(email, password) {
+        return _this28.request('post', '/auth', { data: { email: email, password: password } }).then(function (res) {
+          return _this28.auth.set(res.data);
+        });
+      },
+
+      requestPasswordReset: function requestPasswordReset(email) {
+        return _this28.request('post', '/auth/password_reset', { data: { email: email } });
+      },
+
+      logout: function logout() {
+        // Clear session immediately even if server fails to respond
+        _this28.auth.session = null;
+
+        return _this28.request('delete', '/session').then(function (res) {
+          return res;
+        });
+      }
+    };
+    return _this28;
+  }
+
+  Papi.prototype.request = function request(method, path) {
+    var _this29 = this;
+
+    var options = arguments.length <= 2 || arguments[2] === undefined ? {} : arguments[2];
+
+    return new AbortablePromise(function (resolve, reject, onAbort) {
+      var url = /^(https?:)?\/\//.test(path) ? path : _this29.options.host + path;
+
+      var req = {
+        url: url,
+        method: method,
+        headers: {},
+        query: {}
+      };
+
+      req.headers['Content-Type'] = 'application/json';
+
+      // if (options.timeout || this.options.timeout) {
+      //   req.timeout(options.timeout || this.options.timeout);
+      // }
+
+      // Allow sending cookies from origin
+      if (typeof req.withCredentials == 'function' && !hasXDomain()) {
+        req.credentials = 'include';
+      }
+
+      // Send Authorization header when we have a JSON Web Token set in the session
+      if (_this29.auth.session && _this29.auth.session.jwt) {
+        req.headers['Authorization'] = 'Bearer ' + _this29.auth.session.jwt;
+      }
+
+      req.headers['Accept'] = 'application/vnd.pressly.v0.12+json';
+
+      // Query params to be added to the url
+      if (options.query) {
+        (0, _extend2.default)(req.query, options.query);
+      }
+
+      // Data to send (with get requests these are converted into query params)
+      if (options.data) {
+        if (method == 'get') {
+          (0, _extend2.default)(req.query, options.data);
+        } else {
+          req.body = JSON.stringify(options.data);
+        }
+      }
+
+      if (!(0, _isEmpty2.default)(req.query)) {
+        req.url += '?' + _querystring2.default.stringify(req.query);
+      }
+
+      var res = {};
+
+      var beginRequest = function beginRequest() {
+        if (_this29.requestMiddlewares.length) {
+          var offset = 0;
+          var next = function next() {
+            var layer = _this29.requestMiddlewares[++offset] || endRequest;
+            return layer(req, res, next, resolve, reject);
+          };
+
+          _this29.requestMiddlewares[0](req, res, next, resolve, reject);
+        } else {
+          endRequest();
+        }
+      };
+
+      var endRequest = function endRequest() {
+        // XXX this is where the request will be made
+        fetch(req.url, req).then(function (response) {
+          if (response.status >= 200 && response.status < 300) {
+            res = response;
+
+            response.json().then(function (data) {
+              res.data = data || {};
+            }).catch(function (err) {
+              res.data = {};
+            }).then(function () {
+              beginResponse();
+            });
+          } else {
+            return reject(response);
+          }
+        }).catch(function (err) {
+          return reject(err);
+        });
+      };
+
+      var beginResponse = function beginResponse() {
+        if (_this29.responseMiddlewares.length) {
+          var offset = 0;
+          var next = function next() {
+            var layer = _this29.responseMiddlewares[++offset] || endResponse;
+            return layer(req, res, next, resolve, reject);
+          };
+
+          _this29.responseMiddlewares[0](req, res, next, resolve, reject);
+        } else {
+          endResponse();
+        }
+      };
+
+      var endResponse = function endResponse() {
+        resolve(res);
+      };
+
+      onAbort(function (why) {});
+
+      beginRequest();
+    });
+  };
+
+  Papi.prototype.before = function before(middleware) {
+    this.requestMiddlewares.push(middleware);
+  };
+
+  Papi.prototype.after = function after(middleware) {
+    this.responseMiddlewares.push(middleware);
+  };
+
+  return Papi;
+}(ResourceSchema);
+
+module.exports = Papi;
+
+// <= IE10, does not support static method inheritance
+if (Papi.defineSchema == undefined) {
+  Papi.defineSchema = ResourceSchema.defineSchema;
+}
+
+Papi.defineSchema().resource('accounts').open().get('available', { on: 'resource' }).post('become', { on: 'member' }).resource('users').resource('hubs', { link: 'hubs' }).close().resource('organizations').open().resource('users').resource('hubs').resource('invites').open().post('bulk_invite', { on: 'resource' }).post('resend', { on: 'member' }).put('accept', { on: 'member', routeSegment: '/invites/:hash' }).put('reject', { on: 'member', routeSegment: '/invites/:hash' }).close().close().resource('activity').resource('posts', { routeSegment: '/stream/posts/:id' }).resource('hubs').open().get('search', { on: 'resource' }).post('upgrade', { on: 'member' }).post('follow', { on: 'member' }).delete('unfollow', { on: 'member' }).resource('apps').open().get('current', { on: 'resource' }).get('build', { on: 'member', path: '/build_app' }).get('status', { on: 'member' }).resource('styles').close().resource('addons').open().resource('configs').close().resource('analytics').open().get('summary', { on: 'resource' }).get('visitors', { on: 'resource' }).get('pageviews', { on: 'resource' }).get('duration', { on: 'resource' }).close().resource('feeds').open().resource('assets', { modelName: 'FeedAsset' }).close().resource('invites').open().post('bulk_invite', { on: 'resource' }).post('resend', { on: 'member' }).put('accept', { on: 'member', routeSegment: '/invites/:hash' }).put('reject', { on: 'member', routeSegment: '/invites/:hash' }).close().resource('recommendations').resource('users').open().post('grant_access', { on: 'resource' }).delete('revoke_access', { on: 'member' }).close().resource('collections').open().put('reorder', { on: 'resource' }).close().resource('tags').resource('assets', { routeSegment: '/stream/:id' }).open().put('feature', { on: 'member' }).put('unfeature', { on: 'member' }).put('hide', { on: 'member' }).put('unhide', { on: 'member' }).put('lock', { on: 'member' }).put('unlock', { on: 'member' }).resource('likes').resource('comments').close().resource('drafts').open().put('publish', { on: 'member' }).close().close().resource('invites').open().get('incoming', { on: 'resource' }).get('outgoing', { on: 'resource' }).post('bulk_invite', { on: 'resource' }).post('resend', { on: 'member' }).put('accept', { on: 'member', routeSegment: '/invites/:hash' }).put('reject', { on: 'member', routeSegment: '/invites/:hash' }).close().resource('code_revisions').open().get('fetch_repo', { on: 'member' })
+
+// This resource links to the root hubs resource
+.resource('hubs', { link: 'hubs' }).close().resource('signup').open().get('account_uid_available', { on: 'member' }).get('account_email_available', { on: 'member' }).close().resource('users').open().get('roles', { on: 'resource' }).resource('hubs').resource('organizations').close().resource('discover').open().resource('users', { link: 'users' }).resource('organizations', { link: 'organizations' }).resource('hubs', { link: 'hubs' }).resource('posts').close().resource('stream').open().resource('following').close();
+}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
+},{"dodgy":2,"isomorphic-fetch":3,"lodash/array/difference":4,"lodash/array/last":5,"lodash/collection/all":6,"lodash/collection/detect":7,"lodash/collection/each":8,"lodash/collection/filter":10,"lodash/collection/findWhere":12,"lodash/collection/map":14,"lodash/collection/where":15,"lodash/lang/clone":85,"lodash/lang/isArray":87,"lodash/lang/isEmpty":88,"lodash/lang/isNumber":91,"lodash/lang/isObject":92,"lodash/object/extend":96,"lodash/object/functions":97,"lodash/object/keys":98,"lodash/object/pick":101,"promiz":104,"querystring":107}],2:[function(require,module,exports){
 /*!
 Copyright (C) 2015 by Andrea Giammarchi - @WebReflection
 
@@ -3116,7 +2574,7 @@ function dodger(dog, resolvable, resolve, reject, abort) {
 }
 module.exports = Dodgy;
 Dodgy.Promise = Dodgy;
-},{}],24:[function(require,module,exports){
+},{}],3:[function(require,module,exports){
 // the whatwg-fetch polyfill installs the fetch() function
 // on the global object (window or self)
 //
@@ -3124,7 +2582,7 @@ Dodgy.Promise = Dodgy;
 require('whatwg-fetch');
 module.exports = self.fetch.bind(self);
 
-},{"whatwg-fetch":129}],25:[function(require,module,exports){
+},{"whatwg-fetch":108}],4:[function(require,module,exports){
 var baseDifference = require('../internal/baseDifference'),
     baseFlatten = require('../internal/baseFlatten'),
     isArrayLike = require('../internal/isArrayLike'),
@@ -3155,7 +2613,7 @@ var difference = restParam(function(array, values) {
 
 module.exports = difference;
 
-},{"../function/restParam":37,"../internal/baseDifference":51,"../internal/baseFlatten":57,"../internal/isArrayLike":94,"../internal/isObjectLike":99}],26:[function(require,module,exports){
+},{"../function/restParam":16,"../internal/baseDifference":30,"../internal/baseFlatten":36,"../internal/isArrayLike":73,"../internal/isObjectLike":78}],5:[function(require,module,exports){
 /**
  * Gets the last element of `array`.
  *
@@ -3176,16 +2634,16 @@ function last(array) {
 
 module.exports = last;
 
-},{}],27:[function(require,module,exports){
+},{}],6:[function(require,module,exports){
 module.exports = require('./every');
 
-},{"./every":30}],28:[function(require,module,exports){
+},{"./every":9}],7:[function(require,module,exports){
 module.exports = require('./find');
 
-},{"./find":32}],29:[function(require,module,exports){
+},{"./find":11}],8:[function(require,module,exports){
 module.exports = require('./forEach');
 
-},{"./forEach":34}],30:[function(require,module,exports){
+},{"./forEach":13}],9:[function(require,module,exports){
 var arrayEvery = require('../internal/arrayEvery'),
     baseCallback = require('../internal/baseCallback'),
     baseEvery = require('../internal/baseEvery'),
@@ -3253,7 +2711,7 @@ function every(collection, predicate, thisArg) {
 
 module.exports = every;
 
-},{"../internal/arrayEvery":41,"../internal/baseCallback":48,"../internal/baseEvery":53,"../internal/isIterateeCall":96,"../lang/isArray":108}],31:[function(require,module,exports){
+},{"../internal/arrayEvery":20,"../internal/baseCallback":27,"../internal/baseEvery":32,"../internal/isIterateeCall":75,"../lang/isArray":87}],10:[function(require,module,exports){
 var arrayFilter = require('../internal/arrayFilter'),
     baseCallback = require('../internal/baseCallback'),
     baseFilter = require('../internal/baseFilter'),
@@ -3316,7 +2774,7 @@ function filter(collection, predicate, thisArg) {
 
 module.exports = filter;
 
-},{"../internal/arrayFilter":42,"../internal/baseCallback":48,"../internal/baseFilter":54,"../lang/isArray":108}],32:[function(require,module,exports){
+},{"../internal/arrayFilter":21,"../internal/baseCallback":27,"../internal/baseFilter":33,"../lang/isArray":87}],11:[function(require,module,exports){
 var baseEach = require('../internal/baseEach'),
     createFind = require('../internal/createFind');
 
@@ -3374,7 +2832,7 @@ var find = createFind(baseEach);
 
 module.exports = find;
 
-},{"../internal/baseEach":52,"../internal/createFind":82}],33:[function(require,module,exports){
+},{"../internal/baseEach":31,"../internal/createFind":61}],12:[function(require,module,exports){
 var baseMatches = require('../internal/baseMatches'),
     find = require('./find');
 
@@ -3413,7 +2871,7 @@ function findWhere(collection, source) {
 
 module.exports = findWhere;
 
-},{"../internal/baseMatches":68,"./find":32}],34:[function(require,module,exports){
+},{"../internal/baseMatches":47,"./find":11}],13:[function(require,module,exports){
 var arrayEach = require('../internal/arrayEach'),
     baseEach = require('../internal/baseEach'),
     createForEach = require('../internal/createForEach');
@@ -3452,7 +2910,7 @@ var forEach = createForEach(arrayEach, baseEach);
 
 module.exports = forEach;
 
-},{"../internal/arrayEach":40,"../internal/baseEach":52,"../internal/createForEach":83}],35:[function(require,module,exports){
+},{"../internal/arrayEach":19,"../internal/baseEach":31,"../internal/createForEach":62}],14:[function(require,module,exports){
 var arrayMap = require('../internal/arrayMap'),
     baseCallback = require('../internal/baseCallback'),
     baseMap = require('../internal/baseMap'),
@@ -3522,7 +2980,7 @@ function map(collection, iteratee, thisArg) {
 
 module.exports = map;
 
-},{"../internal/arrayMap":43,"../internal/baseCallback":48,"../internal/baseMap":67,"../lang/isArray":108}],36:[function(require,module,exports){
+},{"../internal/arrayMap":22,"../internal/baseCallback":27,"../internal/baseMap":46,"../lang/isArray":87}],15:[function(require,module,exports){
 var baseMatches = require('../internal/baseMatches'),
     filter = require('./filter');
 
@@ -3561,7 +3019,7 @@ function where(collection, source) {
 
 module.exports = where;
 
-},{"../internal/baseMatches":68,"./filter":31}],37:[function(require,module,exports){
+},{"../internal/baseMatches":47,"./filter":10}],16:[function(require,module,exports){
 /** Used as the `TypeError` message for "Functions" methods. */
 var FUNC_ERROR_TEXT = 'Expected a function';
 
@@ -3621,7 +3079,7 @@ function restParam(func, start) {
 
 module.exports = restParam;
 
-},{}],38:[function(require,module,exports){
+},{}],17:[function(require,module,exports){
 (function (global){
 var cachePush = require('./cachePush'),
     getNative = require('./getNative');
@@ -3654,7 +3112,7 @@ SetCache.prototype.push = cachePush;
 module.exports = SetCache;
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./cachePush":77,"./getNative":89}],39:[function(require,module,exports){
+},{"./cachePush":56,"./getNative":68}],18:[function(require,module,exports){
 /**
  * Copies the values of `source` to `array`.
  *
@@ -3676,7 +3134,7 @@ function arrayCopy(source, array) {
 
 module.exports = arrayCopy;
 
-},{}],40:[function(require,module,exports){
+},{}],19:[function(require,module,exports){
 /**
  * A specialized version of `_.forEach` for arrays without support for callback
  * shorthands and `this` binding.
@@ -3700,7 +3158,7 @@ function arrayEach(array, iteratee) {
 
 module.exports = arrayEach;
 
-},{}],41:[function(require,module,exports){
+},{}],20:[function(require,module,exports){
 /**
  * A specialized version of `_.every` for arrays without support for callback
  * shorthands and `this` binding.
@@ -3725,7 +3183,7 @@ function arrayEvery(array, predicate) {
 
 module.exports = arrayEvery;
 
-},{}],42:[function(require,module,exports){
+},{}],21:[function(require,module,exports){
 /**
  * A specialized version of `_.filter` for arrays without support for callback
  * shorthands and `this` binding.
@@ -3752,7 +3210,7 @@ function arrayFilter(array, predicate) {
 
 module.exports = arrayFilter;
 
-},{}],43:[function(require,module,exports){
+},{}],22:[function(require,module,exports){
 /**
  * A specialized version of `_.map` for arrays without support for callback
  * shorthands and `this` binding.
@@ -3775,7 +3233,7 @@ function arrayMap(array, iteratee) {
 
 module.exports = arrayMap;
 
-},{}],44:[function(require,module,exports){
+},{}],23:[function(require,module,exports){
 /**
  * Appends the elements of `values` to `array`.
  *
@@ -3797,7 +3255,7 @@ function arrayPush(array, values) {
 
 module.exports = arrayPush;
 
-},{}],45:[function(require,module,exports){
+},{}],24:[function(require,module,exports){
 /**
  * A specialized version of `_.some` for arrays without support for callback
  * shorthands and `this` binding.
@@ -3822,7 +3280,7 @@ function arraySome(array, predicate) {
 
 module.exports = arraySome;
 
-},{}],46:[function(require,module,exports){
+},{}],25:[function(require,module,exports){
 var keys = require('../object/keys');
 
 /**
@@ -3856,7 +3314,7 @@ function assignWith(object, source, customizer) {
 
 module.exports = assignWith;
 
-},{"../object/keys":119}],47:[function(require,module,exports){
+},{"../object/keys":98}],26:[function(require,module,exports){
 var baseCopy = require('./baseCopy'),
     keys = require('../object/keys');
 
@@ -3877,7 +3335,7 @@ function baseAssign(object, source) {
 
 module.exports = baseAssign;
 
-},{"../object/keys":119,"./baseCopy":50}],48:[function(require,module,exports){
+},{"../object/keys":98,"./baseCopy":29}],27:[function(require,module,exports){
 var baseMatches = require('./baseMatches'),
     baseMatchesProperty = require('./baseMatchesProperty'),
     bindCallback = require('./bindCallback'),
@@ -3914,7 +3372,7 @@ function baseCallback(func, thisArg, argCount) {
 
 module.exports = baseCallback;
 
-},{"../utility/identity":123,"../utility/property":124,"./baseMatches":68,"./baseMatchesProperty":69,"./bindCallback":74}],49:[function(require,module,exports){
+},{"../utility/identity":102,"../utility/property":103,"./baseMatches":47,"./baseMatchesProperty":48,"./bindCallback":53}],28:[function(require,module,exports){
 var arrayCopy = require('./arrayCopy'),
     arrayEach = require('./arrayEach'),
     baseAssign = require('./baseAssign'),
@@ -4044,7 +3502,7 @@ function baseClone(value, isDeep, customizer, key, object, stackA, stackB) {
 
 module.exports = baseClone;
 
-},{"../lang/isArray":108,"../lang/isObject":113,"./arrayCopy":39,"./arrayEach":40,"./baseAssign":47,"./baseForOwn":60,"./initCloneArray":91,"./initCloneByTag":92,"./initCloneObject":93}],50:[function(require,module,exports){
+},{"../lang/isArray":87,"../lang/isObject":92,"./arrayCopy":18,"./arrayEach":19,"./baseAssign":26,"./baseForOwn":39,"./initCloneArray":70,"./initCloneByTag":71,"./initCloneObject":72}],29:[function(require,module,exports){
 /**
  * Copies properties of `source` to `object`.
  *
@@ -4069,7 +3527,7 @@ function baseCopy(source, props, object) {
 
 module.exports = baseCopy;
 
-},{}],51:[function(require,module,exports){
+},{}],30:[function(require,module,exports){
 var baseIndexOf = require('./baseIndexOf'),
     cacheIndexOf = require('./cacheIndexOf'),
     createCache = require('./createCache');
@@ -4126,7 +3584,7 @@ function baseDifference(array, values) {
 
 module.exports = baseDifference;
 
-},{"./baseIndexOf":63,"./cacheIndexOf":76,"./createCache":81}],52:[function(require,module,exports){
+},{"./baseIndexOf":42,"./cacheIndexOf":55,"./createCache":60}],31:[function(require,module,exports){
 var baseForOwn = require('./baseForOwn'),
     createBaseEach = require('./createBaseEach');
 
@@ -4143,7 +3601,7 @@ var baseEach = createBaseEach(baseForOwn);
 
 module.exports = baseEach;
 
-},{"./baseForOwn":60,"./createBaseEach":79}],53:[function(require,module,exports){
+},{"./baseForOwn":39,"./createBaseEach":58}],32:[function(require,module,exports){
 var baseEach = require('./baseEach');
 
 /**
@@ -4167,7 +3625,7 @@ function baseEvery(collection, predicate) {
 
 module.exports = baseEvery;
 
-},{"./baseEach":52}],54:[function(require,module,exports){
+},{"./baseEach":31}],33:[function(require,module,exports){
 var baseEach = require('./baseEach');
 
 /**
@@ -4191,7 +3649,7 @@ function baseFilter(collection, predicate) {
 
 module.exports = baseFilter;
 
-},{"./baseEach":52}],55:[function(require,module,exports){
+},{"./baseEach":31}],34:[function(require,module,exports){
 /**
  * The base implementation of `_.find`, `_.findLast`, `_.findKey`, and `_.findLastKey`,
  * without support for callback shorthands and `this` binding, which iterates
@@ -4218,7 +3676,7 @@ function baseFind(collection, predicate, eachFunc, retKey) {
 
 module.exports = baseFind;
 
-},{}],56:[function(require,module,exports){
+},{}],35:[function(require,module,exports){
 /**
  * The base implementation of `_.findIndex` and `_.findLastIndex` without
  * support for callback shorthands and `this` binding.
@@ -4243,7 +3701,7 @@ function baseFindIndex(array, predicate, fromRight) {
 
 module.exports = baseFindIndex;
 
-},{}],57:[function(require,module,exports){
+},{}],36:[function(require,module,exports){
 var arrayPush = require('./arrayPush'),
     isArguments = require('../lang/isArguments'),
     isArray = require('../lang/isArray'),
@@ -4286,7 +3744,7 @@ function baseFlatten(array, isDeep, isStrict, result) {
 
 module.exports = baseFlatten;
 
-},{"../lang/isArguments":107,"../lang/isArray":108,"./arrayPush":44,"./isArrayLike":94,"./isObjectLike":99}],58:[function(require,module,exports){
+},{"../lang/isArguments":86,"../lang/isArray":87,"./arrayPush":23,"./isArrayLike":73,"./isObjectLike":78}],37:[function(require,module,exports){
 var createBaseFor = require('./createBaseFor');
 
 /**
@@ -4305,7 +3763,7 @@ var baseFor = createBaseFor();
 
 module.exports = baseFor;
 
-},{"./createBaseFor":80}],59:[function(require,module,exports){
+},{"./createBaseFor":59}],38:[function(require,module,exports){
 var baseFor = require('./baseFor'),
     keysIn = require('../object/keysIn');
 
@@ -4324,7 +3782,7 @@ function baseForIn(object, iteratee) {
 
 module.exports = baseForIn;
 
-},{"../object/keysIn":120,"./baseFor":58}],60:[function(require,module,exports){
+},{"../object/keysIn":99,"./baseFor":37}],39:[function(require,module,exports){
 var baseFor = require('./baseFor'),
     keys = require('../object/keys');
 
@@ -4343,7 +3801,7 @@ function baseForOwn(object, iteratee) {
 
 module.exports = baseForOwn;
 
-},{"../object/keys":119,"./baseFor":58}],61:[function(require,module,exports){
+},{"../object/keys":98,"./baseFor":37}],40:[function(require,module,exports){
 var isFunction = require('../lang/isFunction');
 
 /**
@@ -4372,7 +3830,7 @@ function baseFunctions(object, props) {
 
 module.exports = baseFunctions;
 
-},{"../lang/isFunction":110}],62:[function(require,module,exports){
+},{"../lang/isFunction":89}],41:[function(require,module,exports){
 var toObject = require('./toObject');
 
 /**
@@ -4403,7 +3861,7 @@ function baseGet(object, path, pathKey) {
 
 module.exports = baseGet;
 
-},{"./toObject":104}],63:[function(require,module,exports){
+},{"./toObject":83}],42:[function(require,module,exports){
 var indexOfNaN = require('./indexOfNaN');
 
 /**
@@ -4432,7 +3890,7 @@ function baseIndexOf(array, value, fromIndex) {
 
 module.exports = baseIndexOf;
 
-},{"./indexOfNaN":90}],64:[function(require,module,exports){
+},{"./indexOfNaN":69}],43:[function(require,module,exports){
 var baseIsEqualDeep = require('./baseIsEqualDeep'),
     isObject = require('../lang/isObject'),
     isObjectLike = require('./isObjectLike');
@@ -4462,7 +3920,7 @@ function baseIsEqual(value, other, customizer, isLoose, stackA, stackB) {
 
 module.exports = baseIsEqual;
 
-},{"../lang/isObject":113,"./baseIsEqualDeep":65,"./isObjectLike":99}],65:[function(require,module,exports){
+},{"../lang/isObject":92,"./baseIsEqualDeep":44,"./isObjectLike":78}],44:[function(require,module,exports){
 var equalArrays = require('./equalArrays'),
     equalByTag = require('./equalByTag'),
     equalObjects = require('./equalObjects'),
@@ -4566,7 +4024,7 @@ function baseIsEqualDeep(object, other, equalFunc, customizer, isLoose, stackA, 
 
 module.exports = baseIsEqualDeep;
 
-},{"../lang/isArray":108,"../lang/isTypedArray":115,"./equalArrays":84,"./equalByTag":85,"./equalObjects":86}],66:[function(require,module,exports){
+},{"../lang/isArray":87,"../lang/isTypedArray":94,"./equalArrays":63,"./equalByTag":64,"./equalObjects":65}],45:[function(require,module,exports){
 var baseIsEqual = require('./baseIsEqual'),
     toObject = require('./toObject');
 
@@ -4620,7 +4078,7 @@ function baseIsMatch(object, matchData, customizer) {
 
 module.exports = baseIsMatch;
 
-},{"./baseIsEqual":64,"./toObject":104}],67:[function(require,module,exports){
+},{"./baseIsEqual":43,"./toObject":83}],46:[function(require,module,exports){
 var baseEach = require('./baseEach'),
     isArrayLike = require('./isArrayLike');
 
@@ -4645,7 +4103,7 @@ function baseMap(collection, iteratee) {
 
 module.exports = baseMap;
 
-},{"./baseEach":52,"./isArrayLike":94}],68:[function(require,module,exports){
+},{"./baseEach":31,"./isArrayLike":73}],47:[function(require,module,exports){
 var baseIsMatch = require('./baseIsMatch'),
     getMatchData = require('./getMatchData'),
     toObject = require('./toObject');
@@ -4677,7 +4135,7 @@ function baseMatches(source) {
 
 module.exports = baseMatches;
 
-},{"./baseIsMatch":66,"./getMatchData":88,"./toObject":104}],69:[function(require,module,exports){
+},{"./baseIsMatch":45,"./getMatchData":67,"./toObject":83}],48:[function(require,module,exports){
 var baseGet = require('./baseGet'),
     baseIsEqual = require('./baseIsEqual'),
     baseSlice = require('./baseSlice'),
@@ -4724,7 +4182,7 @@ function baseMatchesProperty(path, srcValue) {
 
 module.exports = baseMatchesProperty;
 
-},{"../array/last":26,"../lang/isArray":108,"./baseGet":62,"./baseIsEqual":64,"./baseSlice":72,"./isKey":97,"./isStrictComparable":100,"./toObject":104,"./toPath":105}],70:[function(require,module,exports){
+},{"../array/last":5,"../lang/isArray":87,"./baseGet":41,"./baseIsEqual":43,"./baseSlice":51,"./isKey":76,"./isStrictComparable":79,"./toObject":83,"./toPath":84}],49:[function(require,module,exports){
 /**
  * The base implementation of `_.property` without support for deep paths.
  *
@@ -4740,7 +4198,7 @@ function baseProperty(key) {
 
 module.exports = baseProperty;
 
-},{}],71:[function(require,module,exports){
+},{}],50:[function(require,module,exports){
 var baseGet = require('./baseGet'),
     toPath = require('./toPath');
 
@@ -4761,7 +4219,7 @@ function basePropertyDeep(path) {
 
 module.exports = basePropertyDeep;
 
-},{"./baseGet":62,"./toPath":105}],72:[function(require,module,exports){
+},{"./baseGet":41,"./toPath":84}],51:[function(require,module,exports){
 /**
  * The base implementation of `_.slice` without an iteratee call guard.
  *
@@ -4795,7 +4253,7 @@ function baseSlice(array, start, end) {
 
 module.exports = baseSlice;
 
-},{}],73:[function(require,module,exports){
+},{}],52:[function(require,module,exports){
 /**
  * Converts `value` to a string if it's not one. An empty string is returned
  * for `null` or `undefined` values.
@@ -4810,7 +4268,7 @@ function baseToString(value) {
 
 module.exports = baseToString;
 
-},{}],74:[function(require,module,exports){
+},{}],53:[function(require,module,exports){
 var identity = require('../utility/identity');
 
 /**
@@ -4851,7 +4309,7 @@ function bindCallback(func, thisArg, argCount) {
 
 module.exports = bindCallback;
 
-},{"../utility/identity":123}],75:[function(require,module,exports){
+},{"../utility/identity":102}],54:[function(require,module,exports){
 (function (global){
 /** Native method references. */
 var ArrayBuffer = global.ArrayBuffer,
@@ -4875,7 +4333,7 @@ function bufferClone(buffer) {
 module.exports = bufferClone;
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],76:[function(require,module,exports){
+},{}],55:[function(require,module,exports){
 var isObject = require('../lang/isObject');
 
 /**
@@ -4896,7 +4354,7 @@ function cacheIndexOf(cache, value) {
 
 module.exports = cacheIndexOf;
 
-},{"../lang/isObject":113}],77:[function(require,module,exports){
+},{"../lang/isObject":92}],56:[function(require,module,exports){
 var isObject = require('../lang/isObject');
 
 /**
@@ -4918,7 +4376,7 @@ function cachePush(value) {
 
 module.exports = cachePush;
 
-},{"../lang/isObject":113}],78:[function(require,module,exports){
+},{"../lang/isObject":92}],57:[function(require,module,exports){
 var bindCallback = require('./bindCallback'),
     isIterateeCall = require('./isIterateeCall'),
     restParam = require('../function/restParam');
@@ -4961,7 +4419,7 @@ function createAssigner(assigner) {
 
 module.exports = createAssigner;
 
-},{"../function/restParam":37,"./bindCallback":74,"./isIterateeCall":96}],79:[function(require,module,exports){
+},{"../function/restParam":16,"./bindCallback":53,"./isIterateeCall":75}],58:[function(require,module,exports){
 var getLength = require('./getLength'),
     isLength = require('./isLength'),
     toObject = require('./toObject');
@@ -4994,7 +4452,7 @@ function createBaseEach(eachFunc, fromRight) {
 
 module.exports = createBaseEach;
 
-},{"./getLength":87,"./isLength":98,"./toObject":104}],80:[function(require,module,exports){
+},{"./getLength":66,"./isLength":77,"./toObject":83}],59:[function(require,module,exports){
 var toObject = require('./toObject');
 
 /**
@@ -5023,7 +4481,7 @@ function createBaseFor(fromRight) {
 
 module.exports = createBaseFor;
 
-},{"./toObject":104}],81:[function(require,module,exports){
+},{"./toObject":83}],60:[function(require,module,exports){
 (function (global){
 var SetCache = require('./SetCache'),
     getNative = require('./getNative');
@@ -5048,7 +4506,7 @@ function createCache(values) {
 module.exports = createCache;
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./SetCache":38,"./getNative":89}],82:[function(require,module,exports){
+},{"./SetCache":17,"./getNative":68}],61:[function(require,module,exports){
 var baseCallback = require('./baseCallback'),
     baseFind = require('./baseFind'),
     baseFindIndex = require('./baseFindIndex'),
@@ -5075,7 +4533,7 @@ function createFind(eachFunc, fromRight) {
 
 module.exports = createFind;
 
-},{"../lang/isArray":108,"./baseCallback":48,"./baseFind":55,"./baseFindIndex":56}],83:[function(require,module,exports){
+},{"../lang/isArray":87,"./baseCallback":27,"./baseFind":34,"./baseFindIndex":35}],62:[function(require,module,exports){
 var bindCallback = require('./bindCallback'),
     isArray = require('../lang/isArray');
 
@@ -5097,7 +4555,7 @@ function createForEach(arrayFunc, eachFunc) {
 
 module.exports = createForEach;
 
-},{"../lang/isArray":108,"./bindCallback":74}],84:[function(require,module,exports){
+},{"../lang/isArray":87,"./bindCallback":53}],63:[function(require,module,exports){
 var arraySome = require('./arraySome');
 
 /**
@@ -5150,7 +4608,7 @@ function equalArrays(array, other, equalFunc, customizer, isLoose, stackA, stack
 
 module.exports = equalArrays;
 
-},{"./arraySome":45}],85:[function(require,module,exports){
+},{"./arraySome":24}],64:[function(require,module,exports){
 /** `Object#toString` result references. */
 var boolTag = '[object Boolean]',
     dateTag = '[object Date]',
@@ -5200,7 +4658,7 @@ function equalByTag(object, other, tag) {
 
 module.exports = equalByTag;
 
-},{}],86:[function(require,module,exports){
+},{}],65:[function(require,module,exports){
 var keys = require('../object/keys');
 
 /** Used for native method references. */
@@ -5269,7 +4727,7 @@ function equalObjects(object, other, equalFunc, customizer, isLoose, stackA, sta
 
 module.exports = equalObjects;
 
-},{"../object/keys":119}],87:[function(require,module,exports){
+},{"../object/keys":98}],66:[function(require,module,exports){
 var baseProperty = require('./baseProperty');
 
 /**
@@ -5286,7 +4744,7 @@ var getLength = baseProperty('length');
 
 module.exports = getLength;
 
-},{"./baseProperty":70}],88:[function(require,module,exports){
+},{"./baseProperty":49}],67:[function(require,module,exports){
 var isStrictComparable = require('./isStrictComparable'),
     pairs = require('../object/pairs');
 
@@ -5309,7 +4767,7 @@ function getMatchData(object) {
 
 module.exports = getMatchData;
 
-},{"../object/pairs":121,"./isStrictComparable":100}],89:[function(require,module,exports){
+},{"../object/pairs":100,"./isStrictComparable":79}],68:[function(require,module,exports){
 var isNative = require('../lang/isNative');
 
 /**
@@ -5327,7 +4785,7 @@ function getNative(object, key) {
 
 module.exports = getNative;
 
-},{"../lang/isNative":111}],90:[function(require,module,exports){
+},{"../lang/isNative":90}],69:[function(require,module,exports){
 /**
  * Gets the index at which the first occurrence of `NaN` is found in `array`.
  *
@@ -5352,7 +4810,7 @@ function indexOfNaN(array, fromIndex, fromRight) {
 
 module.exports = indexOfNaN;
 
-},{}],91:[function(require,module,exports){
+},{}],70:[function(require,module,exports){
 /** Used for native method references. */
 var objectProto = Object.prototype;
 
@@ -5380,7 +4838,7 @@ function initCloneArray(array) {
 
 module.exports = initCloneArray;
 
-},{}],92:[function(require,module,exports){
+},{}],71:[function(require,module,exports){
 var bufferClone = require('./bufferClone');
 
 /** `Object#toString` result references. */
@@ -5445,7 +4903,7 @@ function initCloneByTag(object, tag, isDeep) {
 
 module.exports = initCloneByTag;
 
-},{"./bufferClone":75}],93:[function(require,module,exports){
+},{"./bufferClone":54}],72:[function(require,module,exports){
 /**
  * Initializes an object clone.
  *
@@ -5463,7 +4921,7 @@ function initCloneObject(object) {
 
 module.exports = initCloneObject;
 
-},{}],94:[function(require,module,exports){
+},{}],73:[function(require,module,exports){
 var getLength = require('./getLength'),
     isLength = require('./isLength');
 
@@ -5480,7 +4938,7 @@ function isArrayLike(value) {
 
 module.exports = isArrayLike;
 
-},{"./getLength":87,"./isLength":98}],95:[function(require,module,exports){
+},{"./getLength":66,"./isLength":77}],74:[function(require,module,exports){
 /** Used to detect unsigned integer values. */
 var reIsUint = /^\d+$/;
 
@@ -5506,7 +4964,7 @@ function isIndex(value, length) {
 
 module.exports = isIndex;
 
-},{}],96:[function(require,module,exports){
+},{}],75:[function(require,module,exports){
 var isArrayLike = require('./isArrayLike'),
     isIndex = require('./isIndex'),
     isObject = require('../lang/isObject');
@@ -5536,7 +4994,7 @@ function isIterateeCall(value, index, object) {
 
 module.exports = isIterateeCall;
 
-},{"../lang/isObject":113,"./isArrayLike":94,"./isIndex":95}],97:[function(require,module,exports){
+},{"../lang/isObject":92,"./isArrayLike":73,"./isIndex":74}],76:[function(require,module,exports){
 var isArray = require('../lang/isArray'),
     toObject = require('./toObject');
 
@@ -5566,7 +5024,7 @@ function isKey(value, object) {
 
 module.exports = isKey;
 
-},{"../lang/isArray":108,"./toObject":104}],98:[function(require,module,exports){
+},{"../lang/isArray":87,"./toObject":83}],77:[function(require,module,exports){
 /**
  * Used as the [maximum length](http://ecma-international.org/ecma-262/6.0/#sec-number.max_safe_integer)
  * of an array-like value.
@@ -5588,7 +5046,7 @@ function isLength(value) {
 
 module.exports = isLength;
 
-},{}],99:[function(require,module,exports){
+},{}],78:[function(require,module,exports){
 /**
  * Checks if `value` is object-like.
  *
@@ -5602,7 +5060,7 @@ function isObjectLike(value) {
 
 module.exports = isObjectLike;
 
-},{}],100:[function(require,module,exports){
+},{}],79:[function(require,module,exports){
 var isObject = require('../lang/isObject');
 
 /**
@@ -5619,7 +5077,7 @@ function isStrictComparable(value) {
 
 module.exports = isStrictComparable;
 
-},{"../lang/isObject":113}],101:[function(require,module,exports){
+},{"../lang/isObject":92}],80:[function(require,module,exports){
 var toObject = require('./toObject');
 
 /**
@@ -5649,7 +5107,7 @@ function pickByArray(object, props) {
 
 module.exports = pickByArray;
 
-},{"./toObject":104}],102:[function(require,module,exports){
+},{"./toObject":83}],81:[function(require,module,exports){
 var baseForIn = require('./baseForIn');
 
 /**
@@ -5673,7 +5131,7 @@ function pickByCallback(object, predicate) {
 
 module.exports = pickByCallback;
 
-},{"./baseForIn":59}],103:[function(require,module,exports){
+},{"./baseForIn":38}],82:[function(require,module,exports){
 var isArguments = require('../lang/isArguments'),
     isArray = require('../lang/isArray'),
     isIndex = require('./isIndex'),
@@ -5716,7 +5174,7 @@ function shimKeys(object) {
 
 module.exports = shimKeys;
 
-},{"../lang/isArguments":107,"../lang/isArray":108,"../object/keysIn":120,"./isIndex":95,"./isLength":98}],104:[function(require,module,exports){
+},{"../lang/isArguments":86,"../lang/isArray":87,"../object/keysIn":99,"./isIndex":74,"./isLength":77}],83:[function(require,module,exports){
 var isObject = require('../lang/isObject');
 
 /**
@@ -5732,7 +5190,7 @@ function toObject(value) {
 
 module.exports = toObject;
 
-},{"../lang/isObject":113}],105:[function(require,module,exports){
+},{"../lang/isObject":92}],84:[function(require,module,exports){
 var baseToString = require('./baseToString'),
     isArray = require('../lang/isArray');
 
@@ -5762,7 +5220,7 @@ function toPath(value) {
 
 module.exports = toPath;
 
-},{"../lang/isArray":108,"./baseToString":73}],106:[function(require,module,exports){
+},{"../lang/isArray":87,"./baseToString":52}],85:[function(require,module,exports){
 var baseClone = require('../internal/baseClone'),
     bindCallback = require('../internal/bindCallback'),
     isIterateeCall = require('../internal/isIterateeCall');
@@ -5834,7 +5292,7 @@ function clone(value, isDeep, customizer, thisArg) {
 
 module.exports = clone;
 
-},{"../internal/baseClone":49,"../internal/bindCallback":74,"../internal/isIterateeCall":96}],107:[function(require,module,exports){
+},{"../internal/baseClone":28,"../internal/bindCallback":53,"../internal/isIterateeCall":75}],86:[function(require,module,exports){
 var isArrayLike = require('../internal/isArrayLike'),
     isObjectLike = require('../internal/isObjectLike');
 
@@ -5870,7 +5328,7 @@ function isArguments(value) {
 
 module.exports = isArguments;
 
-},{"../internal/isArrayLike":94,"../internal/isObjectLike":99}],108:[function(require,module,exports){
+},{"../internal/isArrayLike":73,"../internal/isObjectLike":78}],87:[function(require,module,exports){
 var getNative = require('../internal/getNative'),
     isLength = require('../internal/isLength'),
     isObjectLike = require('../internal/isObjectLike');
@@ -5912,7 +5370,7 @@ var isArray = nativeIsArray || function(value) {
 
 module.exports = isArray;
 
-},{"../internal/getNative":89,"../internal/isLength":98,"../internal/isObjectLike":99}],109:[function(require,module,exports){
+},{"../internal/getNative":68,"../internal/isLength":77,"../internal/isObjectLike":78}],88:[function(require,module,exports){
 var isArguments = require('./isArguments'),
     isArray = require('./isArray'),
     isArrayLike = require('../internal/isArrayLike'),
@@ -5961,7 +5419,7 @@ function isEmpty(value) {
 
 module.exports = isEmpty;
 
-},{"../internal/isArrayLike":94,"../internal/isObjectLike":99,"../object/keys":119,"./isArguments":107,"./isArray":108,"./isFunction":110,"./isString":114}],110:[function(require,module,exports){
+},{"../internal/isArrayLike":73,"../internal/isObjectLike":78,"../object/keys":98,"./isArguments":86,"./isArray":87,"./isFunction":89,"./isString":93}],89:[function(require,module,exports){
 var isObject = require('./isObject');
 
 /** `Object#toString` result references. */
@@ -6001,7 +5459,7 @@ function isFunction(value) {
 
 module.exports = isFunction;
 
-},{"./isObject":113}],111:[function(require,module,exports){
+},{"./isObject":92}],90:[function(require,module,exports){
 var isFunction = require('./isFunction'),
     isObjectLike = require('../internal/isObjectLike');
 
@@ -6051,7 +5509,7 @@ function isNative(value) {
 
 module.exports = isNative;
 
-},{"../internal/isObjectLike":99,"./isFunction":110}],112:[function(require,module,exports){
+},{"../internal/isObjectLike":78,"./isFunction":89}],91:[function(require,module,exports){
 var isObjectLike = require('../internal/isObjectLike');
 
 /** `Object#toString` result references. */
@@ -6094,7 +5552,7 @@ function isNumber(value) {
 
 module.exports = isNumber;
 
-},{"../internal/isObjectLike":99}],113:[function(require,module,exports){
+},{"../internal/isObjectLike":78}],92:[function(require,module,exports){
 /**
  * Checks if `value` is the [language type](https://es5.github.io/#x8) of `Object`.
  * (e.g. arrays, functions, objects, regexes, `new Number(0)`, and `new String('')`)
@@ -6124,7 +5582,7 @@ function isObject(value) {
 
 module.exports = isObject;
 
-},{}],114:[function(require,module,exports){
+},{}],93:[function(require,module,exports){
 var isObjectLike = require('../internal/isObjectLike');
 
 /** `Object#toString` result references. */
@@ -6161,7 +5619,7 @@ function isString(value) {
 
 module.exports = isString;
 
-},{"../internal/isObjectLike":99}],115:[function(require,module,exports){
+},{"../internal/isObjectLike":78}],94:[function(require,module,exports){
 var isLength = require('../internal/isLength'),
     isObjectLike = require('../internal/isObjectLike');
 
@@ -6237,7 +5695,7 @@ function isTypedArray(value) {
 
 module.exports = isTypedArray;
 
-},{"../internal/isLength":98,"../internal/isObjectLike":99}],116:[function(require,module,exports){
+},{"../internal/isLength":77,"../internal/isObjectLike":78}],95:[function(require,module,exports){
 var assignWith = require('../internal/assignWith'),
     baseAssign = require('../internal/baseAssign'),
     createAssigner = require('../internal/createAssigner');
@@ -6282,10 +5740,10 @@ var assign = createAssigner(function(object, source, customizer) {
 
 module.exports = assign;
 
-},{"../internal/assignWith":46,"../internal/baseAssign":47,"../internal/createAssigner":78}],117:[function(require,module,exports){
+},{"../internal/assignWith":25,"../internal/baseAssign":26,"../internal/createAssigner":57}],96:[function(require,module,exports){
 module.exports = require('./assign');
 
-},{"./assign":116}],118:[function(require,module,exports){
+},{"./assign":95}],97:[function(require,module,exports){
 var baseFunctions = require('../internal/baseFunctions'),
     keysIn = require('./keysIn');
 
@@ -6310,7 +5768,7 @@ function functions(object) {
 
 module.exports = functions;
 
-},{"../internal/baseFunctions":61,"./keysIn":120}],119:[function(require,module,exports){
+},{"../internal/baseFunctions":40,"./keysIn":99}],98:[function(require,module,exports){
 var getNative = require('../internal/getNative'),
     isArrayLike = require('../internal/isArrayLike'),
     isObject = require('../lang/isObject'),
@@ -6357,7 +5815,7 @@ var keys = !nativeKeys ? shimKeys : function(object) {
 
 module.exports = keys;
 
-},{"../internal/getNative":89,"../internal/isArrayLike":94,"../internal/shimKeys":103,"../lang/isObject":113}],120:[function(require,module,exports){
+},{"../internal/getNative":68,"../internal/isArrayLike":73,"../internal/shimKeys":82,"../lang/isObject":92}],99:[function(require,module,exports){
 var isArguments = require('../lang/isArguments'),
     isArray = require('../lang/isArray'),
     isIndex = require('../internal/isIndex'),
@@ -6423,7 +5881,7 @@ function keysIn(object) {
 
 module.exports = keysIn;
 
-},{"../internal/isIndex":95,"../internal/isLength":98,"../lang/isArguments":107,"../lang/isArray":108,"../lang/isObject":113}],121:[function(require,module,exports){
+},{"../internal/isIndex":74,"../internal/isLength":77,"../lang/isArguments":86,"../lang/isArray":87,"../lang/isObject":92}],100:[function(require,module,exports){
 var keys = require('./keys'),
     toObject = require('../internal/toObject');
 
@@ -6458,7 +5916,7 @@ function pairs(object) {
 
 module.exports = pairs;
 
-},{"../internal/toObject":104,"./keys":119}],122:[function(require,module,exports){
+},{"../internal/toObject":83,"./keys":98}],101:[function(require,module,exports){
 var baseFlatten = require('../internal/baseFlatten'),
     bindCallback = require('../internal/bindCallback'),
     pickByArray = require('../internal/pickByArray'),
@@ -6502,7 +5960,7 @@ var pick = restParam(function(object, props) {
 
 module.exports = pick;
 
-},{"../function/restParam":37,"../internal/baseFlatten":57,"../internal/bindCallback":74,"../internal/pickByArray":101,"../internal/pickByCallback":102}],123:[function(require,module,exports){
+},{"../function/restParam":16,"../internal/baseFlatten":36,"../internal/bindCallback":53,"../internal/pickByArray":80,"../internal/pickByCallback":81}],102:[function(require,module,exports){
 /**
  * This method returns the first argument provided to it.
  *
@@ -6524,7 +5982,7 @@ function identity(value) {
 
 module.exports = identity;
 
-},{}],124:[function(require,module,exports){
+},{}],103:[function(require,module,exports){
 var baseProperty = require('../internal/baseProperty'),
     basePropertyDeep = require('../internal/basePropertyDeep'),
     isKey = require('../internal/isKey');
@@ -6557,136 +6015,327 @@ function property(path) {
 
 module.exports = property;
 
-},{"../internal/baseProperty":70,"../internal/basePropertyDeep":71,"../internal/isKey":97}],125:[function(require,module,exports){
-/**@license MIT-promiscuous-©Ruben Verborgh*/
-(function (func, obj) {
-  // Type checking utility function
-  function is(type, item) { return (typeof item)[0] == type; }
+},{"../internal/baseProperty":49,"../internal/basePropertyDeep":50,"../internal/isKey":76}],104:[function(require,module,exports){
+(function () {
+  global = this
 
-  // Creates a promise, calling callback(resolve, reject), ignoring other parameters.
-  function Promise(callback, handler) {
-    // The `handler` variable points to the function that will
-    // 1) handle a .then(resolved, rejected) call
-    // 2) handle a resolve or reject call (if the first argument === `is`)
-    // Before 2), `handler` holds a queue of callbacks.
-    // After 2), `handler` is a finalized .then handler.
-    handler = function pendingHandler(resolved, rejected, value, queue, then, i) {
-      queue = pendingHandler.q;
+  var queueId = 1
+  var queue = {}
+  var isRunningTask = false
 
-      // Case 1) handle a .then(resolved, rejected) call
-      if (resolved != is) {
-        return Promise(function (resolve, reject) {
-          queue.push({ p: this, r: resolve, j: reject, 1: resolved, 0: rejected });
-        });
-      }
+  if (!global.setImmediate)
+    global.addEventListener('message', function (e) {
+      if (e.source == global){
+        if (isRunningTask)
+          nextTick(queue[e.data])
+        else {
+          isRunningTask = true
+          try {
+            queue[e.data]()
+          } catch (e) {}
 
-      // Case 2) handle a resolve or reject call
-      // (`resolved` === `is` acts as a sentinel)
-      // The actual function signature is
-      // .re[ject|solve](<is>, success, value)
-
-      // Check if the value is a promise and try to obtain its `then` method
-      if (value && (is(func, value) | is(obj, value))) {
-        try { then = value.then; }
-        catch (reason) { rejected = 0; value = reason; }
-      }
-      // If the value is a promise, take over its state
-      if (is(func, then)) {
-        function valueHandler(resolved) {
-          return function (value) { then && (then = 0, pendingHandler(is, resolved, value)); };
+          delete queue[e.data]
+          isRunningTask = false
         }
-        try { then.call(value, valueHandler(1), rejected = valueHandler(0)); }
-        catch (reason) { rejected(reason); }
       }
-      // The value is not a promise; handle resolve/reject
+    })
+
+  function nextTick(fn) {
+    if (global.setImmediate) setImmediate(fn)
+    // if inside of web worker
+    else if (global.importScripts) setTimeout(fn)
+    else {
+      queueId++
+      queue[queueId] = fn
+      global.postMessage(queueId, '*')
+    }
+  }
+
+  Deferred.resolve = function (value) {
+    if (!(this._d == 1))
+      throw TypeError()
+
+    if (value instanceof Deferred)
+      return value
+
+    return new Deferred(function (resolve) {
+        resolve(value)
+    })
+  }
+
+  Deferred.reject = function (value) {
+    if (!(this._d == 1))
+      throw TypeError()
+
+    return new Deferred(function (resolve, reject) {
+        reject(value)
+    })
+  }
+
+  Deferred.all = function (arr) {
+    if (!(this._d == 1))
+      throw TypeError()
+
+    if (!(arr instanceof Array))
+      return Deferred.reject(TypeError())
+
+    var d = new Deferred()
+
+    function done(e, v) {
+      if (v)
+        return d.resolve(v)
+
+      if (e)
+        return d.reject(e)
+
+      var unresolved = arr.reduce(function (cnt, v) {
+        if (v && v.then)
+          return cnt + 1
+        return cnt
+      }, 0)
+
+      if(unresolved == 0)
+        d.resolve(arr)
+
+      arr.map(function (v, i) {
+        if (v && v.then)
+          v.then(function (r) {
+            arr[i] = r
+            done()
+            return r
+          }, done)
+      })
+    }
+
+    done()
+
+    return d
+  }
+
+  Deferred.race = function (arr) {
+    if (!(this._d == 1))
+      throw TypeError()
+
+    if (!(arr instanceof Array))
+      return Deferred.reject(TypeError())
+
+    if (arr.length == 0)
+      return new Deferred()
+
+    var d = new Deferred()
+
+    function done(e, v) {
+      if (v)
+        return d.resolve(v)
+
+      if (e)
+        return d.reject(e)
+
+      var unresolved = arr.reduce(function (cnt, v) {
+        if (v && v.then)
+          return cnt + 1
+        return cnt
+      }, 0)
+
+      if(unresolved == 0)
+        d.resolve(arr)
+
+      arr.map(function (v, i) {
+        if (v && v.then)
+          v.then(function (r) {
+            done(null, r)
+          }, done)
+      })
+    }
+
+    done()
+
+    return d
+  }
+
+  Deferred._d = 1
+
+
+  /**
+   * @constructor
+   */
+  function Deferred(resolver) {
+    'use strict'
+    if (typeof resolver != 'function' && resolver != undefined)
+      throw TypeError()
+
+    if (typeof this != 'object' || (this && this.then))
+      throw TypeError()
+
+    // states
+    // 0: pending
+    // 1: resolving
+    // 2: rejecting
+    // 3: resolved
+    // 4: rejected
+    var self = this,
+      state = 0,
+      val = 0,
+      next = [],
+      fn, er;
+
+    self['promise'] = self
+
+    self['resolve'] = function (v) {
+      fn = self.fn
+      er = self.er
+      if (!state) {
+        val = v
+        state = 1
+
+        nextTick(fire)
+      }
+      return self
+    }
+
+    self['reject'] = function (v) {
+      fn = self.fn
+      er = self.er
+      if (!state) {
+        val = v
+        state = 2
+
+        nextTick(fire)
+
+      }
+      return self
+    }
+
+    self['_d'] = 1
+
+    self['then'] = function (_fn, _er) {
+      if (!(this._d == 1))
+        throw TypeError()
+
+      var d = new Deferred()
+
+      d.fn = _fn
+      d.er = _er
+      if (state == 3) {
+        d.resolve(val)
+      }
+      else if (state == 4) {
+        d.reject(val)
+      }
       else {
-        // Replace this handler with a finalized resolved/rejected handler
-        handler = function (Resolved, Rejected) {
-          // If the Resolved or Rejected parameter is not a function,
-          // return the original promise (now stored in the `callback` variable)
-          if (!is(func, (Resolved = rejected ? Resolved : Rejected)))
-            return callback;
-          // Otherwise, return a finalized promise, transforming the value with the function
-          return Promise(function (resolve, reject) { finalize(this, resolve, reject, value, Resolved); });
-        };
-        // Resolve/reject pending callbacks
-        i = 0;
-        while (i < queue.length) {
-          then = queue[i++];
-          // If no callback, just resolve/reject the promise
-          if (!is(func, resolved = then[rejected]))
-            (rejected ? then.r : then.j)(value);
-          // Otherwise, resolve/reject the promise with the result of the callback
-          else
-            finalize(then.p, then.r, then.j, value, resolved);
+        next.push(d)
+      }
+
+      return d
+    }
+
+    self['catch'] = function (_er) {
+      return self['then'](null, _er)
+    }
+
+    var finish = function (type) {
+      state = type || 4
+      next.map(function (p) {
+        state == 3 && p.resolve(val) || p.reject(val)
+      })
+    }
+
+    try {
+      if (typeof resolver == 'function')
+        resolver(self['resolve'], self['reject'])
+    } catch (e) {
+      self['reject'](e)
+    }
+
+    return self
+
+    // ref : reference to 'then' function
+    // cb, ec, cn : successCallback, failureCallback, notThennableCallback
+    function thennable (ref, cb, ec, cn) {
+      // Promises can be rejected with other promises, which should pass through
+      if (state == 2) {
+        return cn()
+      }
+      if ((typeof val == 'object' || typeof val == 'function') && typeof ref == 'function') {
+        try {
+
+          // cnt protects against abuse calls from spec checker
+          var cnt = 0
+          ref.call(val, function (v) {
+            if (cnt++) return
+            val = v
+            cb()
+          }, function (v) {
+            if (cnt++) return
+            val = v
+            ec()
+          })
+        } catch (e) {
+          val = e
+          ec()
         }
+      } else {
+        cn()
       }
     };
-    // The queue of pending callbacks; garbage-collected when handler is resolved/rejected
-    handler.q = [];
 
-    // Create and return the promise (reusing the callback variable)
-    callback.call(callback = { then:  function (resolved, rejected) { return handler(resolved, rejected); },
-                               catch: function (rejected)           { return handler(0,        rejected); } },
-                  function (value)  { handler(is, 1,  value); },
-                  function (reason) { handler(is, 0, reason); });
-    return callback;
-  }
+    function fire() {
 
-  // Finalizes the promise by resolving/rejecting it with the transformed value
-  function finalize(promise, resolve, reject, value, transform) {
-    setImmediate(function () {
+      // check if it's a thenable
+      var ref;
       try {
-        // Transform the value through and check whether it's a promise
-        value = transform(value);
-        transform = value && (is(obj, value) | is(func, value)) && value.then;
-        // Return the result if it's not a promise
-        if (!is(func, transform))
-          resolve(value);
-        // If it's a promise, make sure it's not circular
-        else if (value == promise)
-          reject(TypeError());
-        // Take over the promise's state
-        else
-          transform.call(value, resolve, reject);
+        ref = val && val.then
+      } catch (e) {
+        val = e
+        state = 2
+        return fire()
       }
-      catch (error) { reject(error); }
-    });
+
+      thennable(ref, function () {
+        state = 1
+        fire()
+      }, function () {
+        state = 2
+        fire()
+      }, function () {
+        try {
+          if (state == 1 && typeof fn == 'function') {
+            val = fn(val)
+          }
+
+          else if (state == 2 && typeof er == 'function') {
+            val = er(val)
+            state = 1
+          }
+        } catch (e) {
+          val = e
+          return finish()
+        }
+
+        if (val == self) {
+          val = TypeError()
+          finish()
+        } else thennable(ref, function () {
+            finish(3)
+          }, finish, function () {
+            finish(state == 1 && 3)
+          })
+
+      })
+    }
+
+
   }
 
-  // Export the main module
-  module.exports = Promise;
+  // Export our library object, either for node.js or as a globally scoped variable
+  if (typeof module != 'undefined') {
+    module['exports'] = Deferred
+  } else {
+    global['Promise'] = global['Promise'] || Deferred
+  }
+})()
 
-  // Creates a resolved promise
-  Promise.resolve = ResolvedPromise;
-  function ResolvedPromise(value) { return Promise(function (resolve) { resolve(value); }); }
-
-  // Creates a rejected promise
-  Promise.reject = function (reason) { return Promise(function (resolve, reject) { reject(reason); }); };
-
-  // Transforms an array of promises into a promise for an array
-  Promise.all = function (promises) {
-    return Promise(function (resolve, reject, count, values) {
-      // Array of collected values
-      values = [];
-      // Resolve immediately if there are no promises
-      count = promises.length || resolve(values);
-      // Transform all elements (`map` is shorter than `forEach`)
-      promises.map(function (promise, index) {
-        ResolvedPromise(promise).then(
-          // Store the value and resolve if it was the last
-          function (value) {
-            values[index] = value;
-            --count || resolve(values);
-          },
-          // Reject if one element fails
-          reject);
-      });
-    });
-  };
-})('f', 'o');
-
-},{}],126:[function(require,module,exports){
+},{}],105:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -6772,7 +6421,7 @@ var isArray = Array.isArray || function (xs) {
   return Object.prototype.toString.call(xs) === '[object Array]';
 };
 
-},{}],127:[function(require,module,exports){
+},{}],106:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -6859,13 +6508,13 @@ var objectKeys = Object.keys || function (obj) {
   return res;
 };
 
-},{}],128:[function(require,module,exports){
+},{}],107:[function(require,module,exports){
 'use strict';
 
 exports.decode = exports.parse = require('./decode');
 exports.encode = exports.stringify = require('./encode');
 
-},{"./decode":126,"./encode":127}],129:[function(require,module,exports){
+},{"./decode":105,"./encode":106}],108:[function(require,module,exports){
 (function(self) {
   'use strict';
 

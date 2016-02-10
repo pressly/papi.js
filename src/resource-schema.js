@@ -3,7 +3,7 @@
 import {map, each, select, extend, last, isObject, isArray, isEmpty} from 'lodash';
 
 import Resource from './resource';
-import * as models from './models';
+import * as models from './models/index';
 
 function singularize(string) {
   return string.replace(/s$/, '');

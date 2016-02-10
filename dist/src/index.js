@@ -8,9 +8,9 @@ var _extend = require('lodash/object/extend');
 
 var _extend2 = _interopRequireDefault(_extend);
 
-var _promiscuous = require('promiscuous');
+var _promiz = require('promiz');
 
-var _promiscuous2 = _interopRequireDefault(_promiscuous);
+var _promiz2 = _interopRequireDefault(_promiz);
 
 var _isomorphicFetch = require('isomorphic-fetch');
 
@@ -33,7 +33,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 if (!global.Promise) {
-  global.Promise = _promiscuous2.default;
+  global.Promise = _promiz2.default;
 }
 
 var AbortablePromise = require('dodgy');
@@ -44,6 +44,7 @@ if (!global.fetch) {
 
 // Query string parser and stringifier -- fetch does not support any query string
 // parsing so we need to handle it separately.
+
 
 function hasXDomain() {
   return typeof window !== 'undefined' && window.xdomain != null;
@@ -252,7 +253,7 @@ if (Papi.defineSchema == undefined) {
   Papi.defineSchema = _resourceSchema2.default.defineSchema;
 }
 
-Papi.defineSchema().resource('accounts').open().get('available', { on: 'resource' }).post('become', { on: 'member' }).resource('users').resource('hubs', { link: 'hubs' }).close().resource('organizations').open().resource('users').resource('hubs').resource('invites').open().post('bulk_invite', { on: 'resource' }).post('resend', { on: 'member' }).put('accept', { on: 'member', routeSegment: '/invites/:hash' }).put('reject', { on: 'member', routeSegment: '/invites/:hash' }).close().close().resource('activity').resource('posts', { routeSegment: '/stream/posts/:id' }).resource('hubs').open().get('search', { on: 'resource' }).post('upgrade', { on: 'member' }).resource('apps').open().get('current', { on: 'resource' }).get('build', { on: 'member', path: '/build_app' }).get('status', { on: 'member' }).resource('styles').close().resource('addons').open().resource('configs').close().resource('analytics').open().get('summary', { on: 'resource' }).get('visitors', { on: 'resource' }).get('pageviews', { on: 'resource' }).get('duration', { on: 'resource' }).close().resource('feeds').open().resource('assets', { modelName: 'FeedAsset' }).close().resource('invites').open().post('bulk_invite', { on: 'resource' }).post('resend', { on: 'member' }).put('accept', { on: 'member', routeSegment: '/invites/:hash' }).put('reject', { on: 'member', routeSegment: '/invites/:hash' }).close().resource('recommendations').resource('users').open().post('grant_access', { on: 'resource' }).delete('revoke_access', { on: 'member' }).close().resource('collections').open().put('reorder', { on: 'resource' }).close().resource('tags').resource('assets', { routeSegment: '/stream/:id' }).open().put('feature', { on: 'member' }).put('unfeature', { on: 'member' }).put('hide', { on: 'member' }).put('unhide', { on: 'member' }).put('lock', { on: 'member' }).put('unlock', { on: 'member' }).resource('likes').resource('comments').close().resource('drafts').open().put('publish', { on: 'member' }).close().close().resource('invites').open().get('incoming', { on: 'resource' }).get('outgoing', { on: 'resource' }).post('bulk_invite', { on: 'resource' }).post('resend', { on: 'member' }).put('accept', { on: 'member', routeSegment: '/invites/:hash' }).put('reject', { on: 'member', routeSegment: '/invites/:hash' }).close().resource('code_revisions').open().get('fetch_repo', { on: 'member' })
+Papi.defineSchema().resource('accounts').open().get('available', { on: 'resource' }).post('become', { on: 'member' }).resource('users').resource('hubs', { link: 'hubs' }).close().resource('organizations').open().resource('users').resource('hubs').resource('invites').open().post('bulk_invite', { on: 'resource' }).post('resend', { on: 'member' }).put('accept', { on: 'member', routeSegment: '/invites/:hash' }).put('reject', { on: 'member', routeSegment: '/invites/:hash' }).close().close().resource('activity').resource('posts', { routeSegment: '/stream/posts/:id' }).resource('hubs').open().get('search', { on: 'resource' }).post('upgrade', { on: 'member' }).post('follow', { on: 'member' }).delete('unfollow', { on: 'member' }).resource('apps').open().get('current', { on: 'resource' }).get('build', { on: 'member', path: '/build_app' }).get('status', { on: 'member' }).resource('styles').close().resource('addons').open().resource('configs').close().resource('analytics').open().get('summary', { on: 'resource' }).get('visitors', { on: 'resource' }).get('pageviews', { on: 'resource' }).get('duration', { on: 'resource' }).close().resource('feeds').open().resource('assets', { modelName: 'FeedAsset' }).close().resource('invites').open().post('bulk_invite', { on: 'resource' }).post('resend', { on: 'member' }).put('accept', { on: 'member', routeSegment: '/invites/:hash' }).put('reject', { on: 'member', routeSegment: '/invites/:hash' }).close().resource('recommendations').resource('users').open().post('grant_access', { on: 'resource' }).delete('revoke_access', { on: 'member' }).close().resource('collections').open().put('reorder', { on: 'resource' }).close().resource('tags').resource('assets', { routeSegment: '/stream/:id' }).open().put('feature', { on: 'member' }).put('unfeature', { on: 'member' }).put('hide', { on: 'member' }).put('unhide', { on: 'member' }).put('lock', { on: 'member' }).put('unlock', { on: 'member' }).resource('likes').resource('comments').close().resource('drafts').open().put('publish', { on: 'member' }).close().close().resource('invites').open().get('incoming', { on: 'resource' }).get('outgoing', { on: 'resource' }).post('bulk_invite', { on: 'resource' }).post('resend', { on: 'member' }).put('accept', { on: 'member', routeSegment: '/invites/:hash' }).put('reject', { on: 'member', routeSegment: '/invites/:hash' }).close().resource('code_revisions').open().get('fetch_repo', { on: 'member' })
 
 // This resource links to the root hubs resource
 .resource('hubs', { link: 'hubs' }).close().resource('signup').open().get('account_uid_available', { on: 'member' }).get('account_email_available', { on: 'member' }).close().resource('users').open().get('roles', { on: 'resource' }).resource('hubs').resource('organizations').close().resource('discover').open().resource('users', { link: 'users' }).resource('organizations', { link: 'organizations' }).resource('hubs', { link: 'hubs' }).resource('posts').close().resource('stream').open().resource('following').close();

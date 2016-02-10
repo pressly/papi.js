@@ -1,5 +1,7 @@
 'use strict';
 
+exports.__esModule = true;
+
 var _isArray = require('lodash/lang/isArray');
 
 var _isArray2 = _interopRequireDefault(_isArray);
@@ -24,15 +26,13 @@ var _map = require('lodash/collection/map');
 
 var _map2 = _interopRequireDefault(_map);
 
-exports.__esModule = true;
-
 var _resource = require('./resource');
 
 var _resource2 = _interopRequireDefault(_resource);
 
-var _models = require('./models');
+var _index = require('./models/index');
 
-var models = _interopRequireWildcard(_models);
+var models = _interopRequireWildcard(_index);
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
@@ -145,6 +145,7 @@ var ResourceSchema = function () {
     $resource(name, parentResource);
     $resource(name, params, parentResource);
   */
+
 
   ResourceSchema.prototype.$resource = function $resource() {
     var key = arguments[0];
