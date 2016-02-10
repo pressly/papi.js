@@ -9,7 +9,7 @@ import should from 'should';
 
 const api = new Papi();
 
-mockRequest.configure({host: api.options.host});
+mockRequest.config({host: api.options.host});
 
 // interceptors
 // var mockRequest = nock(api.options.host);

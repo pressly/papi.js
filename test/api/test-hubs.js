@@ -14,7 +14,7 @@ api.auth.set({jwt: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNTRmMGR
 
 //var mockRequest = nock(api.options.host).matchHeader('authorization', function() { return `Bearer ${api.auth.session.jwt}`; });
 
-mockRequest.configure({host: api.options.host});
+mockRequest.config({host: api.options.host});
 
 
 describe('Hubs Resource', function () {

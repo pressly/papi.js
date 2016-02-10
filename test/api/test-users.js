@@ -12,7 +12,7 @@ const api = new Papi();
 api.auth.set({jwt: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNTRmMGRiNzMwOGFmYTEyYjUzNjIwNTg4In0.CvXGDKAJYZkoH3nnEirtlGlwRzErv1ANOJ-dVkUAnjo#_login_post'});
 
 //var mockRequest = nock(api.options.host).matchHeader('authorization', function() { return `Bearer ${api.auth.session.jwt}`; });
-mockRequest.configure({host: api.options.host});
+mockRequest.config({host: api.options.host});
 
 describe('Users Resource', function () {
   it("all should return an array", function (done) {
