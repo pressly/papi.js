@@ -16,7 +16,7 @@ gulp.task('build:es6', function() {
   return gulp.src('./src/index.js')
     .pipe(require('gulp-rollup')())
     .pipe(require('gulp-babel')())
-    .pipe(gulp.dest('build/src'))
+    .pipe(gulp.dest('build/src'));
 });
 
 // gulp.task('build:es6', function() {
