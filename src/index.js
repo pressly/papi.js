@@ -339,6 +339,10 @@ Papi.defineSchema()
     .resource('posts')
   .close()
 
+  .resource('creds').open()
+    .post('share', { on: 'member' })
+  .close()
+
   .resource('stream').open()
     .resource('following')
   .close()
