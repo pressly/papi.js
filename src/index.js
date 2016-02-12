@@ -243,6 +243,7 @@ Papi.defineSchema()
     .post('upgrade',    { on: 'member' })
     .post('follow',     { on: 'member' })
     .delete('unfollow', { on: 'member' })
+    .get('reach',       { on: 'member' })
 
     .resource('apps').open()
       .get('current', { on: 'resource' })
