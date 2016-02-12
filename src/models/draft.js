@@ -1,4 +1,4 @@
 import Model from '../model';
 
-export default class Draft extends Model {
+export class Draft extends Model {
 }

@@ -1,4 +1,4 @@
 import Model from '../model';
 
-export default class CodeRevision extends Model {
+export class CodeRevision extends Model {
 }

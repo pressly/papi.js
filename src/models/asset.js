@@ -8,7 +8,7 @@ var DISPLAY_STATES = {
   LOCKED:       8
 };
 
-export default class Asset extends Model {
+export class Asset extends Model {
   isVisible() {
     return (this.display_state & DISPLAY_STATES.VISIBLE) === DISPLAY_STATES.VISIBLE;
   }

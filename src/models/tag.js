@@ -1,4 +1,4 @@
 import Model from '../model';
 
-export default class Tag extends Model {
+export class Tag extends Model {
 }

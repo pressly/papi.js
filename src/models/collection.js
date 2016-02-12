@@ -1,4 +1,4 @@
 import Model from '../model';
 
-export default class Collection extends Model {
+export class Collection extends Model {
 }
