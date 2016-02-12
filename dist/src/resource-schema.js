@@ -1,5 +1,7 @@
 'use strict';
 
+exports.__esModule = true;
+
 var _isArray = require('lodash/isArray');
 
 var _isArray2 = _interopRequireDefault(_isArray);
@@ -23,8 +25,6 @@ var _each2 = _interopRequireDefault(_each);
 var _map = require('lodash/map');
 
 var _map2 = _interopRequireDefault(_map);
-
-exports.__esModule = true;
 
 var _resource = require('./resource');
 
@@ -145,6 +145,7 @@ var ResourceSchema = function () {
     $resource(name, parentResource);
     $resource(name, params, parentResource);
   */
+
 
   ResourceSchema.prototype.$resource = function $resource() {
     var key = arguments[0];

@@ -1,6 +1,5 @@
 'use strict';
 
-require('es6-promise').polyfill();
 import Promise from 'promiz';
 import _fetch from 'isomorphic-fetch';
 if (!global.fetch) {
