@@ -242,7 +242,7 @@ Papi.defineSchema()
     .get('search',      { on: 'resource' })
     .post('upgrade',    { on: 'member' })
     .post('follow',     { on: 'member' })
-    .delete('unfollow', { on: 'member' })
+    .delete('unfollow', { on: 'member', path: '/follow' })
     .get('reach',       { on: 'member' })
 
     .resource('apps').open()
@@ -345,6 +345,5 @@ Papi.defineSchema()
   .close()
 
   .resource('stream').open()
-    .resource('following')
   .close()
 ;
