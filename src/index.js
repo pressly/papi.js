@@ -40,6 +40,12 @@ class Papi extends ResourceSchema {
     this.requestMiddlewares = [];
     this.responseMiddlewares = [];
 
+    this.metrics = {
+      sendEvent: (type, message) => {
+        this.request('post', `/metrix/events/${type}`, message);
+      }
+    }
+
     this.auth = {
       session: null,
 
