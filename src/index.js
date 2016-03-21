@@ -288,6 +288,8 @@ Papi.defineSchema()
       .delete('revoke_access',  { on: 'member' })
     .close()
 
+    .resource('collaborators',  { modelName: 'User' })
+
     .resource('collections').open()
       .put('reorder', { on: 'resource'})
     .close()
