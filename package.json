@@ -7,7 +7,7 @@
   "main": "./dist/src/index.js",
   "scripts": {
     "build": "gulp build",
-    "test": "nyc --require babel-core/register mocha",
+    "test": "nyc --reporter=html --require babel-core/register mocha",
     "test-watch": "mocha -w"
   },
   "repository": {
