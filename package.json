@@ -7,7 +7,7 @@
   "main": "./dist/src/index.js",
   "scripts": {
     "build": "gulp build",
-    "test": "mocha",
+    "test": "nyc --require babel-core/register mocha",
     "test-watch": "mocha -w"
   },
   "repository": {
@@ -59,6 +59,7 @@
     "karma-spec-reporter": "0.0.23",
     "mocha": "^2.2.4",
     "nock": "5.0.0",
+    "nyc": "^6.1.1",
     "phantomjs": "^1.9.18",
     "phantomjs-polyfill": "0.0.1",
     "rollup": "^0.25.3",
