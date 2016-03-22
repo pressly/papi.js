@@ -2,29 +2,37 @@
 
 exports.__esModule = true;
 
-var _isArray = require('lodash/isArray');
+var _isEmpty2 = require('lodash/isEmpty');
 
-var _isArray2 = _interopRequireDefault(_isArray);
+var _isEmpty3 = _interopRequireDefault(_isEmpty2);
 
-var _assignIn = require('lodash/assignIn');
+var _isArray2 = require('lodash/isArray');
 
-var _assignIn2 = _interopRequireDefault(_assignIn);
+var _isArray3 = _interopRequireDefault(_isArray2);
 
-var _isObject = require('lodash/isObject');
+var _isObject2 = require('lodash/isObject');
 
-var _isObject2 = _interopRequireDefault(_isObject);
+var _isObject3 = _interopRequireDefault(_isObject2);
 
-var _last = require('lodash/last');
+var _last2 = require('lodash/last');
 
-var _last2 = _interopRequireDefault(_last);
+var _last3 = _interopRequireDefault(_last2);
 
-var _each = require('lodash/each');
+var _filter2 = require('lodash/filter');
 
-var _each2 = _interopRequireDefault(_each);
+var _filter3 = _interopRequireDefault(_filter2);
 
-var _map = require('lodash/map');
+var _each2 = require('lodash/each');
 
-var _map2 = _interopRequireDefault(_map);
+var _each3 = _interopRequireDefault(_each2);
+
+var _map2 = require('lodash/map');
+
+var _map3 = _interopRequireDefault(_map2);
+
+var _assignIn2 = require('lodash/assignIn');
+
+var _assignIn3 = _interopRequireDefault(_assignIn2);
 
 var _resource = require('./resource');
 
@@ -53,7 +61,7 @@ function capitalize(string) {
 }
 
 function classify(string) {
-  return singularize((0, _map2.default)(string.split("_"), function (s) {
+  return singularize((0, _map3.default)(string.split("_"), function (s) {
     return capitalize(s);
   }).join(''));
 }
@@ -98,7 +106,7 @@ var buildRoute = function buildRoute(resource) {
   }
 
   var params = {};
-  (0, _each2.default)(parseRouteParams(path), function (paramName) {
+  (0, _each3.default)(parseRouteParams(path), function (paramName) {
     params[paramName] = null;
   });
 
@@ -114,7 +122,7 @@ var buildRoute = function buildRoute(resource) {
 // Parses params out of a route ie. /hubs/:hubId/apps/:appId/styles/:id => ['hubId', 'appId', 'id']
 var reRouteParams = /:[^\/]+/gi;
 var parseRouteParams = function parseRouteParams(route) {
-  return (0, _map2.default)(route.match(reRouteParams), function (param) {
+  return (0, _map3.default)(route.match(reRouteParams), function (param) {
     return param.slice(1);
   });
 };
@@ -154,8 +162,8 @@ var ResourceSchema = function () {
       throw new Error("$resource: key is undefined");
     }
 
-    var name = (0, _last2.default)(key.split('.'));
-    var params = (0, _isObject2.default)(arguments[1]) && !(arguments[1] instanceof _resource2.default) ? arguments[1] : undefined;
+    var name = (0, _last3.default)(key.split('.'));
+    var params = (0, _isObject3.default)(arguments[1]) && !(arguments[1] instanceof _resource2.default) ? arguments[1] : undefined;
     var parentResource = arguments[2] || !params && arguments[1] || undefined;
 
     if (parentResource) {
@@ -253,9 +261,9 @@ ResourceSchema.defineSchema = function () {
 
               var data = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
 
-              return this.request((0, _assignIn2.default)({ method: method, action: action }, { data: data })).then(function (res) {
+              return this.request((0, _assignIn3.default)({ method: method, action: action }, { data: data })).then(function (res) {
 
-                if ((0, _isArray2.default)(res)) {
+                if ((0, _isArray3.default)(res)) {
                   return _this2.hydrateCollection(res);
                 } else {
                   return _this2.hydrateModel(res);
@@ -274,7 +282,7 @@ ResourceSchema.defineSchema = function () {
 
               var data = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
 
-              return this.request((0, _assignIn2.default)({ method: method, action: action }, { data: data })).then(function (res) {
+              return this.request((0, _assignIn3.default)({ method: method, action: action }, { data: data })).then(function (res) {
                 return _this3.hydrateModel(res);
               });
             };
@@ -314,7 +322,7 @@ ResourceSchema.defineSchema = function () {
     };
   };
 
-  return (0, _assignIn2.default)({}, pointer({}));
+  return (0, _assignIn3.default)({}, pointer({}));
 };
 
 // ResourceSchema.generateMarkdown = function() {

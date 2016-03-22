@@ -2,17 +2,17 @@
 
 exports.__esModule = true;
 
-var _pick = require('lodash/pick');
+var _isEmpty2 = require('lodash/isEmpty');
 
-var _pick2 = _interopRequireDefault(_pick);
+var _isEmpty3 = _interopRequireDefault(_isEmpty2);
 
-var _isEmpty = require('lodash/isEmpty');
+var _pick2 = require('lodash/pick');
 
-var _isEmpty2 = _interopRequireDefault(_isEmpty);
+var _pick3 = _interopRequireDefault(_pick2);
 
-var _every = require('lodash/every');
+var _every2 = require('lodash/every');
 
-var _every2 = _interopRequireDefault(_every);
+var _every3 = _interopRequireDefault(_every2);
 
 var _model = require('../model');
 
@@ -63,7 +63,7 @@ var Asset = function (_Model) {
   };
 
   Asset.prototype.isOriginal = function isOriginal() {
-    return (0, _every2.default)((0, _pick2.default)(this.source, 'network', 'uid', 'url'), _isEmpty2.default);
+    return (0, _every3.default)((0, _pick3.default)(this.source, 'network', 'uid', 'url'), _isEmpty3.default);
   };
 
   return Asset;

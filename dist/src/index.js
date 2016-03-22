@@ -1,12 +1,12 @@
 'use strict';
 
-var _isEmpty = require('lodash/isEmpty');
+var _isEmpty2 = require('lodash/isEmpty');
 
-var _isEmpty2 = _interopRequireDefault(_isEmpty);
+var _isEmpty3 = _interopRequireDefault(_isEmpty2);
 
-var _assignIn = require('lodash/assignIn');
+var _assignIn2 = require('lodash/assignIn');
 
-var _assignIn2 = _interopRequireDefault(_assignIn);
+var _assignIn3 = _interopRequireDefault(_assignIn2);
 
 var _promiz = require('promiz');
 
@@ -151,19 +151,19 @@ var Papi = function (_ResourceSchema) {
 
       // Query params to be added to the url
       if (options.query) {
-        (0, _assignIn2.default)(req.query, options.query);
+        (0, _assignIn3.default)(req.query, options.query);
       }
 
       // Data to send (with get requests these are converted into query params)
       if (options.data) {
         if (method == 'get') {
-          (0, _assignIn2.default)(req.query, options.data);
+          (0, _assignIn3.default)(req.query, options.data);
         } else {
           req.body = JSON.stringify(options.data);
         }
       }
 
-      if (!(0, _isEmpty2.default)(req.query)) {
+      if (!(0, _isEmpty3.default)(req.query)) {
         req.url += '?' + _querystring2.default.stringify(req.query);
       }
 
