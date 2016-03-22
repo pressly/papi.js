@@ -18,7 +18,7 @@
   "homepage": "https://github.com/pressly/papi.js",
   "dependencies": {
     "dodgy": "1.1.0",
-    "isomorphic-fetch": "2.2.0",
+    "isomorphic-fetch": "2.2.1",
     "lodash": "3.10.1",
     "promiz": "1.0.5",
     "querystring": "0.2.0"
