@@ -13,155 +13,206 @@ Object.defineProperty(exports, 'Base', {
 
 var _account = require('./account');
 
-Object.defineProperty(exports, 'Account', {
-  enumerable: true,
-  get: function get() {
-    return _interopRequireDefault(_account).default;
-  }
+Object.keys(_account).forEach(function (key) {
+  if (key === "default") return;
+  Object.defineProperty(exports, key, {
+    enumerable: true,
+    get: function get() {
+      return _account[key];
+    }
+  });
 });
 
 var _organization = require('./organization');
 
-Object.defineProperty(exports, 'Organization', {
-  enumerable: true,
-  get: function get() {
-    return _interopRequireDefault(_organization).default;
-  }
+Object.keys(_organization).forEach(function (key) {
+  if (key === "default") return;
+  Object.defineProperty(exports, key, {
+    enumerable: true,
+    get: function get() {
+      return _organization[key];
+    }
+  });
 });
 
 var _app = require('./app');
 
-Object.defineProperty(exports, 'App', {
-  enumerable: true,
-  get: function get() {
-    return _interopRequireDefault(_app).default;
-  }
+Object.keys(_app).forEach(function (key) {
+  if (key === "default") return;
+  Object.defineProperty(exports, key, {
+    enumerable: true,
+    get: function get() {
+      return _app[key];
+    }
+  });
 });
 
 var _asset = require('./asset');
 
-Object.defineProperty(exports, 'Asset', {
-  enumerable: true,
-  get: function get() {
-    return _interopRequireDefault(_asset).default;
-  }
+Object.keys(_asset).forEach(function (key) {
+  if (key === "default") return;
+  Object.defineProperty(exports, key, {
+    enumerable: true,
+    get: function get() {
+      return _asset[key];
+    }
+  });
 });
 
 var _codeRevision = require('./code-revision');
 
-Object.defineProperty(exports, 'CodeRevision', {
-  enumerable: true,
-  get: function get() {
-    return _interopRequireDefault(_codeRevision).default;
-  }
+Object.keys(_codeRevision).forEach(function (key) {
+  if (key === "default") return;
+  Object.defineProperty(exports, key, {
+    enumerable: true,
+    get: function get() {
+      return _codeRevision[key];
+    }
+  });
 });
 
 var _collection = require('./collection');
 
-Object.defineProperty(exports, 'Collection', {
-  enumerable: true,
-  get: function get() {
-    return _interopRequireDefault(_collection).default;
-  }
+Object.keys(_collection).forEach(function (key) {
+  if (key === "default") return;
+  Object.defineProperty(exports, key, {
+    enumerable: true,
+    get: function get() {
+      return _collection[key];
+    }
+  });
 });
 
 var _comment = require('./comment');
 
-Object.defineProperty(exports, 'Comment', {
-  enumerable: true,
-  get: function get() {
-    return _interopRequireDefault(_comment).default;
-  }
+Object.keys(_comment).forEach(function (key) {
+  if (key === "default") return;
+  Object.defineProperty(exports, key, {
+    enumerable: true,
+    get: function get() {
+      return _comment[key];
+    }
+  });
 });
 
 var _draft = require('./draft');
 
-Object.defineProperty(exports, 'Draft', {
-  enumerable: true,
-  get: function get() {
-    return _interopRequireDefault(_draft).default;
-  }
+Object.keys(_draft).forEach(function (key) {
+  if (key === "default") return;
+  Object.defineProperty(exports, key, {
+    enumerable: true,
+    get: function get() {
+      return _draft[key];
+    }
+  });
 });
 
 var _feed = require('./feed');
 
-Object.defineProperty(exports, 'Feed', {
-  enumerable: true,
-  get: function get() {
-    return _interopRequireDefault(_feed).default;
-  }
+Object.keys(_feed).forEach(function (key) {
+  if (key === "default") return;
+  Object.defineProperty(exports, key, {
+    enumerable: true,
+    get: function get() {
+      return _feed[key];
+    }
+  });
 });
 
 var _feedAsset = require('./feed-asset');
 
-Object.defineProperty(exports, 'FeedAsset', {
-  enumerable: true,
-  get: function get() {
-    return _interopRequireDefault(_feedAsset).default;
-  }
+Object.keys(_feedAsset).forEach(function (key) {
+  if (key === "default") return;
+  Object.defineProperty(exports, key, {
+    enumerable: true,
+    get: function get() {
+      return _feedAsset[key];
+    }
+  });
 });
 
 var _hub = require('./hub');
 
-Object.defineProperty(exports, 'Hub', {
-  enumerable: true,
-  get: function get() {
-    return _interopRequireDefault(_hub).default;
-  }
+Object.keys(_hub).forEach(function (key) {
+  if (key === "default") return;
+  Object.defineProperty(exports, key, {
+    enumerable: true,
+    get: function get() {
+      return _hub[key];
+    }
+  });
 });
 
 var _invite = require('./invite');
 
-Object.defineProperty(exports, 'Invite', {
-  enumerable: true,
-  get: function get() {
-    return _interopRequireDefault(_invite).default;
-  }
+Object.keys(_invite).forEach(function (key) {
+  if (key === "default") return;
+  Object.defineProperty(exports, key, {
+    enumerable: true,
+    get: function get() {
+      return _invite[key];
+    }
+  });
 });
 
 var _like = require('./like');
 
-Object.defineProperty(exports, 'Like', {
-  enumerable: true,
-  get: function get() {
-    return _interopRequireDefault(_like).default;
-  }
+Object.keys(_like).forEach(function (key) {
+  if (key === "default") return;
+  Object.defineProperty(exports, key, {
+    enumerable: true,
+    get: function get() {
+      return _like[key];
+    }
+  });
 });
 
 var _recommendation = require('./recommendation');
 
-Object.defineProperty(exports, 'Recommendation', {
-  enumerable: true,
-  get: function get() {
-    return _interopRequireDefault(_recommendation).default;
-  }
+Object.keys(_recommendation).forEach(function (key) {
+  if (key === "default") return;
+  Object.defineProperty(exports, key, {
+    enumerable: true,
+    get: function get() {
+      return _recommendation[key];
+    }
+  });
 });
 
 var _style = require('./style');
 
-Object.defineProperty(exports, 'Style', {
-  enumerable: true,
-  get: function get() {
-    return _interopRequireDefault(_style).default;
-  }
+Object.keys(_style).forEach(function (key) {
+  if (key === "default") return;
+  Object.defineProperty(exports, key, {
+    enumerable: true,
+    get: function get() {
+      return _style[key];
+    }
+  });
 });
 
 var _tag = require('./tag');
 
-Object.defineProperty(exports, 'Tag', {
-  enumerable: true,
-  get: function get() {
-    return _interopRequireDefault(_tag).default;
-  }
+Object.keys(_tag).forEach(function (key) {
+  if (key === "default") return;
+  Object.defineProperty(exports, key, {
+    enumerable: true,
+    get: function get() {
+      return _tag[key];
+    }
+  });
 });
 
 var _user = require('./user');
 
-Object.defineProperty(exports, 'User', {
-  enumerable: true,
-  get: function get() {
-    return _interopRequireDefault(_user).default;
-  }
+Object.keys(_user).forEach(function (key) {
+  if (key === "default") return;
+  Object.defineProperty(exports, key, {
+    enumerable: true,
+    get: function get() {
+      return _user[key];
+    }
+  });
 });
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }

@@ -330,6 +330,7 @@ exports.default = Model;
 'use strict';
 
 exports.__esModule = true;
+exports.Account = undefined;
 
 var _model = require('../model');
 
@@ -343,7 +344,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var Account = function (_Model) {
+var Account = exports.Account = function (_Model) {
   _inherits(Account, _Model);
 
   function Account() {
@@ -354,12 +355,11 @@ var Account = function (_Model) {
 
   return Account;
 }(_model2.default);
-
-exports.default = Account;
 },{"../model":2}],4:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
+exports.App = undefined;
 
 var _model = require('../model');
 
@@ -373,7 +373,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var App = function (_Model) {
+var App = exports.App = function (_Model) {
   _inherits(App, _Model);
 
   function App() {
@@ -384,12 +384,11 @@ var App = function (_Model) {
 
   return App;
 }(_model2.default);
-
-exports.default = App;
 },{"../model":2}],5:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
+exports.Asset = undefined;
 
 var _isEmpty2 = require('lodash/isEmpty');
 
@@ -422,7 +421,7 @@ var DISPLAY_STATES = {
   LOCKED: 8
 };
 
-var Asset = function (_Model) {
+var Asset = exports.Asset = function (_Model) {
   _inherits(Asset, _Model);
 
   function Asset() {
@@ -457,12 +456,11 @@ var Asset = function (_Model) {
 
   return Asset;
 }(_model2.default);
-
-exports.default = Asset;
 },{"../model":2,"lodash/every":152,"lodash/isEmpty":165,"lodash/pick":179}],6:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
+exports.CodeRevision = undefined;
 
 var _model = require('../model');
 
@@ -476,7 +474,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var CodeRevision = function (_Model) {
+var CodeRevision = exports.CodeRevision = function (_Model) {
   _inherits(CodeRevision, _Model);
 
   function CodeRevision() {
@@ -487,12 +485,11 @@ var CodeRevision = function (_Model) {
 
   return CodeRevision;
 }(_model2.default);
-
-exports.default = CodeRevision;
 },{"../model":2}],7:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
+exports.Collection = undefined;
 
 var _model = require('../model');
 
@@ -506,7 +503,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var Collection = function (_Model) {
+var Collection = exports.Collection = function (_Model) {
   _inherits(Collection, _Model);
 
   function Collection() {
@@ -517,12 +514,11 @@ var Collection = function (_Model) {
 
   return Collection;
 }(_model2.default);
-
-exports.default = Collection;
 },{"../model":2}],8:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
+exports.Comment = undefined;
 
 var _model = require('../model');
 
@@ -536,7 +532,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var Comment = function (_Model) {
+var Comment = exports.Comment = function (_Model) {
   _inherits(Comment, _Model);
 
   function Comment() {
@@ -547,12 +543,11 @@ var Comment = function (_Model) {
 
   return Comment;
 }(_model2.default);
-
-exports.default = Comment;
 },{"../model":2}],9:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
+exports.Draft = undefined;
 
 var _model = require('../model');
 
@@ -566,7 +561,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var Draft = function (_Model) {
+var Draft = exports.Draft = function (_Model) {
   _inherits(Draft, _Model);
 
   function Draft() {
@@ -577,12 +572,11 @@ var Draft = function (_Model) {
 
   return Draft;
 }(_model2.default);
-
-exports.default = Draft;
 },{"../model":2}],10:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
+exports.FeedAsset = undefined;
 
 var _model = require('../model');
 
@@ -596,7 +590,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var FeedAsset = function (_Model) {
+var FeedAsset = exports.FeedAsset = function (_Model) {
   _inherits(FeedAsset, _Model);
 
   function FeedAsset() {
@@ -607,12 +601,11 @@ var FeedAsset = function (_Model) {
 
   return FeedAsset;
 }(_model2.default);
-
-exports.default = FeedAsset;
 },{"../model":2}],11:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
+exports.Feed = undefined;
 
 var _model = require('../model');
 
@@ -626,7 +619,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var Feed = function (_Model) {
+var Feed = exports.Feed = function (_Model) {
   _inherits(Feed, _Model);
 
   function Feed() {
@@ -637,12 +630,11 @@ var Feed = function (_Model) {
 
   return Feed;
 }(_model2.default);
-
-exports.default = Feed;
 },{"../model":2}],12:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
+exports.Hub = undefined;
 
 var _model = require('../model');
 
@@ -656,7 +648,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var Hub = function (_Model) {
+var Hub = exports.Hub = function (_Model) {
   _inherits(Hub, _Model);
 
   function Hub() {
@@ -667,8 +659,6 @@ var Hub = function (_Model) {
 
   return Hub;
 }(_model2.default);
-
-exports.default = Hub;
 },{"../model":2}],13:[function(require,module,exports){
 'use strict';
 
@@ -685,155 +675,206 @@ Object.defineProperty(exports, 'Base', {
 
 var _account = require('./account');
 
-Object.defineProperty(exports, 'Account', {
-  enumerable: true,
-  get: function get() {
-    return _interopRequireDefault(_account).default;
-  }
+Object.keys(_account).forEach(function (key) {
+  if (key === "default") return;
+  Object.defineProperty(exports, key, {
+    enumerable: true,
+    get: function get() {
+      return _account[key];
+    }
+  });
 });
 
 var _organization = require('./organization');
 
-Object.defineProperty(exports, 'Organization', {
-  enumerable: true,
-  get: function get() {
-    return _interopRequireDefault(_organization).default;
-  }
+Object.keys(_organization).forEach(function (key) {
+  if (key === "default") return;
+  Object.defineProperty(exports, key, {
+    enumerable: true,
+    get: function get() {
+      return _organization[key];
+    }
+  });
 });
 
 var _app = require('./app');
 
-Object.defineProperty(exports, 'App', {
-  enumerable: true,
-  get: function get() {
-    return _interopRequireDefault(_app).default;
-  }
+Object.keys(_app).forEach(function (key) {
+  if (key === "default") return;
+  Object.defineProperty(exports, key, {
+    enumerable: true,
+    get: function get() {
+      return _app[key];
+    }
+  });
 });
 
 var _asset = require('./asset');
 
-Object.defineProperty(exports, 'Asset', {
-  enumerable: true,
-  get: function get() {
-    return _interopRequireDefault(_asset).default;
-  }
+Object.keys(_asset).forEach(function (key) {
+  if (key === "default") return;
+  Object.defineProperty(exports, key, {
+    enumerable: true,
+    get: function get() {
+      return _asset[key];
+    }
+  });
 });
 
 var _codeRevision = require('./code-revision');
 
-Object.defineProperty(exports, 'CodeRevision', {
-  enumerable: true,
-  get: function get() {
-    return _interopRequireDefault(_codeRevision).default;
-  }
+Object.keys(_codeRevision).forEach(function (key) {
+  if (key === "default") return;
+  Object.defineProperty(exports, key, {
+    enumerable: true,
+    get: function get() {
+      return _codeRevision[key];
+    }
+  });
 });
 
 var _collection = require('./collection');
 
-Object.defineProperty(exports, 'Collection', {
-  enumerable: true,
-  get: function get() {
-    return _interopRequireDefault(_collection).default;
-  }
+Object.keys(_collection).forEach(function (key) {
+  if (key === "default") return;
+  Object.defineProperty(exports, key, {
+    enumerable: true,
+    get: function get() {
+      return _collection[key];
+    }
+  });
 });
 
 var _comment = require('./comment');
 
-Object.defineProperty(exports, 'Comment', {
-  enumerable: true,
-  get: function get() {
-    return _interopRequireDefault(_comment).default;
-  }
+Object.keys(_comment).forEach(function (key) {
+  if (key === "default") return;
+  Object.defineProperty(exports, key, {
+    enumerable: true,
+    get: function get() {
+      return _comment[key];
+    }
+  });
 });
 
 var _draft = require('./draft');
 
-Object.defineProperty(exports, 'Draft', {
-  enumerable: true,
-  get: function get() {
-    return _interopRequireDefault(_draft).default;
-  }
+Object.keys(_draft).forEach(function (key) {
+  if (key === "default") return;
+  Object.defineProperty(exports, key, {
+    enumerable: true,
+    get: function get() {
+      return _draft[key];
+    }
+  });
 });
 
 var _feed = require('./feed');
 
-Object.defineProperty(exports, 'Feed', {
-  enumerable: true,
-  get: function get() {
-    return _interopRequireDefault(_feed).default;
-  }
+Object.keys(_feed).forEach(function (key) {
+  if (key === "default") return;
+  Object.defineProperty(exports, key, {
+    enumerable: true,
+    get: function get() {
+      return _feed[key];
+    }
+  });
 });
 
 var _feedAsset = require('./feed-asset');
 
-Object.defineProperty(exports, 'FeedAsset', {
-  enumerable: true,
-  get: function get() {
-    return _interopRequireDefault(_feedAsset).default;
-  }
+Object.keys(_feedAsset).forEach(function (key) {
+  if (key === "default") return;
+  Object.defineProperty(exports, key, {
+    enumerable: true,
+    get: function get() {
+      return _feedAsset[key];
+    }
+  });
 });
 
 var _hub = require('./hub');
 
-Object.defineProperty(exports, 'Hub', {
-  enumerable: true,
-  get: function get() {
-    return _interopRequireDefault(_hub).default;
-  }
+Object.keys(_hub).forEach(function (key) {
+  if (key === "default") return;
+  Object.defineProperty(exports, key, {
+    enumerable: true,
+    get: function get() {
+      return _hub[key];
+    }
+  });
 });
 
 var _invite = require('./invite');
 
-Object.defineProperty(exports, 'Invite', {
-  enumerable: true,
-  get: function get() {
-    return _interopRequireDefault(_invite).default;
-  }
+Object.keys(_invite).forEach(function (key) {
+  if (key === "default") return;
+  Object.defineProperty(exports, key, {
+    enumerable: true,
+    get: function get() {
+      return _invite[key];
+    }
+  });
 });
 
 var _like = require('./like');
 
-Object.defineProperty(exports, 'Like', {
-  enumerable: true,
-  get: function get() {
-    return _interopRequireDefault(_like).default;
-  }
+Object.keys(_like).forEach(function (key) {
+  if (key === "default") return;
+  Object.defineProperty(exports, key, {
+    enumerable: true,
+    get: function get() {
+      return _like[key];
+    }
+  });
 });
 
 var _recommendation = require('./recommendation');
 
-Object.defineProperty(exports, 'Recommendation', {
-  enumerable: true,
-  get: function get() {
-    return _interopRequireDefault(_recommendation).default;
-  }
+Object.keys(_recommendation).forEach(function (key) {
+  if (key === "default") return;
+  Object.defineProperty(exports, key, {
+    enumerable: true,
+    get: function get() {
+      return _recommendation[key];
+    }
+  });
 });
 
 var _style = require('./style');
 
-Object.defineProperty(exports, 'Style', {
-  enumerable: true,
-  get: function get() {
-    return _interopRequireDefault(_style).default;
-  }
+Object.keys(_style).forEach(function (key) {
+  if (key === "default") return;
+  Object.defineProperty(exports, key, {
+    enumerable: true,
+    get: function get() {
+      return _style[key];
+    }
+  });
 });
 
 var _tag = require('./tag');
 
-Object.defineProperty(exports, 'Tag', {
-  enumerable: true,
-  get: function get() {
-    return _interopRequireDefault(_tag).default;
-  }
+Object.keys(_tag).forEach(function (key) {
+  if (key === "default") return;
+  Object.defineProperty(exports, key, {
+    enumerable: true,
+    get: function get() {
+      return _tag[key];
+    }
+  });
 });
 
 var _user = require('./user');
 
-Object.defineProperty(exports, 'User', {
-  enumerable: true,
-  get: function get() {
-    return _interopRequireDefault(_user).default;
-  }
+Object.keys(_user).forEach(function (key) {
+  if (key === "default") return;
+  Object.defineProperty(exports, key, {
+    enumerable: true,
+    get: function get() {
+      return _user[key];
+    }
+  });
 });
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
@@ -841,6 +882,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 'use strict';
 
 exports.__esModule = true;
+exports.Invite = undefined;
 
 var _model = require('../model');
 
@@ -854,7 +896,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var Invite = function (_Model) {
+var Invite = exports.Invite = function (_Model) {
   _inherits(Invite, _Model);
 
   function Invite() {
@@ -865,12 +907,11 @@ var Invite = function (_Model) {
 
   return Invite;
 }(_model2.default);
-
-exports.default = Invite;
 },{"../model":2}],15:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
+exports.Like = undefined;
 
 var _model = require('../model');
 
@@ -884,7 +925,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var Like = function (_Model) {
+var Like = exports.Like = function (_Model) {
   _inherits(Like, _Model);
 
   function Like() {
@@ -895,12 +936,11 @@ var Like = function (_Model) {
 
   return Like;
 }(_model2.default);
-
-exports.default = Like;
 },{"../model":2}],16:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
+exports.Organization = undefined;
 
 var _model = require('../model');
 
@@ -914,7 +954,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var Organization = function (_Model) {
+var Organization = exports.Organization = function (_Model) {
   _inherits(Organization, _Model);
 
   function Organization() {
@@ -925,12 +965,11 @@ var Organization = function (_Model) {
 
   return Organization;
 }(_model2.default);
-
-exports.default = Organization;
 },{"../model":2}],17:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
+exports.Recommendation = undefined;
 
 var _model = require('../model');
 
@@ -944,7 +983,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var Recommendation = function (_Model) {
+var Recommendation = exports.Recommendation = function (_Model) {
   _inherits(Recommendation, _Model);
 
   function Recommendation() {
@@ -955,12 +994,11 @@ var Recommendation = function (_Model) {
 
   return Recommendation;
 }(_model2.default);
-
-exports.default = Recommendation;
 },{"../model":2}],18:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
+exports.Style = undefined;
 
 var _model = require('../model');
 
@@ -974,7 +1012,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var Style = function (_Model) {
+var Style = exports.Style = function (_Model) {
   _inherits(Style, _Model);
 
   function Style() {
@@ -985,12 +1023,11 @@ var Style = function (_Model) {
 
   return Style;
 }(_model2.default);
-
-exports.default = Style;
 },{"../model":2}],19:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
+exports.Tag = undefined;
 
 var _model = require('../model');
 
@@ -1004,7 +1041,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var Tag = function (_Model) {
+var Tag = exports.Tag = function (_Model) {
   _inherits(Tag, _Model);
 
   function Tag() {
@@ -1015,12 +1052,11 @@ var Tag = function (_Model) {
 
   return Tag;
 }(_model2.default);
-
-exports.default = Tag;
 },{"../model":2}],20:[function(require,module,exports){
 'use strict';
 
 exports.__esModule = true;
+exports.User = undefined;
 
 var _model = require('../model');
 
@@ -1034,7 +1070,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var User = function (_Model) {
+var User = exports.User = function (_Model) {
   _inherits(User, _Model);
 
   function User() {
@@ -1049,8 +1085,6 @@ var User = function (_Model) {
 
   return User;
 }(_model2.default);
-
-exports.default = User;
 },{"../model":2}],21:[function(require,module,exports){
 'use strict';
 

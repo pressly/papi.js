@@ -1,6 +1,7 @@
 'use strict';
 
 exports.__esModule = true;
+exports.Organization = undefined;
 
 var _model = require('../model');
 
@@ -14,7 +15,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var Organization = function (_Model) {
+var Organization = exports.Organization = function (_Model) {
   _inherits(Organization, _Model);
 
   function Organization() {
@@ -25,5 +26,3 @@ var Organization = function (_Model) {
 
   return Organization;
 }(_model2.default);
-
-exports.default = Organization;

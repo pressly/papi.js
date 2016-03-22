@@ -1,6 +1,7 @@
 'use strict';
 
 exports.__esModule = true;
+exports.Asset = undefined;
 
 var _isEmpty2 = require('lodash/isEmpty');
 
@@ -33,7 +34,7 @@ var DISPLAY_STATES = {
   LOCKED: 8
 };
 
-var Asset = function (_Model) {
+var Asset = exports.Asset = function (_Model) {
   _inherits(Asset, _Model);
 
   function Asset() {
@@ -68,5 +69,3 @@ var Asset = function (_Model) {
 
   return Asset;
 }(_model2.default);
-
-exports.default = Asset;
