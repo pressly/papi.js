@@ -44,7 +44,7 @@ gulp.task('build:bundle-babelify', function () {
 
 /** DIST **********************************************************************/
 gulp.task('dist', ['build'], function(cb) {
-  return runSequence('dist:clean', 'dist:copy', 'dist:minify', 'dist:xdomain', cb);
+  return runSequence('dist:clean', 'dist:copy', 'dist:minify', cb);
 });
 
 gulp.task('dist:clean', function(cb) {
@@ -67,31 +67,6 @@ gulp.task('dist:minify', function() {
   .pipe(require('gulp-size')({showFiles: true, gzip: true}))
   .pipe(gulp.dest('dist'));
 });
-
-gulp.task('dist:ie8', function() {
-  return gulp.src(['lib/xdomain.js', 'lib/es5-shim.js', 'lib/es5-sham.js', 'build/papi.js'])
-  .pipe(require('gulp-concat')('papi.ie8.js'))
-  .pipe(gulp.dest('dist'))
-  .pipe(require('gulp-size')({showFiles: true}))
-  .pipe(require('gulp-rename')('papi.ie8.min.js'))
-  .pipe(require('gulp-uglify')({mangle: false, preserveComments: 'some'}))
-  .pipe(require('gulp-size')({showFiles: true}))
-  .pipe(require('gulp-size')({showFiles: true, gzip: true}))
-  .pipe(gulp.dest('dist'));
-});
-
-gulp.task('dist:xdomain', function() {
-  return gulp.src(['lib/xdomain.js', 'build/papi.js'])
-  .pipe(require('gulp-concat')('papi.xdomain.js'))
-  .pipe(gulp.dest('dist'))
-  .pipe(require('gulp-size')({showFiles: true}))
-  .pipe(require('gulp-rename')('papi.xdomain.min.js'))
-  .pipe(require('gulp-uglify')({mangle: false, preserveComments: 'some'}))
-  .pipe(require('gulp-size')({showFiles: true}))
-  .pipe(require('gulp-size')({showFiles: true, gzip: true}))
-  .pipe(gulp.dest('dist'));
-});
-
 
 /** WATCH and SERVER **********************************************************/
 gulp.task('connect', function() {

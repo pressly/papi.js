@@ -1138,10 +1138,6 @@ if (!global.fetch) {
   global.fetch = require('isomorphic-fetch');
 }
 
-function hasXDomain() {
-  return typeof window !== 'undefined' && window.xdomain != null;
-}
-
 var Papi = function (_ResourceSchema) {
   _inherits(Papi, _ResourceSchema);
 
@@ -1154,12 +1150,6 @@ var Papi = function (_ResourceSchema) {
 
     _this28.options = options;
     _this28.options.host = options.host || 'https://api.pressly.com';
-
-    if (hasXDomain()) {
-      var slaves = {};
-      slaves[_this28.options.host] = '/proxy.html';
-      window.xdomain.slaves(slaves);
-    }
 
     _this28.requestMiddlewares = [];
     _this28.responseMiddlewares = [];
@@ -1243,7 +1233,7 @@ var Papi = function (_ResourceSchema) {
       // }
 
       // Allow sending cookies from origin
-      if (typeof req.withCredentials == 'function' && !hasXDomain()) {
+      if (typeof req.withCredentials == 'function') {
         req.credentials = 'include';
       }
 

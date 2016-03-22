@@ -16,10 +16,6 @@ import qs from 'querystring';
 
 import {extend, isEmpty} from 'lodash';
 
-function hasXDomain() {
-  return typeof window !== 'undefined' && window.xdomain != null;
-}
-
 import ResourceSchema from './resource-schema';
 
 class Papi extends ResourceSchema {
@@ -28,12 +24,6 @@ class Papi extends ResourceSchema {
 
     this.options = options;
     this.options.host = (options.host || 'https://api.pressly.com');
-
-    if (hasXDomain()) {
-      var slaves = {};
-      slaves[this.options.host] = '/proxy.html';
-      window.xdomain.slaves(slaves);
-    }
 
     this.requestMiddlewares = [];
     this.responseMiddlewares = [];
@@ -112,7 +102,7 @@ class Papi extends ResourceSchema {
       // }
 
       // Allow sending cookies from origin
-      if (typeof req.withCredentials == 'function' && !hasXDomain()) {
+      if (typeof req.withCredentials == 'function') {
         req.credentials = 'include'
       }
 
