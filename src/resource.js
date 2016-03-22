@@ -1,6 +1,6 @@
 'use strict'
 
-import {map, each, detect, where, findWhere, extend, clone, isEmpty, isArray, isObject, isNumber} from 'lodash';
+import {map, each, find, filter, extend, clone, isEmpty, isArray, isObject, isNumber} from 'lodash';
 
 function deepClone(obj) {
   return JSON.parse(JSON.stringify(obj));
@@ -273,17 +273,17 @@ export default class Resource {
       },
 
       $find: (id) => {
-        return detect(collection, (item) => {
+        return find(collection, (item) => {
           return item.id == id;
         });
       },
 
       $findWhere: (params) => {
-        return findWhere(collection, params);
+        return find(collection, params);
       },
 
       $where: (params) => {
-        return where(collection, params);
+        return filter(collection, params);
       },
 
       $create: (data = {}) => {

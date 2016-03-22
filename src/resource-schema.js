@@ -1,6 +1,6 @@
 'use strict'
 
-import {map, each, select, extend, last, isObject, isArray, isEmpty} from 'lodash';
+import {map, each, filter, extend, last, isObject, isArray, isEmpty} from 'lodash';
 
 import Resource from './resource';
 import * as models from './models/index';
@@ -292,11 +292,11 @@ ResourceSchema.defineSchema = function() {
 //     markdown += `- \`DELETE\` ${def.route.path}\n\n`;
 //
 //     if (!isEmpty(def.actions)) {
-//       let memberActions = select(def.actions, (action) => {
+//       let memberActions = filter(def.actions, (action) => {
 //         return action.options.on == 'member';
 //       });
 //
-//       let collectionActions = select(def.actions, (action) => {
+//       let collectionActions = filter(def.actions, (action) => {
 //         return action.options.on == 'collection';
 //       });
 //
