@@ -1221,14 +1221,6 @@ var _isEmpty3 = _interopRequireDefault(_isEmpty2);
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
 
-var _promiz = require('promiz');
-
-var _promiz2 = _interopRequireDefault(_promiz);
-
-var _isomorphicFetch = require('isomorphic-fetch');
-
-var _isomorphicFetch2 = _interopRequireDefault(_isomorphicFetch);
-
 var _querystring = require('querystring');
 
 var _querystring2 = _interopRequireDefault(_querystring);
@@ -2290,13 +2282,13 @@ ResourceSchema.defineSchema = function () {
 // };
 
 if (!global.Promise) {
-  global.Promise = _promiz2.default;
+  global.Promise = require('promiz');
 }
 
 var AbortablePromise = require('dodgy');
 
 if (!global.fetch) {
-  global.fetch = _isomorphicFetch2.default;
+  global.fetch = require('isomorphic-fetch');
 }
 
 function hasXDomain() {
