@@ -1,15 +1,13 @@
 'use strict';
 
-import _Promise from 'promiz';
 if (!global.Promise) {
-  global.Promise = _Promise;
+  global.Promise = require('promiz');
 }
 
 let AbortablePromise = require('dodgy');
 
-import _fetch from 'isomorphic-fetch';
 if (!global.fetch) {
-  global.fetch = _fetch;
+  global.fetch = require('isomorphic-fetch');
 }
 
 // Query string parser and stringifier -- fetch does not support any query string
