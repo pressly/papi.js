@@ -1,4 +1,4 @@
 import Model from '../model';
 
-export default class Invite extends Model {
+export class Invite extends Model {
 }
