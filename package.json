@@ -16,9 +16,9 @@
   "license": "MIT",
   "homepage": "https://github.com/pressly/papi.js",
   "dependencies": {
-    "isomorphic-fetch": "2.2.0",
-    "lodash": "4.3.0",
-    "promiz": "^1.0.5",
+    "isomorphic-fetch": "2.2.1",
+    "lodash": "4.6.1",
+    "promiz": "1.0.5",
     "querystring": "0.2.0"
   },
   "devDependencies": {
