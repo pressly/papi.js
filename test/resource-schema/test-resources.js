@@ -15,10 +15,26 @@ api.auth.set({jwt: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNTRmMGR
 mockRequest.config({host: api.options.host});
 
 describe('Resources', function() {
-  it('should validate that the resource exists', function(done) {
+  it('should throw if resource key does not exist', function(done) {
     should.throws(function() {
-      api.$resource('hubs.nothing');
+      var resource = api.$resource('hubs.nothing');
     });
+
+    done();
+  });
+
+  it('should return a resource if key exists', function(done) {
+    var resource = api.$resource('hubs');
+    resource.name.should.equal('hubs');
+    resource.constructor.modelClass.should.equal(models.Hub);
+
+    done();
+  });
+
+  it('should return a child resource if key exists', function(done) {
+    var resource = api.$resource('hubs.assets');
+    resource.name.should.equal('assets');
+    resource.constructor.modelClass.should.equal(models.Asset);
 
     done();
   });
@@ -32,12 +48,16 @@ describe('Resources', function() {
     done();
   });
 
-  // it('should validate route params are set before request', function(done) {
-  //   var model = api.$resource('hubs.assets').$create({title: 'New Article'});
-  //   model.should.be.instanceOf(models.Asset);
-  //   model.title.should.equal('New Article');
-  //   should(model.$newRecord).equal(true);
-  //
-  //   done();
-  // });
+  it('should validate route params are set before request', function(done) {
+    var model = api.$resource('hubs.assets').$create({title: 'New Article'});
+    model.should.be.instanceOf(models.Asset);
+    model.title.should.equal('New Article');
+    should(model.$newRecord).equal(true);
+
+    should.throws(function() {
+      model.$save();
+    });
+
+    done();
+  });
 });

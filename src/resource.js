@@ -89,6 +89,10 @@ export default class Resource {
     var route = this.route.segments.join('');
 
     each(this.route.params, (value, paramName) => {
+      if (!value && this.route.segments.length > 1 && paramName !== this.route.paramName) {
+        throw new Error(`$resource: Can't make request because route was missing '${paramName}' param.`);
+      }
+
       route = route.replace('/:' + paramName, value ? '/' + value : '');
     });
 
@@ -196,7 +200,9 @@ export default class Resource {
 
     // Update actions route params
     each(this.actions, (action) => {
-      this.route.params[action.options.paramName] = data[action.options.paramName];
+      if (action.options.paramName) {
+        this.route.params[action.options.paramName] = data[action.options.paramName];
+      }
     });
   }
 
