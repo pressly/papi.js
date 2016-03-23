@@ -123,7 +123,13 @@ export default class ResourceSchema {
       key = parentResource.key + '.' + name;
     }
 
-    return new this.constructor.resourceClasses[key](this, parentResource).includeParams(params);
+    var resourceClass = this.constructor.resourceClasses[key];
+
+    if (typeof resourceClass == 'undefined') {
+      throw new Error(`$resource: key '${key}' does not exist in schema.`);
+    }
+
+    return new resourceClass(this, parentResource).includeParams(params);
   }
 };
 
