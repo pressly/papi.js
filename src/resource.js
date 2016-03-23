@@ -1,6 +1,6 @@
 'use strict'
 
-import {map, each, find, filter, extend, clone, isEmpty, isArray, isObject, isNumber} from 'lodash';
+import {map, each, find, filter, clone, isEmpty, isArray, isObject, isNumber} from 'lodash';
 
 function deepClone(obj) {
   return JSON.parse(JSON.stringify(obj));
@@ -60,7 +60,7 @@ export default class Resource {
         parentParams[paramName] = value;
       });
 
-      extend(this.route.params, parentParams);
+      Object.assign(this.route.params, parentParams);
 
       if (inherit) {
         this.route.queryParams = clone(parentResource.route.queryParams);
@@ -79,7 +79,7 @@ export default class Resource {
   request(options = {}) {
     var path = options.action ? this.buildActionPath(options.action) : this.buildPath();
 
-    return this.api.request(options.method || 'get', path, extend({}, this.options, { query: extend({}, this.route.queryParams, options.query), data: options.data })).then((res) => {
+    return this.api.request(options.method || 'get', path, Object.assign({}, this.options, { query: Object.assign({}, this.route.queryParams, options.query), data: options.data })).then((res) => {
       this.setResponse(res);
       return res.data;
     });
@@ -127,7 +127,7 @@ export default class Resource {
   }
 
   query(params) {
-    extend(this.route.queryParams, params);
+    Object.assign(this.route.queryParams, params);
 
     return this;
   }
@@ -353,7 +353,7 @@ export default class Resource {
       }
     };
 
-    extend(collection, methods);
+    Object.assign(collection, methods);
 
     return collection;
   }

@@ -56,10 +56,6 @@ var _map2 = require('lodash/map');
 
 var _map3 = _interopRequireDefault(_map2);
 
-var _extend2 = require('lodash/extend');
-
-var _extend3 = _interopRequireDefault(_extend2);
-
 var _isEmpty2 = require('lodash/isEmpty');
 
 var _isEmpty3 = _interopRequireDefault(_isEmpty2);
@@ -148,7 +144,7 @@ var Resource = function () {
         parentParams[paramName] = value;
       });
 
-      (0, _extend3.default)(this.route.params, parentParams);
+      Object.assign(this.route.params, parentParams);
 
       if (inherit) {
         this.route.queryParams = (0, _clone3.default)(parentResource.route.queryParams);
@@ -173,7 +169,7 @@ var Resource = function () {
 
     var path = options.action ? this.buildActionPath(options.action) : this.buildPath();
 
-    return this.api.request(options.method || 'get', path, (0, _extend3.default)({}, this.options, { query: (0, _extend3.default)({}, this.route.queryParams, options.query), data: options.data })).then(function (res) {
+    return this.api.request(options.method || 'get', path, Object.assign({}, this.options, { query: Object.assign({}, this.route.queryParams, options.query), data: options.data })).then(function (res) {
       _this2.setResponse(res);
       return res.data;
     });
@@ -223,7 +219,7 @@ var Resource = function () {
   };
 
   Resource.prototype.query = function query(params) {
-    (0, _extend3.default)(this.route.queryParams, params);
+    Object.assign(this.route.queryParams, params);
 
     return this;
   };
@@ -472,7 +468,7 @@ var Resource = function () {
       }
     };
 
-    (0, _extend3.default)(collection, methods);
+    Object.assign(collection, methods);
 
     return collection;
   };
@@ -486,7 +482,7 @@ var Model = function () {
 
     _classCallCheck(this, Model);
 
-    (0, _extend3.default)(this, data);
+    Object.assign(this, data);
 
     this.$newRecord = true;
   }
@@ -504,7 +500,7 @@ var Model = function () {
       _this7.$newRecord = false;
       _this7.$resource().sync(res);
 
-      return (0, _extend3.default)(_this7, res);
+      return Object.assign(_this7, res);
     });
   };
 
@@ -989,7 +985,7 @@ ResourceSchema.defineSchema = function () {
 
               var data = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
 
-              return this.request((0, _extend3.default)({ method: method, action: action }, { data: data })).then(function (res) {
+              return this.request(Object.assign({ method: method, action: action }, { data: data })).then(function (res) {
                 if ((0, _isArray3.default)(res)) {
                   return _this26.hydrateCollection(res);
                 } else {
@@ -1009,7 +1005,7 @@ ResourceSchema.defineSchema = function () {
 
               var data = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
 
-              return this.request((0, _extend3.default)({ method: method, action: action }, { data: data })).then(function (res) {
+              return this.request(Object.assign({ method: method, action: action }, { data: data })).then(function (res) {
                 return _this27.hydrateModel(res);
               });
             };
@@ -1049,7 +1045,7 @@ ResourceSchema.defineSchema = function () {
     };
   };
 
-  return (0, _extend3.default)({}, pointer({}));
+  return Object.assign({}, pointer({}));
 };
 
 // ResourceSchema.generateMarkdown = function() {
@@ -1244,13 +1240,13 @@ var Papi = function (_ResourceSchema) {
 
       // Query params to be added to the url
       if (options.query) {
-        (0, _extend3.default)(req.query, options.query);
+        Object.assign(req.query, options.query);
       }
 
       // Data to send (with get requests these are converted into query params)
       if (options.data) {
         if (method == 'get') {
-          (0, _extend3.default)(req.query, options.data);
+          Object.assign(req.query, options.data);
         } else {
           req.body = JSON.stringify(options.data);
         }

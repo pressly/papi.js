@@ -1,6 +1,6 @@
 'use strict'
 
-import {map, each, filter, extend, last, isObject, isArray, isEmpty} from 'lodash';
+import {map, each, filter, last, isObject, isArray, isEmpty} from 'lodash';
 
 import Resource from './resource';
 import * as models from './models/index';
@@ -195,7 +195,7 @@ ResourceSchema.defineSchema = function() {
             //console.log(`- adding collection action to ${parentPointer.current.key}:`, method, name, options);
 
             resourceClass.prototype['$' + name] = function(data = {}) {
-              return this.request(extend({ method, action }, { data })).then((res) => {
+              return this.request(Object.assign({ method, action }, { data })).then((res) => {
                 if (isArray(res)) {
                   return this.hydrateCollection(res);
                 } else {
@@ -211,7 +211,7 @@ ResourceSchema.defineSchema = function() {
             //console.log(`- adding member action to ${parentPointer.current.key}:`, method, name, options);
 
             resourceClass.prototype['$' + name] = function(data = {}) {
-              return this.request(extend({ method, action }, { data })).then((res) => {
+              return this.request(Object.assign({ method, action }, { data })).then((res) => {
                 return this.hydrateModel(res);
               });
             };
@@ -249,7 +249,7 @@ ResourceSchema.defineSchema = function() {
     };
   };
 
-  return extend({}, pointer({}));
+  return Object.assign({}, pointer({}));
 };
 
 // ResourceSchema.generateMarkdown = function() {

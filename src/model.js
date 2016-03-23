@@ -1,10 +1,10 @@
 'use strict'
 
-import {extend, filter, pick, difference, keys, functions} from 'lodash';
+import {filter, pick, difference, keys, functions} from 'lodash';
 
 export default class Model {
   constructor(data, options = {}) {
-    extend(this, data);
+    Object.assign(this, data);
 
     this.$newRecord = true;
   }
@@ -20,7 +20,7 @@ export default class Model {
       this.$newRecord = false;
       this.$resource().sync(res);
 
-      return extend(this, res);
+      return Object.assign(this, res);
     });
   }
 
