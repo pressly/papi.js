@@ -10,10 +10,6 @@ var _difference2 = require('lodash/difference');
 
 var _difference3 = _interopRequireDefault(_difference2);
 
-var _keys2 = require('lodash/keys');
-
-var _keys3 = _interopRequireDefault(_keys2);
-
 var _functions2 = require('lodash/functions');
 
 var _functions3 = _interopRequireDefault(_functions2);
@@ -178,9 +174,15 @@ var Resource = function () {
   };
 
   Resource.prototype.buildPath = function buildPath() {
+    var _this3 = this;
+
     var route = this.route.segments.join('');
 
     (0, _each3.default)(this.route.params, function (value, paramName) {
+      if (!value && _this3.route.segments.length > 1 && paramName !== _this3.route.paramName) {
+        throw new Error('$resource: Can\'t make request because route was missing \'' + paramName + '\' param.');
+      }
+
       route = route.replace('/:' + paramName, value ? '/' + value : '');
     });
 
@@ -206,14 +208,14 @@ var Resource = function () {
   };
 
   Resource.prototype.includeParams = function includeParams(params) {
-    var _this3 = this;
+    var _this4 = this;
 
     (0, _each3.default)(params, function (value, paramName) {
-      if (_this3.route.params.hasOwnProperty(paramName)) {
-        _this3.route.params[paramName] = value;
+      if (_this4.route.params.hasOwnProperty(paramName)) {
+        _this4.route.params[paramName] = value;
       } else {
         // Break out query params from route params
-        _this3.route.queryParams[paramName] = value;
+        _this4.route.queryParams[paramName] = value;
       }
     });
 
@@ -284,7 +286,7 @@ var Resource = function () {
   };
 
   Resource.prototype.sync = function sync(data) {
-    var _this4 = this;
+    var _this5 = this;
 
     // Set route params based on data from the model
     // This is important step to take if the model queried from an all, queryParams, or action
@@ -294,12 +296,14 @@ var Resource = function () {
 
     // Update actions route params
     (0, _each3.default)(this.actions, function (action) {
-      _this4.route.params[action.options.paramName] = data[action.options.paramName];
+      if (action.options.paramName) {
+        _this5.route.params[action.options.paramName] = data[action.options.paramName];
+      }
     });
   };
 
   Resource.prototype.hydrateModel = function hydrateModel(data) {
-    var _this5 = this;
+    var _this6 = this;
 
     var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
 
@@ -314,9 +318,9 @@ var Resource = function () {
     // Set a reference to the resource on the model
     model.$resource = function (name) {
       if ((0, _isEmpty3.default)(name)) {
-        return _this5;
+        return _this6;
       } else {
-        return _this5.api.$resource(name, _this5);
+        return _this6.api.$resource(name, _this6);
       }
     };
 
@@ -324,11 +328,11 @@ var Resource = function () {
   };
 
   Resource.prototype.hydrateCollection = function hydrateCollection(data) {
-    var _this6 = this;
+    var _this7 = this;
 
     var collection = (0, _map3.default)(data, function (item) {
       // Models in a collection need a new resource created
-      var resource = _this6.createResource();
+      var resource = _this7.createResource();
 
       var model = resource.hydrateModel(item);
 
@@ -338,23 +342,23 @@ var Resource = function () {
     var getPage = function getPage(page) {
       var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
 
-      if (_this6.links && _this6.links.hasOwnProperty(page)) {
-        return _this6.api.request('get', _this6.links[page]).then(function (res) {
+      if (_this7.links && _this7.links.hasOwnProperty(page)) {
+        return _this7.api.request('get', _this7.links[page]).then(function (res) {
           if (options.append || options.prepend) {
-            _this6.setResponse(res);
+            _this7.setResponse(res);
 
             var method = options.append ? 'push' : 'unshift';
 
             (0, _each3.default)(res.data, function (item) {
-              collection[method](_this6.hydrateModel(item));
+              collection[method](_this7.hydrateModel(item));
             });
 
             return collection;
           } else {
-            _this6.setResponse(res);
+            _this7.setResponse(res);
 
             // Should create a new resource and hydrate
-            return _this6.hydrateCollection(res.data);
+            return _this7.hydrateCollection(res.data);
           }
         });
       }
@@ -362,7 +366,7 @@ var Resource = function () {
 
     var methods = {
       $resource: function $resource() {
-        return _this6;
+        return _this7;
       },
 
       $nextPage: function $nextPage() {
@@ -378,7 +382,7 @@ var Resource = function () {
       },
 
       $hasPage: function $hasPage(name) {
-        return _this6.links && _this6.links.hasOwnProperty(name);
+        return _this7.links && _this7.links.hasOwnProperty(name);
       },
 
       $find: function $find(id) {
@@ -398,7 +402,7 @@ var Resource = function () {
       $create: function $create() {
         var data = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
 
-        var resource = _this6.createResource();
+        var resource = _this7.createResource();
         return resource.hydrateModel(data, { newRecord: true });
       },
 
@@ -407,7 +411,7 @@ var Resource = function () {
         var idx = arguments[1];
         var applySorting = arguments.length <= 2 || arguments[2] === undefined ? false : arguments[2];
 
-        if ((typeof model === 'undefined' ? 'undefined' : _typeof(model)) == 'object' && !(model instanceof _this6.constructor.modelClass)) {
+        if ((typeof model === 'undefined' ? 'undefined' : _typeof(model)) == 'object' && !(model instanceof _this7.constructor.modelClass)) {
           model = collection.$create(model);
         }
 
@@ -438,7 +442,7 @@ var Resource = function () {
         var idx;
         if ((0, _isNumber3.default)(arg)) {
           idx = arg;
-        } else if (arg instanceof _this6.constructor.modelClass) {
+        } else if (arg instanceof _this7.constructor.modelClass) {
           idx = collection.indexOf(arg);
         }
 
@@ -462,7 +466,7 @@ var Resource = function () {
       $delete: function $delete(model) {
         var params = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
 
-        if (model instanceof _this6.constructor.modelClass) {
+        if (model instanceof _this7.constructor.modelClass) {
           return model.$delete(params).then(function () {
             return collection.$remove(model);
           });
@@ -494,20 +498,20 @@ var Model = function () {
   };
 
   Model.prototype.$save = function $save(params) {
-    var _this7 = this;
+    var _this8 = this;
 
     var method = this.$newRecord ? 'post' : 'put';
 
     return this.$resource().request({ method: method, data: this, query: params }).then(function (res) {
-      _this7.$newRecord = false;
-      _this7.$resource().sync(res);
+      _this8.$newRecord = false;
+      _this8.$resource().sync(res);
 
-      return Object.assign(_this7, res);
+      return Object.assign(_this8, res);
     });
   };
 
   Model.prototype.$attributes = function $attributes() {
-    return (0, _filter3.default)((0, _difference3.default)((0, _keys3.default)(this), (0, _functions3.default)(this)), function (x) {
+    return (0, _filter3.default)((0, _difference3.default)(Object.keys(this), (0, _functions3.default)(this)), function (x) {
       return x[0] != '$';
     });
   };
@@ -901,7 +905,13 @@ var ResourceSchema = function () {
       key = parentResource.key + '.' + name;
     }
 
-    return new this.constructor.resourceClasses[key](this, parentResource).includeParams(params);
+    var resourceClass = this.constructor.resourceClasses[key];
+
+    if (typeof resourceClass == 'undefined') {
+      throw new Error('$resource: key \'' + key + '\' does not exist in schema.');
+    }
+
+    return new resourceClass(this, parentResource).includeParams(params);
   };
 
   return ResourceSchema;
@@ -983,15 +993,15 @@ ResourceSchema.defineSchema = function () {
             //console.log(`- adding collection action to ${parentPointer.current.key}:`, method, name, options);
 
             resourceClass.prototype['$' + name] = function () {
-              var _this26 = this;
+              var _this27 = this;
 
               var data = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
 
               return this.request(Object.assign({ method: method, action: action }, { data: data })).then(function (res) {
                 if ((0, _isArray3.default)(res)) {
-                  return _this26.hydrateCollection(res);
+                  return _this27.hydrateCollection(res);
                 } else {
-                  return _this26.hydrateModel(res);
+                  return _this27.hydrateModel(res);
                 }
               });
             };
@@ -1003,12 +1013,12 @@ ResourceSchema.defineSchema = function () {
             //console.log(`- adding member action to ${parentPointer.current.key}:`, method, name, options);
 
             resourceClass.prototype['$' + name] = function () {
-              var _this27 = this;
+              var _this28 = this;
 
               var data = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
 
               return this.request(Object.assign({ method: method, action: action }, { data: data })).then(function (res) {
-                return _this27.hydrateModel(res);
+                return _this28.hydrateModel(res);
               });
             };
 
@@ -1142,26 +1152,26 @@ var Papi = function (_ResourceSchema) {
 
     _classCallCheck(this, Papi);
 
-    var _this28 = _possibleConstructorReturn(this, _ResourceSchema.apply(this, arguments));
+    var _this29 = _possibleConstructorReturn(this, _ResourceSchema.apply(this, arguments));
 
-    _this28.options = options;
-    _this28.options.host = options.host || 'https://api.pressly.com';
+    _this29.options = options;
+    _this29.options.host = options.host || 'https://api.pressly.com';
 
-    _this28.requestMiddlewares = [];
-    _this28.responseMiddlewares = [];
+    _this29.requestMiddlewares = [];
+    _this29.responseMiddlewares = [];
 
-    _this28.metrics = {
+    _this29.metrics = {
       sendEvent: function sendEvent(type, message) {
-        _this28.request('post', '/metrix/events/' + type, message);
+        _this29.request('post', '/metrix/events/' + type, message);
       }
     };
 
-    _this28.auth = {
+    _this29.auth = {
       session: null,
 
       get: function get() {
-        return _this28.request('get', '/session').then(function (res) {
-          return _this28.auth.set(res.data);
+        return _this29.request('get', '/session').then(function (res) {
+          return _this29.auth.set(res.data);
         });
       },
 
@@ -1170,13 +1180,13 @@ var Papi = function (_ResourceSchema) {
           throw new Error('Papi:Auth: Invalid session response - missing jwt');
         }
 
-        _this28.auth.session = session;
+        _this29.auth.session = session;
 
-        return _this28.auth.session;
+        return _this29.auth.session;
       },
 
       isLoggedIn: function isLoggedIn() {
-        return !!_this28.auth.session && !_this28.auth.isExpired();
+        return !!_this29.auth.session && !_this29.auth.isExpired();
       },
 
       isExpired: function isExpired() {
@@ -1186,34 +1196,34 @@ var Papi = function (_ResourceSchema) {
       },
 
       login: function login(email, password) {
-        return _this28.request('post', '/auth', { data: { email: email, password: password } }).then(function (res) {
-          return _this28.auth.set(res.data);
+        return _this29.request('post', '/auth', { data: { email: email, password: password } }).then(function (res) {
+          return _this29.auth.set(res.data);
         });
       },
 
       requestPasswordReset: function requestPasswordReset(email) {
-        return _this28.request('post', '/auth/password_reset', { data: { email: email } });
+        return _this29.request('post', '/auth/password_reset', { data: { email: email } });
       },
 
       logout: function logout() {
         // Clear session immediately even if server fails to respond
-        _this28.auth.session = null;
+        _this29.auth.session = null;
 
-        return _this28.request('delete', '/session').then(function (res) {
+        return _this29.request('delete', '/session').then(function (res) {
           return res;
         });
       }
     };
-    return _this28;
+    return _this29;
   }
 
   Papi.prototype.request = function request(method, path) {
-    var _this29 = this;
+    var _this30 = this;
 
     var options = arguments.length <= 2 || arguments[2] === undefined ? {} : arguments[2];
 
     return new AbortablePromise(function (resolve, reject, onAbort) {
-      var url = /^(https?:)?\/\//.test(path) ? path : _this29.options.host + path;
+      var url = /^(https?:)?\/\//.test(path) ? path : _this30.options.host + path;
 
       var req = {
         url: url,
@@ -1234,8 +1244,8 @@ var Papi = function (_ResourceSchema) {
       }
 
       // Send Authorization header when we have a JSON Web Token set in the session
-      if (_this29.auth.session && _this29.auth.session.jwt) {
-        req.headers['Authorization'] = 'Bearer ' + _this29.auth.session.jwt;
+      if (_this30.auth.session && _this30.auth.session.jwt) {
+        req.headers['Authorization'] = 'Bearer ' + _this30.auth.session.jwt;
       }
 
       req.headers['Accept'] = 'application/vnd.pressly.v0.12+json';
@@ -1261,14 +1271,14 @@ var Papi = function (_ResourceSchema) {
       var res = {};
 
       var beginRequest = function beginRequest() {
-        if (_this29.requestMiddlewares.length) {
+        if (_this30.requestMiddlewares.length) {
           var offset = 0;
           var next = function next() {
-            var layer = _this29.requestMiddlewares[++offset] || endRequest;
+            var layer = _this30.requestMiddlewares[++offset] || endRequest;
             return layer(req, res, next, resolve, reject);
           };
 
-          _this29.requestMiddlewares[0](req, res, next, resolve, reject);
+          _this30.requestMiddlewares[0](req, res, next, resolve, reject);
         } else {
           endRequest();
         }
@@ -1296,14 +1306,14 @@ var Papi = function (_ResourceSchema) {
       };
 
       var beginResponse = function beginResponse() {
-        if (_this29.responseMiddlewares.length) {
+        if (_this30.responseMiddlewares.length) {
           var offset = 0;
           var next = function next() {
-            var layer = _this29.responseMiddlewares[++offset] || endResponse;
+            var layer = _this30.responseMiddlewares[++offset] || endResponse;
             return layer(req, res, next, resolve, reject);
           };
 
-          _this29.responseMiddlewares[0](req, res, next, resolve, reject);
+          _this30.responseMiddlewares[0](req, res, next, resolve, reject);
         } else {
           endResponse();
         }
@@ -1342,7 +1352,7 @@ Papi.defineSchema().resource('accounts').open().get('available', { on: 'resource
 // This resource links to the root hubs resource
 .resource('hubs', { link: 'hubs' }).close().resource('signup').open().get('account_uid_available', { on: 'member' }).get('account_email_available', { on: 'member' }).close().resource('users').open().get('roles', { on: 'resource' }).resource('hubs').resource('organizations').close().resource('discover').open().resource('users', { link: 'users' }).resource('organizations', { link: 'organizations' }).resource('hubs', { link: 'hubs' }).resource('posts').close().resource('creds').open().post('share', { on: 'member' }).close().resource('stream').open().close();
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"dodgy":2,"isomorphic-fetch":3,"lodash/clone":122,"lodash/difference":124,"lodash/each":125,"lodash/every":127,"lodash/filter":128,"lodash/find":129,"lodash/functions":131,"lodash/isArray":136,"lodash/isEmpty":140,"lodash/isNumber":144,"lodash/isObject":145,"lodash/keys":150,"lodash/last":151,"lodash/map":152,"lodash/pick":153,"promiz":160,"querystring":163}],2:[function(require,module,exports){
+},{"dodgy":2,"isomorphic-fetch":3,"lodash/clone":122,"lodash/difference":124,"lodash/each":125,"lodash/every":127,"lodash/filter":128,"lodash/find":129,"lodash/functions":131,"lodash/isArray":136,"lodash/isEmpty":140,"lodash/isNumber":144,"lodash/isObject":145,"lodash/last":151,"lodash/map":152,"lodash/pick":153,"promiz":160,"querystring":163}],2:[function(require,module,exports){
 /*!
 Copyright (C) 2015 by Andrea Giammarchi - @WebReflection
 
