@@ -1,6 +1,6 @@
 'use strict'
 
-import {filter, pick, difference, keys, functions} from 'lodash';
+import {filter, pick, difference, functions} from 'lodash';
 
 export default class Model {
   constructor(data, options = {}) {
@@ -25,7 +25,7 @@ export default class Model {
   }
 
   $attributes() {
-    return filter(difference(keys(this), functions(this)), (x) => { return x[0] != '$' });
+    return filter(difference(Object.keys(this), functions(this)), (x) => { return x[0] != '$' });
   }
 
   $data() {
