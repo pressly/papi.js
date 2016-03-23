@@ -32,6 +32,10 @@ describe('Stream Assets Resource', function() {
       res.should.be.instanceOf(models.Asset);
       res.isVisible().should.equal(true);
       res.isOriginal().should.equal(false);
+      res.isHidden().should.equal(false);
+      res.isHighlighted().should.equal(false);
+      res.isFeatured().should.equal(false);
+      res.isLocked().should.equal(false);
 
       done();
     }).catch((err) => {
