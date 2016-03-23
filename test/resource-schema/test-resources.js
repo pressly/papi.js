@@ -15,9 +15,27 @@ api.auth.set({jwt: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNTRmMGR
 mockRequest.config({host: api.options.host});
 
 describe('Resources', function() {
+  it('should throw if resource key is undefined', function(done) {
+    should.throws(function() {
+      var resource = api.$resource(undefined);
+    });
+
+    done();
+  });
+
   it('should throw if resource key does not exist', function(done) {
     should.throws(function() {
-      var resource = api.$resource('hubs.nothing');
+      var resource = api.$resource('hubs.undefined');
+    });
+
+    done();
+  });
+
+  it('should throw if resource key is not found in parent resource', function(done) {
+    var parentResource = api.$resource('hubs');
+
+    should.throws(function() {
+      var childResource = api.$resource('undefined', parentResource);
     });
 
     done();
@@ -48,7 +66,7 @@ describe('Resources', function() {
     done();
   });
 
-  it('should validate route params are set before request', function(done) {
+  it('should throw error if required route params do not validate before request', function(done) {
     var model = api.$resource('hubs.assets').$create({title: 'New Article'});
     model.should.be.instanceOf(models.Asset);
     model.title.should.equal('New Article');
