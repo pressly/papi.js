@@ -1,5 +1,5 @@
 import Model from '../model';
-import {all, pick, isEmpty} from 'lodash';
+import {every, pick, isEmpty} from 'lodash';
 
 var DISPLAY_STATES = {
   VISIBLE:      1,
@@ -30,6 +30,6 @@ export class Asset extends Model {
   }
 
   isOriginal() {
-    return all(pick(this.source, 'network', 'uid', 'url'), isEmpty);
+    return every(pick(this.source, 'network', 'uid', 'url'), isEmpty);
   }
 }

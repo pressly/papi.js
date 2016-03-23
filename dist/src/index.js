@@ -1,8 +1,8 @@
 'use strict';
 
-var _all2 = require('lodash/fp/all');
+var _every2 = require('lodash/every');
 
-var _all3 = _interopRequireDefault(_all2);
+var _every3 = _interopRequireDefault(_every2);
 
 var _difference2 = require('lodash/difference');
 
@@ -594,7 +594,7 @@ var Asset = function (_Model4) {
   };
 
   Asset.prototype.isOriginal = function isOriginal() {
-    return (0, _all3.default)((0, _pick3.default)(this.source, 'network', 'uid', 'url'), _isEmpty3.default);
+    return (0, _every3.default)((0, _pick3.default)(this.source, 'network', 'uid', 'url'), _isEmpty3.default);
   };
 
   return Asset;
