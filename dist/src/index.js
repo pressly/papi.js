@@ -753,11 +753,19 @@ var User = function (_Model17) {
     return _possibleConstructorReturn(this, _Model17.apply(this, arguments));
   }
 
-  User.prototype.hasAccess = function hasAccess() {
-    return this.access.status === 0;
-  };
-
   return User;
+}(Model);
+
+var Widget = function (_Model18) {
+  _inherits(Widget, _Model18);
+
+  function Widget() {
+    _classCallCheck(this, Widget);
+
+    return _possibleConstructorReturn(this, _Model18.apply(this, arguments));
+  }
+
+  return Widget;
 }(Model);
 
 var models = Object.freeze({
@@ -778,7 +786,8 @@ var models = Object.freeze({
   Recommendation: Recommendation,
   Style: Style,
   Tag: Tag,
-  User: User
+  User: User,
+  Widget: Widget
 });
 
 function singularize(string) {
@@ -991,15 +1000,15 @@ ResourceSchema.defineSchema = function () {
             //console.log(`- adding collection action to ${parentPointer.current.key}:`, method, name, options);
 
             resourceClass.prototype['$' + name] = function () {
-              var _this27 = this;
+              var _this28 = this;
 
               var data = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
 
               return this.request(Object.assign({ method: method, action: action }, { data: data })).then(function (res) {
                 if ((0, _isArray3.default)(res)) {
-                  return _this27.hydrateCollection(res);
+                  return _this28.hydrateCollection(res);
                 } else {
-                  return _this27.hydrateModel(res);
+                  return _this28.hydrateModel(res);
                 }
               });
             };
@@ -1011,12 +1020,12 @@ ResourceSchema.defineSchema = function () {
             //console.log(`- adding member action to ${parentPointer.current.key}:`, method, name, options);
 
             resourceClass.prototype['$' + name] = function () {
-              var _this28 = this;
+              var _this29 = this;
 
               var data = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
 
               return this.request(Object.assign({ method: method, action: action }, { data: data })).then(function (res) {
-                return _this28.hydrateModel(res);
+                return _this29.hydrateModel(res);
               });
             };
 
@@ -1150,26 +1159,26 @@ var Papi = function (_ResourceSchema) {
 
     _classCallCheck(this, Papi);
 
-    var _this29 = _possibleConstructorReturn(this, _ResourceSchema.apply(this, arguments));
+    var _this30 = _possibleConstructorReturn(this, _ResourceSchema.apply(this, arguments));
 
-    _this29.options = options;
-    _this29.options.host = options.host || 'https://api.pressly.com';
+    _this30.options = options;
+    _this30.options.host = options.host || 'https://api.pressly.com';
 
-    _this29.requestMiddlewares = [];
-    _this29.responseMiddlewares = [];
+    _this30.requestMiddlewares = [];
+    _this30.responseMiddlewares = [];
 
-    _this29.metrics = {
+    _this30.metrics = {
       sendEvent: function sendEvent(type, message) {
-        _this29.request('post', '/metrix/events/' + type, message);
+        _this30.request('post', '/metrix/events/' + type, message);
       }
     };
 
-    _this29.auth = {
+    _this30.auth = {
       session: null,
 
       get: function get() {
-        return _this29.request('get', '/session').then(function (res) {
-          return _this29.auth.set(res.data);
+        return _this30.request('get', '/session').then(function (res) {
+          return _this30.auth.set(res.data);
         });
       },
 
@@ -1178,13 +1187,13 @@ var Papi = function (_ResourceSchema) {
           throw new Error('Papi:Auth: Invalid session response - missing jwt');
         }
 
-        _this29.auth.session = session;
+        _this30.auth.session = session;
 
-        return _this29.auth.session;
+        return _this30.auth.session;
       },
 
       isLoggedIn: function isLoggedIn() {
-        return !!_this29.auth.session && !_this29.auth.isExpired();
+        return !!_this30.auth.session && !_this30.auth.isExpired();
       },
 
       isExpired: function isExpired() {
@@ -1194,34 +1203,34 @@ var Papi = function (_ResourceSchema) {
       },
 
       login: function login(email, password) {
-        return _this29.request('post', '/auth', { data: { email: email, password: password } }).then(function (res) {
-          return _this29.auth.set(res.data);
+        return _this30.request('post', '/auth', { data: { email: email, password: password } }).then(function (res) {
+          return _this30.auth.set(res.data);
         });
       },
 
       requestPasswordReset: function requestPasswordReset(email) {
-        return _this29.request('post', '/auth/password_reset', { data: { email: email } });
+        return _this30.request('post', '/auth/password_reset', { data: { email: email } });
       },
 
       logout: function logout() {
         // Clear session immediately even if server fails to respond
-        _this29.auth.session = null;
+        _this30.auth.session = null;
 
-        return _this29.request('delete', '/session').then(function (res) {
+        return _this30.request('delete', '/session').then(function (res) {
           return res;
         });
       }
     };
-    return _this29;
+    return _this30;
   }
 
   Papi.prototype.request = function request(method, path) {
-    var _this30 = this;
+    var _this31 = this;
 
     var options = arguments.length <= 2 || arguments[2] === undefined ? {} : arguments[2];
 
     return new AbortablePromise(function (resolve, reject, onAbort) {
-      var url = /^(https?:)?\/\//.test(path) ? path : _this30.options.host + path;
+      var url = /^(https?:)?\/\//.test(path) ? path : _this31.options.host + path;
 
       var req = {
         url: url,
@@ -1242,8 +1251,8 @@ var Papi = function (_ResourceSchema) {
       }
 
       // Send Authorization header when we have a JSON Web Token set in the session
-      if (_this30.auth.session && _this30.auth.session.jwt) {
-        req.headers['Authorization'] = 'Bearer ' + _this30.auth.session.jwt;
+      if (_this31.auth.session && _this31.auth.session.jwt) {
+        req.headers['Authorization'] = 'Bearer ' + _this31.auth.session.jwt;
       }
 
       req.headers['Accept'] = 'application/vnd.pressly.v0.12+json';
@@ -1269,14 +1278,14 @@ var Papi = function (_ResourceSchema) {
       var res = {};
 
       var beginRequest = function beginRequest() {
-        if (_this30.requestMiddlewares.length) {
+        if (_this31.requestMiddlewares.length) {
           var offset = 0;
           var next = function next() {
-            var layer = _this30.requestMiddlewares[++offset] || endRequest;
+            var layer = _this31.requestMiddlewares[++offset] || endRequest;
             return layer(req, res, next, resolve, reject);
           };
 
-          _this30.requestMiddlewares[0](req, res, next, resolve, reject);
+          _this31.requestMiddlewares[0](req, res, next, resolve, reject);
         } else {
           endRequest();
         }
@@ -1304,14 +1313,14 @@ var Papi = function (_ResourceSchema) {
       };
 
       var beginResponse = function beginResponse() {
-        if (_this30.responseMiddlewares.length) {
+        if (_this31.responseMiddlewares.length) {
           var offset = 0;
           var next = function next() {
-            var layer = _this30.responseMiddlewares[++offset] || endResponse;
+            var layer = _this31.responseMiddlewares[++offset] || endResponse;
             return layer(req, res, next, resolve, reject);
           };
 
-          _this30.responseMiddlewares[0](req, res, next, resolve, reject);
+          _this31.responseMiddlewares[0](req, res, next, resolve, reject);
         } else {
           endResponse();
         }
@@ -1345,7 +1354,7 @@ if (Papi.defineSchema == undefined) {
   Papi.defineSchema = ResourceSchema.defineSchema;
 }
 
-Papi.defineSchema().resource('accounts').open().get('available', { on: 'resource' }).post('become', { on: 'member' }).resource('users').resource('hubs', { link: 'hubs' }).close().resource('organizations').open().resource('users').resource('hubs').resource('invites').open().post('bulk_invite', { on: 'resource' }).post('resend', { on: 'member' }).put('accept', { on: 'member', routeSegment: '/invites/:hash' }).put('reject', { on: 'member', routeSegment: '/invites/:hash' }).close().close().resource('activity').resource('posts', { routeSegment: '/stream/posts/:id' }).resource('hubs').open().get('search', { on: 'resource' }).post('upgrade', { on: 'member' }).post('follow', { on: 'member' }).delete('unfollow', { on: 'member', path: '/follow' }).get('reach', { on: 'member' }).resource('apps').open().get('current', { on: 'resource' }).get('build', { on: 'member', path: '/build_app' }).get('status', { on: 'member' }).resource('styles').close().resource('addons').open().resource('configs').close().resource('analytics').open().get('summary', { on: 'resource' }).get('visitors', { on: 'resource' }).get('pageviews', { on: 'resource' }).get('duration', { on: 'resource' }).close().resource('feeds').open().resource('assets', { modelName: 'FeedAsset' }).close().resource('invites').open().post('bulk_invite', { on: 'resource' }).post('resend', { on: 'member' }).put('accept', { on: 'member', routeSegment: '/invites/:hash' }).put('reject', { on: 'member', routeSegment: '/invites/:hash' }).close().resource('recommendations').resource('users').open().post('grant_access', { on: 'resource' }).delete('revoke_access', { on: 'member' }).close().resource('collaborators', { modelName: 'User' }).resource('collections').open().put('reorder', { on: 'resource' }).close().resource('tags').resource('assets', { routeSegment: '/stream/:id' }).open().put('feature', { on: 'member' }).put('unfeature', { on: 'member' }).put('hide', { on: 'member' }).put('unhide', { on: 'member' }).put('lock', { on: 'member' }).put('unlock', { on: 'member' }).resource('likes').resource('comments').close().resource('drafts').open().put('publish', { on: 'member' }).close().close().resource('invites').open().get('incoming', { on: 'resource' }).get('outgoing', { on: 'resource' }).post('bulk_invite', { on: 'resource' }).post('resend', { on: 'member' }).put('accept', { on: 'member', routeSegment: '/invites/:hash' }).put('reject', { on: 'member', routeSegment: '/invites/:hash' }).close().resource('code_revisions').open().get('fetch_repo', { on: 'member' })
+Papi.defineSchema().resource('accounts').open().get('available', { on: 'resource' }).post('become', { on: 'member' }).resource('users').resource('hubs', { link: 'hubs' }).close().resource('organizations').open().resource('users').resource('hubs').resource('invites').open().post('bulk_invite', { on: 'resource' }).post('resend', { on: 'member' }).put('accept', { on: 'member', routeSegment: '/invites/:hash' }).put('reject', { on: 'member', routeSegment: '/invites/:hash' }).close().close().resource('activity').resource('posts', { routeSegment: '/stream/posts/:id' }).resource('hubs').open().get('search', { on: 'resource' }).post('upgrade', { on: 'member' }).post('follow', { on: 'member' }).delete('unfollow', { on: 'member', path: '/follow' }).get('reach', { on: 'member' }).resource('widgets').open().get('dimensions', { on: 'resource' }).close().resource('apps').open().get('current', { on: 'resource' }).get('build', { on: 'member', path: '/build_app' }).get('status', { on: 'member' }).resource('styles').close().resource('addons').open().resource('configs').close().resource('analytics').open().get('summary', { on: 'resource' }).get('visitors', { on: 'resource' }).get('pageviews', { on: 'resource' }).get('duration', { on: 'resource' }).close().resource('feeds').open().resource('assets', { modelName: 'FeedAsset' }).close().resource('invites').open().post('bulk_invite', { on: 'resource' }).post('resend', { on: 'member' }).put('accept', { on: 'member', routeSegment: '/invites/:hash' }).put('reject', { on: 'member', routeSegment: '/invites/:hash' }).close().resource('recommendations').resource('users').open().post('grant_access', { on: 'resource' }).delete('revoke_access', { on: 'member' }).close().resource('collaborators', { modelName: 'User' }).resource('collections').open().put('reorder', { on: 'resource' }).close().resource('tags').resource('assets', { routeSegment: '/stream/:id' }).open().put('feature', { on: 'member' }).put('unfeature', { on: 'member' }).put('hide', { on: 'member' }).put('unhide', { on: 'member' }).put('lock', { on: 'member' }).put('unlock', { on: 'member' }).resource('likes').resource('comments').close().resource('drafts').open().put('publish', { on: 'member' }).close().close().resource('invites').open().get('incoming', { on: 'resource' }).get('outgoing', { on: 'resource' }).post('bulk_invite', { on: 'resource' }).post('resend', { on: 'member' }).put('accept', { on: 'member', routeSegment: '/invites/:hash' }).put('reject', { on: 'member', routeSegment: '/invites/:hash' }).close().resource('code_revisions').open().get('fetch_repo', { on: 'member' })
 
 // This resource links to the root hubs resource
 .resource('hubs', { link: 'hubs' }).close().resource('signup').open().get('account_uid_available', { on: 'member' }).get('account_email_available', { on: 'member' }).close().resource('users').open().get('roles', { on: 'resource' }).resource('hubs').resource('organizations').close().resource('discover').open().resource('users', { link: 'users' }).resource('organizations', { link: 'organizations' }).resource('hubs', { link: 'hubs' }).resource('posts').close().resource('creds').open().post('share', { on: 'member' }).close().resource('stream').open().close();
