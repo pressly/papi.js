@@ -17,3 +17,4 @@ export * from './recommendation';
 export * from './style';
 export * from './tag';
 export * from './user';
+export * from './widget';
