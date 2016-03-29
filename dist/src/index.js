@@ -4,14 +4,6 @@ var _every2 = require('lodash/every');
 
 var _every3 = _interopRequireDefault(_every2);
 
-var _difference2 = require('lodash/difference');
-
-var _difference3 = _interopRequireDefault(_difference2);
-
-var _functions2 = require('lodash/functions');
-
-var _functions3 = _interopRequireDefault(_functions2);
-
 var _pick2 = require('lodash/pick');
 
 var _pick3 = _interopRequireDefault(_pick2);
@@ -307,20 +299,24 @@ var Resource = function () {
 
     var model = new this.constructor.modelClass(data);
 
+    this.sync(data);
+
+    // By default the model $newRecord will be true
     if (!options.newRecord) {
       model.$newRecord = false;
     }
 
-    this.sync(data);
-
     // Set a reference to the resource on the model
-    model.$resource = function (name) {
-      if ((0, _isEmpty3.default)(name)) {
-        return _this6;
-      } else {
-        return _this6.api.$resource(name, _this6);
+    Object.defineProperty(model, '$resource', {
+      enumerable: false,
+      value: function value(name) {
+        if ((0, _isEmpty3.default)(name)) {
+          return _this6;
+        } else {
+          return _this6.api.$resource(name, _this6);
+        }
       }
-    };
+    });
 
     return model;
   };
@@ -488,7 +484,11 @@ var Model = function () {
 
     Object.assign(this, data);
 
-    this.$newRecord = true;
+    Object.defineProperty(this, '$newRecord', {
+      enumerable: false,
+      writable: true,
+      value: true
+    });
   }
 
   Model.prototype.$delete = function $delete(params) {
@@ -509,13 +509,15 @@ var Model = function () {
   };
 
   Model.prototype.$attributes = function $attributes() {
-    return (0, _filter3.default)((0, _difference3.default)(Object.keys(this), (0, _functions3.default)(this)), function (x) {
-      return x[0] != '$';
-    });
+    return Object.keys(this);
   };
 
   Model.prototype.$data = function $data() {
-    return (0, _pick3.default)(this, this.$attributes());
+    var _this9 = this;
+
+    return this.$attributes().reduce(function (result, key) {
+      result[key] = _this9[key];return result;
+    }, {});
   };
 
   return Model;
@@ -1000,15 +1002,15 @@ ResourceSchema.defineSchema = function () {
             //console.log(`- adding collection action to ${parentPointer.current.key}:`, method, name, options);
 
             resourceClass.prototype['$' + name] = function () {
-              var _this28 = this;
+              var _this29 = this;
 
               var data = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
 
               return this.request(Object.assign({ method: method, action: action }, { data: data })).then(function (res) {
                 if ((0, _isArray3.default)(res)) {
-                  return _this28.hydrateCollection(res);
+                  return _this29.hydrateCollection(res);
                 } else {
-                  return _this28.hydrateModel(res);
+                  return _this29.hydrateModel(res);
                 }
               });
             };
@@ -1020,12 +1022,12 @@ ResourceSchema.defineSchema = function () {
             //console.log(`- adding member action to ${parentPointer.current.key}:`, method, name, options);
 
             resourceClass.prototype['$' + name] = function () {
-              var _this29 = this;
+              var _this30 = this;
 
               var data = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
 
               return this.request(Object.assign({ method: method, action: action }, { data: data })).then(function (res) {
-                return _this29.hydrateModel(res);
+                return _this30.hydrateModel(res);
               });
             };
 
@@ -1159,26 +1161,26 @@ var Papi = function (_ResourceSchema) {
 
     _classCallCheck(this, Papi);
 
-    var _this30 = _possibleConstructorReturn(this, _ResourceSchema.apply(this, arguments));
+    var _this31 = _possibleConstructorReturn(this, _ResourceSchema.apply(this, arguments));
 
-    _this30.options = options;
-    _this30.options.host = options.host || 'https://api.pressly.com';
+    _this31.options = options;
+    _this31.options.host = options.host || 'https://api.pressly.com';
 
-    _this30.requestMiddlewares = [];
-    _this30.responseMiddlewares = [];
+    _this31.requestMiddlewares = [];
+    _this31.responseMiddlewares = [];
 
-    _this30.metrics = {
+    _this31.metrics = {
       sendEvent: function sendEvent(type, message) {
-        _this30.request('post', '/metrix/events/' + type, message);
+        _this31.request('post', '/metrix/events/' + type, message);
       }
     };
 
-    _this30.auth = {
+    _this31.auth = {
       session: null,
 
       get: function get() {
-        return _this30.request('get', '/session').then(function (res) {
-          return _this30.auth.set(res.data);
+        return _this31.request('get', '/session').then(function (res) {
+          return _this31.auth.set(res.data);
         });
       },
 
@@ -1187,13 +1189,13 @@ var Papi = function (_ResourceSchema) {
           throw new Error('Papi:Auth: Invalid session response - missing jwt');
         }
 
-        _this30.auth.session = session;
+        _this31.auth.session = session;
 
-        return _this30.auth.session;
+        return _this31.auth.session;
       },
 
       isLoggedIn: function isLoggedIn() {
-        return !!_this30.auth.session && !_this30.auth.isExpired();
+        return !!_this31.auth.session && !_this31.auth.isExpired();
       },
 
       isExpired: function isExpired() {
@@ -1203,34 +1205,34 @@ var Papi = function (_ResourceSchema) {
       },
 
       login: function login(email, password) {
-        return _this30.request('post', '/auth', { data: { email: email, password: password } }).then(function (res) {
-          return _this30.auth.set(res.data);
+        return _this31.request('post', '/auth', { data: { email: email, password: password } }).then(function (res) {
+          return _this31.auth.set(res.data);
         });
       },
 
       requestPasswordReset: function requestPasswordReset(email) {
-        return _this30.request('post', '/auth/password_reset', { data: { email: email } });
+        return _this31.request('post', '/auth/password_reset', { data: { email: email } });
       },
 
       logout: function logout() {
         // Clear session immediately even if server fails to respond
-        _this30.auth.session = null;
+        _this31.auth.session = null;
 
-        return _this30.request('delete', '/session').then(function (res) {
+        return _this31.request('delete', '/session').then(function (res) {
           return res;
         });
       }
     };
-    return _this30;
+    return _this31;
   }
 
   Papi.prototype.request = function request(method, path) {
-    var _this31 = this;
+    var _this32 = this;
 
     var options = arguments.length <= 2 || arguments[2] === undefined ? {} : arguments[2];
 
     return new AbortablePromise(function (resolve, reject, onAbort) {
-      var url = /^(https?:)?\/\//.test(path) ? path : _this31.options.host + path;
+      var url = /^(https?:)?\/\//.test(path) ? path : _this32.options.host + path;
 
       var req = {
         url: url,
@@ -1251,8 +1253,8 @@ var Papi = function (_ResourceSchema) {
       }
 
       // Send Authorization header when we have a JSON Web Token set in the session
-      if (_this31.auth.session && _this31.auth.session.jwt) {
-        req.headers['Authorization'] = 'Bearer ' + _this31.auth.session.jwt;
+      if (_this32.auth.session && _this32.auth.session.jwt) {
+        req.headers['Authorization'] = 'Bearer ' + _this32.auth.session.jwt;
       }
 
       req.headers['Accept'] = 'application/vnd.pressly.v0.12+json';
@@ -1278,14 +1280,14 @@ var Papi = function (_ResourceSchema) {
       var res = {};
 
       var beginRequest = function beginRequest() {
-        if (_this31.requestMiddlewares.length) {
+        if (_this32.requestMiddlewares.length) {
           var offset = 0;
           var next = function next() {
-            var layer = _this31.requestMiddlewares[++offset] || endRequest;
+            var layer = _this32.requestMiddlewares[++offset] || endRequest;
             return layer(req, res, next, resolve, reject);
           };
 
-          _this31.requestMiddlewares[0](req, res, next, resolve, reject);
+          _this32.requestMiddlewares[0](req, res, next, resolve, reject);
         } else {
           endRequest();
         }
@@ -1313,14 +1315,14 @@ var Papi = function (_ResourceSchema) {
       };
 
       var beginResponse = function beginResponse() {
-        if (_this31.responseMiddlewares.length) {
+        if (_this32.responseMiddlewares.length) {
           var offset = 0;
           var next = function next() {
-            var layer = _this31.responseMiddlewares[++offset] || endResponse;
+            var layer = _this32.responseMiddlewares[++offset] || endResponse;
             return layer(req, res, next, resolve, reject);
           };
 
-          _this31.responseMiddlewares[0](req, res, next, resolve, reject);
+          _this32.responseMiddlewares[0](req, res, next, resolve, reject);
         } else {
           endResponse();
         }
