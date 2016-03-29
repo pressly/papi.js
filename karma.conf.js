@@ -141,6 +141,18 @@ module.exports = function(config) {
         browserName: 'internet explorer',
         platform: 'Windows 8.1',
         version: '11'
+      },
+      sl_ie_10: {
+        base: 'SauceLabs',
+        browserName: 'internet explorer',
+        platform: 'Windows 7',
+        version: '10'
+      },
+      sl_ie_9: {
+        base: 'SauceLabs',
+        browserName: 'internet explorer',
+        platform: 'Windows 7',
+        version: '9'
       }
    },
 
@@ -148,11 +160,11 @@ module.exports = function(config) {
     // start these browsers
     // available browser launchers: https://npmjs.org/browse/keyword/karma-launcher
     //browsers: ['Chrome', 'Firefox', 'PhantomJS'],
-    browsers: ['PhantomJS'],
+    //browsers: ['PhantomJS'],
     //browsers: ['bs_firefox_mac', 'bs_iphone5', 'bs_ie11_windows8', 'bs_ie10_windows7', 'bs_ie9_windows7'],
     //browsers: ['bs_ie11_windows8', 'bs_ie10_windows7', 'bs_ie9_windows7'],
     //browsers: ['bs_ie9_windows7'],
-    //browsers: ['sl_ie_11'], 
+    browsers: ['sl_ie_9'], 
     // Continuous Integration mode
     // if true, Karma captures browsers, runs the tests and exits
     singleRun: true
