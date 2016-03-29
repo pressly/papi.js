@@ -1,12 +1,14 @@
 'use strict'
 
-import {filter, pick, difference, functions} from 'lodash';
-
 export default class Model {
   constructor(data, options = {}) {
     Object.assign(this, data);
 
-    this.$newRecord = true;
+    Object.defineProperty(this, '$newRecord', {
+      enumerable: false,
+      writable: true,
+      value: true
+    });
   }
 
   $delete(params) {
@@ -25,10 +27,10 @@ export default class Model {
   }
 
   $attributes() {
-    return filter(difference(Object.keys(this), functions(this)), (x) => { return x[0] != '$' });
+    return Object.keys(this);
   }
 
   $data() {
-    return pick(this, this.$attributes());
+    return this.$attributes().reduce((result, key) => { result[key] = this[key]; return result; }, {});
   }
 }

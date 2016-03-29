@@ -209,20 +209,24 @@ export default class Resource {
   hydrateModel(data, options = {}) {
     var model = new this.constructor.modelClass(data);
 
+    this.sync(data);
+
+    // By default the model $newRecord will be true
     if (!options.newRecord) {
       model.$newRecord = false;
     }
 
-    this.sync(data);
-
     // Set a reference to the resource on the model
-    model.$resource = (name) => {
-      if (isEmpty(name)) {
-        return this;
-      } else {
-        return this.api.$resource(name, this);
+    Object.defineProperty(model, '$resource', {
+      enumerable: false,
+      value: (name) => {
+        if (isEmpty(name)) {
+          return this;
+        } else {
+          return this.api.$resource(name, this);
+        }
       }
-    };
+    });
 
     return model;
   }
