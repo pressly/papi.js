@@ -288,6 +288,7 @@ Papi.defineSchema()
 
     .resource('tags')
 
+    // XXX the assets endpoint will be replaced with posts shortly
     .resource('assets', { routeSegment: '/stream/:id' }).open()
       .put('feature',   { on: 'member' })
       .put('unfeature', { on: 'member' })
@@ -299,6 +300,8 @@ Papi.defineSchema()
       .resource('likes')
       .resource('comments')
     .close()
+
+    .resource('posts', { routeSegment: '/posts/published/:id'})
 
     .resource('drafts').open()
       .put('publish', { on: 'member' })
