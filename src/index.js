@@ -239,6 +239,8 @@ Papi.defineSchema()
     .delete('unfollow', { on: 'member', path: '/follow' })
     .get('reach',       { on: 'member' })
 
+    .get('styles', { on: 'member', path: '/current/styles' })
+
     .resource('widgets').open()
       .get('dimensions', { on: 'resource' })
     .close()
