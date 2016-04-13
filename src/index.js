@@ -239,11 +239,12 @@ Papi.defineSchema()
     .delete('unfollow', { on: 'member', path: '/follow' })
     .get('reach',       { on: 'member' })
 
-    .get('styles', { on: 'member', path: '/current/styles' })
-
     .resource('widgets').open()
       .get('dimensions', { on: 'resource' })
     .close()
+
+    // Readonly styles endpoint
+    .get('styles', { on: 'member', path: '/apps/current/styles' })
 
     .resource('apps').open()
       .get('current', { on: 'resource' })
