@@ -1,13 +1,5 @@
 'use strict';
 
-var _every2 = require('lodash/every');
-
-var _every3 = _interopRequireDefault(_every2);
-
-var _pick2 = require('lodash/pick');
-
-var _pick3 = _interopRequireDefault(_pick2);
-
 var _clone2 = require('lodash/clone');
 
 var _clone3 = _interopRequireDefault(_clone2);
@@ -559,13 +551,6 @@ var App = function (_Model3) {
   return App;
 }(Model);
 
-var DISPLAY_STATES = {
-  VISIBLE: 1,
-  FEATURED: 2,
-  HIGHLIGHTED: 4,
-  LOCKED: 8
-};
-
 var Asset = function (_Model4) {
   _inherits(Asset, _Model4);
 
@@ -574,30 +559,6 @@ var Asset = function (_Model4) {
 
     return _possibleConstructorReturn(this, _Model4.apply(this, arguments));
   }
-
-  Asset.prototype.isVisible = function isVisible() {
-    return (this.display_state & DISPLAY_STATES.VISIBLE) === DISPLAY_STATES.VISIBLE;
-  };
-
-  Asset.prototype.isHidden = function isHidden() {
-    return (this.display_state & DISPLAY_STATES.VISIBLE) !== DISPLAY_STATES.VISIBLE;
-  };
-
-  Asset.prototype.isFeatured = function isFeatured() {
-    return (this.display_state & DISPLAY_STATES.FEATURED) === DISPLAY_STATES.FEATURED;
-  };
-
-  Asset.prototype.isHighlighted = function isHighlighted() {
-    return (this.display_state & DISPLAY_STATES.HIGHLIGHTED) === DISPLAY_STATES.HIGHLIGHTED;
-  };
-
-  Asset.prototype.isLocked = function isLocked() {
-    return (this.display_state & DISPLAY_STATES.LOCKED) === DISPLAY_STATES.LOCKED;
-  };
-
-  Asset.prototype.isOriginal = function isOriginal() {
-    return (0, _every3.default)((0, _pick3.default)(this.source, 'network', 'uid', 'url'), _isEmpty3.default);
-  };
 
   return Asset;
 }(Model);
