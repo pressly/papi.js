@@ -304,7 +304,9 @@ Papi.defineSchema()
       .resource('comments')
     .close()
 
-    .resource('posts', { routeSegment: '/posts/published/:id'})
+    .resource('posts', { routeSegment: '/posts/published/:id'}).open()
+      .resource('contributions')
+    .close()
 
     .resource('drafts').open()
       .put('publish', { on: 'member' })

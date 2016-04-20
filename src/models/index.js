@@ -13,6 +13,7 @@ export * from './feed-asset';
 export * from './hub';
 export * from './invite';
 export * from './like';
+export * from './post';
 export * from './recommendation';
 export * from './style';
 export * from './tag';
