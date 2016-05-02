@@ -13,6 +13,9 @@ build: install
 
 rebuild: clean build
 
+dist: build
+	@gulp dist
+
 test:
 	@npm run test
 
