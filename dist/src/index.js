@@ -1231,7 +1231,7 @@ var Papi = function (_ResourceSchema) {
         req.headers['Authorization'] = 'Bearer ' + _this33.auth.session.jwt;
       }
 
-      req.headers['Accept'] = 'application/vnd.pressly.v0.12+json';
+      req.headers['Accept'] = 'application/vnd.pressly.v2.0+json';
 
       // Query params to be added to the url
       if (options.query) {
