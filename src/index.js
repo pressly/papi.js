@@ -270,6 +270,7 @@ Papi.defineSchema()
     .close()
 
     .resource('invites').open()
+      .get('users',         { on: 'resource' })
       .post('bulk_invite',  { on: 'resource' })
       .post('resend',       { on: 'member' })
       .put('accept',        { on: 'member', routeSegment: '/invites/:hash' })
