@@ -118,12 +118,13 @@ var Resource = function () {
     if (parentResource) {
       var parentParams = {};
 
-      (0, _each3.default)(parentResource.route.params, function (value, paramName) {
+      (0, _each3.default)(parentResource.route.paramNames, function (paramName) {
+        var parentParamName = paramName;
         if (parentResource.key != _this.key && paramName == 'id') {
-          paramName = singularize$1(parentResource.name) + 'Id';
+          parentParamName = singularize$1(parentResource.name) + 'Id';
         }
 
-        parentParams[paramName] = value;
+        parentParams[parentParamName] = parentResource.route.params[paramName];
       });
 
       Object.assign(this.route.params, parentParams);
@@ -162,7 +163,8 @@ var Resource = function () {
 
     var route = this.route.segments.join('');
 
-    (0, _each3.default)(this.route.params, function (value, paramName) {
+    (0, _each3.default)(this.route.paramNames, function (paramName) {
+      var value = _this3.route.params[paramName];
       if (!value && _this3.route.segments.length > 1 && paramName !== _this3.route.paramName) {
         throw new Error('$resource: Can\'t make request because route was missing \'' + paramName + '\' param.');
       }
@@ -278,6 +280,7 @@ var Resource = function () {
       this.route.params[this.route.paramName] = data[this.route.paramName];
     }
 
+    // XXX This will potentially cause conflict errors in the future
     // Update actions route params
     (0, _each3.default)(this.actions, function (action) {
       if (action.options.paramName) {
@@ -821,8 +824,9 @@ var buildRoute = function buildRoute(resource) {
     path = segments.join('');
   }
 
+  var paramNames = parseRouteParams(path);
   var params = {};
-  (0, _each3.default)(parseRouteParams(path), function (paramName) {
+  (0, _each3.default)(paramNames, function (paramName) {
     params[paramName] = null;
   });
 
@@ -831,7 +835,8 @@ var buildRoute = function buildRoute(resource) {
     segments: segments,
     segment: segments[segments.length - 1],
     params: params,
-    paramName: resource.options.paramName || 'id'
+    paramNames: paramNames,
+    paramName: paramNames[paramNames.length - 1]
   };
 };
 
