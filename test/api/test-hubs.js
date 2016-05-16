@@ -122,4 +122,21 @@ describe('Hubs Resource', function () {
       done(err);
     });
   });
+
+  it('should create a new invite', function(done) {
+    mockRequest.post(`/hubs/123/invites`).reply(200, { invite: true });
+
+    var model = api.$resource('hubs.invites', { hubId: 123 }).$create({ name: 'Hello' });
+    model.should.be.instanceOf(models.Invite);
+    should(model.$newRecord).equal(true);
+
+    model.$save().then(function(res) {
+      should(model.$newRecord).equal(false);
+      model.should.be.instanceOf(models.Invite);
+
+      done();
+    }).catch(function(err) {
+      done(err);
+    });
+  });
 });

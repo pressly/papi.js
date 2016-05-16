@@ -52,12 +52,13 @@ export default class Resource {
     if (parentResource) {
       var parentParams = {};
 
-      each(parentResource.route.params, (value, paramName) => {
+      each(parentResource.route.paramNames, (paramName) => {
+        var parentParamName = paramName;
         if (parentResource.key != this.key && paramName == 'id') {
-          paramName = singularize(parentResource.name) + 'Id';
+          parentParamName = singularize(parentResource.name) + 'Id';
         }
 
-        parentParams[paramName] = value;
+        parentParams[parentParamName] = parentResource.route.params[paramName];
       });
 
       Object.assign(this.route.params, parentParams);
@@ -88,7 +89,8 @@ export default class Resource {
   buildPath() {
     var route = this.route.segments.join('');
 
-    each(this.route.params, (value, paramName) => {
+    each(this.route.paramNames, (paramName) => {
+      var value = this.route.params[paramName];
       if (!value && this.route.segments.length > 1 && paramName !== this.route.paramName) {
         throw new Error(`$resource: Can't make request because route was missing '${paramName}' param.`);
       }
@@ -198,6 +200,7 @@ export default class Resource {
       this.route.params[this.route.paramName] = data[this.route.paramName];
     }
 
+    // XXX This will potentially cause conflict errors in the future
     // Update actions route params
     each(this.actions, (action) => {
       if (action.options.paramName) {

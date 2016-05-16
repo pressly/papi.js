@@ -56,17 +56,19 @@ var buildRoute = function(resource) {
     path = segments.join('');
   }
 
+  var paramNames = parseRouteParams(path)
   var params = {};
-  each(parseRouteParams(path), function(paramName) {
+  each(paramNames, function(paramName) {
     params[paramName] = null;
   });
 
   return {
-    path: path,
-    segments: segments,
+    path,
+    segments,
     segment: segments[segments.length - 1],
-    params: params,
-    paramName: resource.options.paramName || 'id'
+    params,
+    paramNames,
+    paramName: paramNames[paramNames.length - 1]
   };
 };
 
