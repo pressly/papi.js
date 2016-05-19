@@ -18,6 +18,9 @@ import {isEmpty} from 'lodash';
 
 import ResourceSchema from './resource-schema';
 
+import memoize from '../lib/memoize'
+
+
 class Papi extends ResourceSchema {
   constructor(options = {}) {
     super(...arguments);
@@ -81,6 +84,10 @@ class Papi extends ResourceSchema {
           return res;
         });
       }
+    }
+
+    if (this.options.memoize == true) {
+      this.request = memoize(this.request, { maxAge: 1000, individualExpiry: true })
     }
   }
 
