@@ -460,6 +460,12 @@ var Resource = function () {
             return collection.$remove(model);
           });
         }
+      },
+
+      $data: function $data() {
+        return (0, _map3.default)(collection, function (model) {
+          return model.$data();
+        });
       }
     };
 
