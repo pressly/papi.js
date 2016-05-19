@@ -1138,7 +1138,7 @@ if (!global.fetch) {
   global.fetch = require('isomorphic-fetch');
 }
 
-var memoize = require('./../lib/memoize');
+var memoize = require('../lib/memoize');
 
 var Papi = function (_ResourceSchema) {
   _inherits(Papi, _ResourceSchema);
