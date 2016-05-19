@@ -4,12 +4,17 @@ var runSequence = require('run-sequence');
 
 /** BUILD *********************************************************************/
 gulp.task('build', function(cb) {
-  return runSequence('build:clean', 'build:es6', 'build:bundle', cb);
+  return runSequence('build:clean', 'build:lib', 'build:es6', 'build:bundle', cb);
   //return runSequence('build:clean', 'build:bundle-babelify', cb);
 });
 
 gulp.task('build:clean', function(cb) {
   require('del')(['build'], cb);
+});
+
+gulp.task('build:lib', function() {
+  return gulp.src('./lib/*')
+    .pipe(gulp.dest('build/lib'))
 });
 
 gulp.task('build:es6', function() {

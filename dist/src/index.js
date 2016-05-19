@@ -1132,6 +1132,8 @@ if (!global.fetch) {
   global.fetch = require('isomorphic-fetch');
 }
 
+var memoize = require('./../lib/memoize');
+
 var Papi = function (_ResourceSchema) {
   _inherits(Papi, _ResourceSchema);
 
@@ -1202,6 +1204,10 @@ var Papi = function (_ResourceSchema) {
         });
       }
     };
+
+    if (_this32.options.memoize == true) {
+      _this32.request = memoize(_this32.request, { maxAge: 1000, individualExpiry: true });
+    }
     return _this32;
   }
 

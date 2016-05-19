@@ -10,6 +10,8 @@ if (!global.fetch) {
   global.fetch = require('isomorphic-fetch');
 }
 
+const memoize = require('./../lib/memoize')
+
 // Query string parser and stringifier -- fetch does not support any query string
 // parsing so we need to handle it separately.
 import qs from 'querystring';
@@ -17,9 +19,6 @@ import qs from 'querystring';
 import {isEmpty} from 'lodash';
 
 import ResourceSchema from './resource-schema';
-
-import memoize from '../lib/memoize'
-
 
 class Papi extends ResourceSchema {
   constructor(options = {}) {
