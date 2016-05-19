@@ -10,7 +10,7 @@ if (!global.fetch) {
   global.fetch = require('isomorphic-fetch');
 }
 
-const memoize = require('./../lib/memoize')
+const memoize = require('../lib/memoize');
 
 // Query string parser and stringifier -- fetch does not support any query string
 // parsing so we need to handle it separately.

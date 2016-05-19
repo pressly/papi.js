@@ -29,7 +29,7 @@
 
 **/
 
-module.exports = function (fn, options) {
+function memoize(fn, options) {
   options || (options = {});
 
   var globalExpiryTimeout = null;
@@ -68,6 +68,8 @@ module.exports = function (fn, options) {
     }
   };
 }
+
+module.exports = memoize;
 
 },{}],2:[function(require,module,exports){
 (function (global){
@@ -1211,7 +1213,7 @@ if (!global.fetch) {
   global.fetch = require('isomorphic-fetch');
 }
 
-var memoize = require('./../lib/memoize');
+var memoize = require('../lib/memoize');
 
 var Papi = function (_ResourceSchema) {
   _inherits(Papi, _ResourceSchema);
@@ -1431,7 +1433,7 @@ Papi.defineSchema().resource('accounts').open().get('available', { on: 'resource
 // This resource links to the root hubs resource
 .resource('hubs', { link: 'hubs' }).close().resource('signup').open().get('account_uid_available', { on: 'member' }).get('account_email_available', { on: 'member' }).close().resource('users').open().get('roles', { on: 'resource' }).resource('hubs').resource('organizations').close().resource('discover').open().resource('users', { link: 'users' }).resource('organizations', { link: 'organizations' }).resource('hubs', { link: 'hubs' }).resource('posts').close().resource('creds').open().post('share', { on: 'member' }).close().resource('stream').open().close();
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./../lib/memoize":1,"dodgy":3,"isomorphic-fetch":4,"lodash/clone":106,"lodash/each":108,"lodash/filter":110,"lodash/find":111,"lodash/isArray":117,"lodash/isEmpty":121,"lodash/isNumber":125,"lodash/isObject":126,"lodash/last":132,"lodash/map":133,"promiz":137,"querystring":140}],3:[function(require,module,exports){
+},{"../lib/memoize":1,"dodgy":3,"isomorphic-fetch":4,"lodash/clone":106,"lodash/each":108,"lodash/filter":110,"lodash/find":111,"lodash/isArray":117,"lodash/isEmpty":121,"lodash/isNumber":125,"lodash/isObject":126,"lodash/last":132,"lodash/map":133,"promiz":137,"querystring":140}],3:[function(require,module,exports){
 /*!
 Copyright (C) 2015 by Andrea Giammarchi - @WebReflection
 
