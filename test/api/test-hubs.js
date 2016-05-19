@@ -27,6 +27,8 @@ describe('Hubs Resource', function () {
       res[0].should.instanceOf(models.Hub);
       should(res[0].$newRecord).not.equal(true);
 
+      should(res.$data().length).equal(6);
+
       should.exist(res.$nextPage);
 
       done();

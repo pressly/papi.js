@@ -363,6 +363,10 @@ export default class Resource {
             return collection.$remove(model);
           });
         }
+      },
+
+      $data: () => {
+        return map(collection, (model) => model.$data())
       }
     };
 
