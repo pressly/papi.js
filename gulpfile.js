@@ -53,7 +53,7 @@ gulp.task('dist', ['build'], function(cb) {
 });
 
 gulp.task('dist:clean', function(cb) {
-  require('del')(['dist'], cb);
+  return require('del')(['dist'], cb);
 })
 
 gulp.task('dist:copy', function() {

@@ -19,8 +19,5 @@ dist: build
 test:
 	@npm run test
 
-test-server:
-	@NOCK_OFF=true npm run test
-
 test-watch:
 	@npm run test-watch

@@ -1,7 +1,5 @@
 'use strict';
 
-import nock from 'nock'; // Needs to be imported first before papi because it overrides http and so does node-fetch
-
 import Papi from '../../src';
 import * as mock from './mocks';
 import should from 'should';

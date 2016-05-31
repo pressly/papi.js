@@ -1,7 +1,6 @@
 'use strict';
 
 import mockRequest from '../../lib/mock-request';
-//import nock from 'nock';  // Needs to be imported first before papi because it overrides http and so does node-fetch
 
 import Papi from '../../src';
 import * as mock from './mocks';
@@ -10,26 +9,6 @@ import should from 'should';
 const api = new Papi();
 
 mockRequest.config({host: api.options.host});
-
-// interceptors
-// var mockRequest = nock(api.options.host);
-//
-// mockRequest.post('/auth/login', { email: 'incorrect-email', password: 'incorrect-password', }).reply(401)
-// mockRequest.post('/auth/login', { email: mock.session.email, password: mock.session.password }).times(3).reply(200, mock.session);
-//
-// mockRequest.delete('/session').reply(200)
-// mockRequest.get('/session').times(2).reply(function() {
-//   if (api.auth.session) {
-//     return [200, mock.session];
-//   }
-//
-//   return [401, null];
-// })
-//
-// clear outstanding interceptors
-// after(function() {
-//   nock.cleanAll();
-// });
 
 describe('Auth', function () {
   describe('Login', function() {

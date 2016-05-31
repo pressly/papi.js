@@ -1,5 +1,5 @@
 import mockRequest from '../../lib/mock-request';
-//import nock from 'nock'; // Needs to be imported first before papi because it overrides http and so does node-fetch
+
 
 import Papi from '../../src';
 import * as mock from './mocks';
@@ -11,7 +11,7 @@ const api = new Papi();
 
 api.auth.set({jwt: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNTRmMGRiNzMwOGFmYTEyYjUzNjIwNTg4In0.CvXGDKAJYZkoH3nnEirtlGlwRzErv1ANOJ-dVkUAnjo#_login_post'});
 
-//var mockRequest = nock(api.options.host).matchHeader('authorization', function() { return `Bearer ${api.auth.session.jwt}`; });
+
 mockRequest.config({host: api.options.host});
 
 describe('Styles Resource', function() {
