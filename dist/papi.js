@@ -1304,7 +1304,8 @@ var Papi = function (_ResourceSchema) {
         url: url,
         method: method,
         headers: {},
-        query: {}
+        query: {},
+        credentials: 'include'
       };
 
       req.headers['Content-Type'] = 'application/json';
@@ -1312,11 +1313,6 @@ var Papi = function (_ResourceSchema) {
       // if (options.timeout || this.options.timeout) {
       //   req.timeout(options.timeout || this.options.timeout);
       // }
-
-      // Allow sending cookies from origin
-      if (typeof req.withCredentials == 'function') {
-        req.credentials = 'include';
-      }
 
       // Send Authorization header when we have a JSON Web Token set in the session
       if (_this33.auth.session && _this33.auth.session.jwt) {
