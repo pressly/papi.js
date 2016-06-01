@@ -75,6 +75,26 @@ class Papi extends ResourceSchema {
         return this.request('post', '/auth/password_reset', { data: {email} });
       },
 
+      requestNetworkCreds: (network) => {
+        return new Promise((resolve, reject) => {
+          const url = this.options.host + `/auth/${network}?close=true`;
+
+          window.open(url);
+
+          const handleResponse = (ev) => {
+            if (/localhost|api\.pressly\.com/.test(ev.origin)) {
+              resolve(ev.data);
+            } else {
+              reject();
+            }
+
+            window.resolveEventListener('message', handleResponse);
+          };
+
+          window.addEventListener('message', handleResponse);
+        });
+      },
+
       logout: () => {
         // Clear session immediately even if server fails to respond
         this.auth.session = null;
