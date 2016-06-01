@@ -1214,7 +1214,7 @@ var Papi = function (_ResourceSchema) {
               reject();
             }
 
-            window.resolveEventListener('message', handleResponse);
+            window.removeEventListener('message', handleResponse);
           };
 
           window.addEventListener('message', handleResponse);
