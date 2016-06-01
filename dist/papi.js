@@ -1276,6 +1276,26 @@ var Papi = function (_ResourceSchema) {
         return _this32.request('post', '/auth/password_reset', { data: { email: email } });
       },
 
+      requestNetworkCreds: function requestNetworkCreds(network) {
+        return new Promise(function (resolve, reject) {
+          var url = _this32.options.host + ('/auth/' + network + '?close=true');
+
+          window.open(url);
+
+          var handleResponse = function handleResponse(ev) {
+            if (/localhost|api\.pressly\.com/.test(ev.origin)) {
+              resolve(ev.data);
+            } else {
+              reject();
+            }
+
+            window.resolveEventListener('message', handleResponse);
+          };
+
+          window.addEventListener('message', handleResponse);
+        });
+      },
+
       logout: function logout() {
         // Clear session immediately even if server fails to respond
         _this32.auth.session = null;
