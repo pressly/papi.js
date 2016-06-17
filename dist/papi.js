@@ -117,6 +117,8 @@ var _isEmpty3 = _interopRequireDefault(_isEmpty2);
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
 
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
 var _querystring = require('querystring');
 
 var _querystring2 = _interopRequireDefault(_querystring);
@@ -200,7 +202,7 @@ var Resource = function () {
         parentParams[parentParamName] = parentResource.route.params[paramName];
       });
 
-      Object.assign(this.route.params, parentParams);
+      _extends(this.route.params, parentParams);
 
       if (inherit) {
         this.route.queryParams = (0, _clone3.default)(parentResource.route.queryParams);
@@ -225,7 +227,7 @@ var Resource = function () {
 
     var path = options.action ? this.buildActionPath(options.action) : this.buildPath();
 
-    return this.api.request(options.method || 'get', path, Object.assign({}, this.options, { query: Object.assign({}, this.route.queryParams, options.query), data: options.data })).then(function (res) {
+    return this.api.request(options.method || 'get', path, _extends({}, this.options, { query: _extends({}, this.route.queryParams, options.query), data: options.data })).then(function (res) {
       _this2.setResponse(res);
       return res.data;
     });
@@ -282,7 +284,7 @@ var Resource = function () {
   };
 
   Resource.prototype.query = function query(params) {
-    Object.assign(this.route.queryParams, params);
+    _extends(this.route.queryParams, params);
 
     return this;
   };
@@ -544,7 +546,7 @@ var Resource = function () {
       }
     };
 
-    Object.assign(collection, methods);
+    _extends(collection, methods);
 
     return collection;
   };
@@ -558,7 +560,7 @@ var Model = function () {
 
     _classCallCheck(this, Model);
 
-    Object.assign(this, data);
+    _extends(this, data);
 
     Object.defineProperty(this, '$newRecord', {
       enumerable: false,
@@ -580,7 +582,7 @@ var Model = function () {
       _this8.$newRecord = false;
       _this8.$resource().sync(res);
 
-      return Object.assign(_this8, res);
+      return _extends(_this8, res);
     });
   };
 
@@ -1066,7 +1068,7 @@ ResourceSchema.defineSchema = function () {
 
               var data = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
 
-              return this.request(Object.assign({ method: method, action: action }, { data: data })).then(function (res) {
+              return this.request(_extends({ method: method, action: action }, { data: data })).then(function (res) {
                 if ((0, _isArray3.default)(res)) {
                   return _this30.hydrateCollection(res);
                 } else {
@@ -1086,7 +1088,7 @@ ResourceSchema.defineSchema = function () {
 
               var data = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
 
-              return this.request(Object.assign({ method: method, action: action }, { data: data })).then(function (res) {
+              return this.request(_extends({ method: method, action: action }, { data: data })).then(function (res) {
                 return _this31.hydrateModel(res);
               });
             };
@@ -1126,7 +1128,7 @@ ResourceSchema.defineSchema = function () {
     };
   };
 
-  return Object.assign({}, pointer({}));
+  return _extends({}, pointer({}));
 };
 
 // ResourceSchema.generateMarkdown = function() {
@@ -1343,13 +1345,13 @@ var Papi = function (_ResourceSchema) {
 
       // Query params to be added to the url
       if (options.query) {
-        Object.assign(req.query, options.query);
+        _extends(req.query, options.query);
       }
 
       // Data to send (with get requests these are converted into query params)
       if (options.data) {
         if (method == 'get') {
-          Object.assign(req.query, options.data);
+          _extends(req.query, options.data);
         } else {
           req.body = JSON.stringify(options.data);
         }

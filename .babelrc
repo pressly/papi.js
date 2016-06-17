@@ -2,5 +2,5 @@
   "presets": [
     "es2015-loose"
   ],
-  "plugins": ["lodash"]
+  "plugins": ["lodash", "transform-object-assign"]
 }
