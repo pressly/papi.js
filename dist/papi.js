@@ -333,7 +333,7 @@ var Resource = function () {
     var data = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
 
     var resource = this.createResource();
-    return resource.hydrateModel(data, { newRecord: (0, _isEmpty3.default)(data[this.route.paramName]) });
+    return resource.hydrateModel(data, { newRecord: !data[this.route.paramName] });
   };
 
   Resource.prototype.setResponse = function setResponse(res) {
@@ -469,7 +469,7 @@ var Resource = function () {
         var data = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
 
         var resource = _this7.createResource();
-        return resource.hydrateModel(data, { newRecord: (0, _isEmpty3.default)(data[_this7.route.paramName]) });
+        return resource.hydrateModel(data, { newRecord: !data[_this7.route.paramName] });
       },
 
       $add: function $add() {

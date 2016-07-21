@@ -180,7 +180,7 @@ export default class Resource {
 
   $create(data = {}) {
     var resource = this.createResource();
-    return resource.hydrateModel(data, { newRecord: isEmpty(data[this.route.paramName]) });
+    return resource.hydrateModel(data, { newRecord: !data[this.route.paramName] });
   }
 
   setResponse(res) {
@@ -301,7 +301,7 @@ export default class Resource {
 
       $create: (data = {}) => {
         var resource = this.createResource();
-        return resource.hydrateModel(data, { newRecord: isEmpty(data[this.route.paramName]) });
+        return resource.hydrateModel(data, { newRecord: !data[this.route.paramName] });
       },
 
       $add: (model = {}, idx, applySorting = false) => {
