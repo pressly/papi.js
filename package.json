@@ -1,6 +1,6 @@
 {
   "name": "papi",
-  "version": "2.0.12",
+  "version": "2.0.13",
   "description": "Javascript HTTP/REST client for the Pressly API",
   "author": "Peter Kieltyka <peter@pressly.com>",
   "jsnext:main": "./src/index.js",
