@@ -328,12 +328,28 @@ Papi.defineSchema()
     .close()
 
     .resource('posts', { routeSegment: '/posts/published/:id'}).open()
+      .put('hide',      { on: 'member' })
+      .put('unhide',    { on: 'member' })
+      .put('reorder',   { on: 'member' })
+
       .resource('contributions')
     .close()
 
-    .resource('drafts').open()
+    .resource('scheduled', { routeSegment: '/posts/scheduled/:id'}).open()
+      .put('publish', { on: 'member' })
+      .put('unpublish', { on: 'member' })
+    .close()
+
+    .resource('submissions', { routeSegment: '/posts/submissions/:id'}).open()
+      .put('publish', { on: 'member' })
+      .put('unpublish', { on: 'member' })
+    .close()
+
+    .resource('drafts', { routeSegment: '/posts/drafts/:id'}).open()
       .put('publish', { on: 'member' })
     .close()
+
+    .resource('deleted', { routeSegment: '/posts/deleted/:id'})
   .close()
 
   .resource('invites').open()
