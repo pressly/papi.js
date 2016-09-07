@@ -25,6 +25,10 @@ var parseHTTPLinks = function(linksString) {
   return links;
 };
 
+var toUnderscoreCase = function(str) {
+	return str.replace(/([A-Z])/g, function($1){return "_" + $1.toLowerCase(); });
+};
+
 export default class Resource {
   constructor(api, parentResource, inherit = false) {
     var def = this.constructor.definition;
@@ -196,9 +200,15 @@ export default class Resource {
   sync(data) {
     // Set route params based on data from the model
     // This is important step to take if the model queried from an all, queryParams, or action
-    if (data[this.route.paramName]) {
-      this.route.params[this.route.paramName] = data[this.route.paramName];
-    }
+    // Route param params are generally populated by the parent resources but sometimes
+    // when hydrating a nested resourcewe will need to populate these properties from the raw data of the model
+    each(Object.keys(this.route.params), (paramName) => {
+      if (!this.route.params[paramName]) {
+        // Data from the backend is in underscore case
+        const param_name = toUnderscoreCase(paramName)
+        this.route.params[paramName] = data[param_name]
+      }
+    })
 
     // XXX This will potentially cause conflict errors in the future
     // Update actions route params

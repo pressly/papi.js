@@ -87,4 +87,23 @@ describe('Resources', function() {
 
     done();
   });
+
+  it('should hydrate model and sync route', function(done) {
+    mockRequest.put('/hubs/1/posts/published/2').reply(200, { hub_id: 1, id: 2, title: 'Persisted Article Update'});
+
+    var model = api.$resource('hubs.posts').hydrateModel({ hub_id: 1, id: 2, title: 'Persisted Article' });
+    model.should.be.instanceOf(models.Post);
+    model.title.should.equal('Persisted Article');
+    should(model.$newRecord).equal(false);
+
+    model.title = 'Persisted Article Update'
+
+    model.$save().then(res => {
+      res.title.should.equal('Persisted Article Update')
+
+      done();
+    }).catch(err => {
+      done(err)
+    });
+  });
 });
