@@ -260,11 +260,17 @@ var Resource = function () {
     });
   };
 
-  Resource.prototype.$create = function $create() {
+  Resource.prototype.$build = function $build() {
     var data = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
 
     var resource = this.createResource();
     return resource.hydrateModel(data, { newRecord: !data[this.route.paramName] });
+  };
+
+  Resource.prototype.$create = function $create() {
+    var data = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+
+    return this.$build(data).$save();
   };
 
   Resource.prototype.setResponse = function setResponse(res) {
@@ -402,11 +408,17 @@ var Resource = function () {
         return (0, _filter3.default)(collection, params);
       },
 
-      $create: function $create() {
+      $build: function $build() {
         var data = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
 
         var resource = _this7.createResource();
         return resource.hydrateModel(data, { newRecord: !data[_this7.route.paramName] });
+      },
+
+      $create: function $create() {
+        var data = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+
+        return collection.$build(data).$save();
       },
 
       $add: function $add() {
@@ -415,7 +427,7 @@ var Resource = function () {
         var applySorting = arguments.length <= 2 || arguments[2] === undefined ? false : arguments[2];
 
         if ((typeof model === 'undefined' ? 'undefined' : _typeof(model)) == 'object' && !(model instanceof _this7.constructor.modelClass)) {
-          model = collection.$create(model);
+          model = collection.$build(model);
         }
 
         if ((0, _isNumber3.default)(idx)) {
