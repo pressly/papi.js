@@ -58,7 +58,7 @@ describe('Resources', function() {
   });
 
   it('should create a new model', function(done) {
-    var model = api.$resource('hubs').$create({ name: 'New Hub' });
+    var model = api.$resource('hubs').$build({ name: 'New Hub' });
     model.should.be.instanceOf(models.Hub);
     model.name.should.equal('New Hub');
     should(model.$newRecord).equal(true);
@@ -67,7 +67,7 @@ describe('Resources', function() {
   });
 
   it('should create a new model with an id', function(done) {
-    var model = api.$resource('hubs').$create({ id: 1, name: 'New Hub' });
+    var model = api.$resource('hubs').$build({ id: 1, name: 'New Hub' });
     model.should.be.instanceOf(models.Hub);
     model.name.should.equal('New Hub');
     should(model.$newRecord).equal(false);
@@ -76,7 +76,7 @@ describe('Resources', function() {
   });
 
   it('should throw error if required route params do not validate before request', function(done) {
-    var model = api.$resource('hubs.assets').$create({title: 'New Article'});
+    var model = api.$resource('hubs.assets').$build({title: 'New Article'});
     model.should.be.instanceOf(models.Asset);
     model.title.should.equal('New Article');
     should(model.$newRecord).equal(true);

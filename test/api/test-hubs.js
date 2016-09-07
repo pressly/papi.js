@@ -110,7 +110,7 @@ describe('Hubs Resource', function () {
   it('should create a new model', function(done) {
     mockRequest.post(`/hubs`).reply(200, mock.hubs[0]);
 
-    var model = api.$resource('hubs').$create({ name: 'Hello' });
+    var model = api.$resource('hubs').$build({ name: 'Hello' });
     model.should.be.instanceOf(models.Hub);
     model.name.should.equal('Hello');
     should(model.$newRecord).equal(true);
@@ -128,7 +128,7 @@ describe('Hubs Resource', function () {
   it('should create a new invite', function(done) {
     mockRequest.post(`/hubs/123/invites`).reply(200, { invite: true });
 
-    var model = api.$resource('hubs.invites', { hubId: 123 }).$create({ name: 'Hello' });
+    var model = api.$resource('hubs.invites', { hubId: 123 }).$build({ name: 'Hello' });
     model.should.be.instanceOf(models.Invite);
     should(model.$newRecord).equal(true);
 

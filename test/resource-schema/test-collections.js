@@ -27,7 +27,7 @@ describe('Collections', function() {
   });
 
   it('should create a new model', function(done) {
-    var model = collection.$create({ name: 'Hello' });
+    var model = collection.$build({ name: 'Hello' });
     model.should.be.instanceOf(models.Hub);
     model.name.should.equal('Hello');
     should(model.$newRecord).equal(true);
@@ -37,7 +37,7 @@ describe('Collections', function() {
 
   it('should add a new model', function(done) {
     should(collection.length).equal(mock.hubs.length);
-    var model = collection.$create({ name: 'Hello' });
+    var model = collection.$build({ name: 'Hello' });
 
     collection.$add(model);
     should(collection.length).equal(mock.hubs.length + 1);
@@ -56,7 +56,7 @@ describe('Collections', function() {
 
   it('should add a new model at an index', function(done) {
     should(collection.length).equal(mock.hubs.length);
-    var model = collection.$create({ name: 'Hello' });
+    var model = collection.$build({ name: 'Hello' });
     collection.$add(model, 3);
     should(collection.length).equal(mock.hubs.length + 1);
     collection[3].should.equal(model);
@@ -119,7 +119,7 @@ describe('Collections', function() {
   it('should properly save a created model', function(done) {
     mockRequest.post(`/hubs`).reply(200, { name: 'Hello', id: 1234 });
 
-    var model = collection.$create({name: 'Hello'});
+    var model = collection.$build({name: 'Hello'});
     model.$save().then(function() {
       model.name.should.equal('Hello');
       should(model.id).equal(1234);

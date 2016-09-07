@@ -182,9 +182,13 @@ export default class Resource {
     });
   }
 
-  $create(data = {}) {
+  $build(data = {}) {
     var resource = this.createResource();
     return resource.hydrateModel(data, { newRecord: !data[this.route.paramName] });
+  }
+
+  $create(data = {}) {
+    return this.$build(data).$save();
   }
 
   setResponse(res) {
@@ -309,14 +313,18 @@ export default class Resource {
         return filter(collection, params);
       },
 
-      $create: (data = {}) => {
+      $build: (data = {}) => {
         var resource = this.createResource();
         return resource.hydrateModel(data, { newRecord: !data[this.route.paramName] });
       },
 
+      $create: (data = {}) => {
+        return collection.$build(data).$save()
+      },
+
       $add: (model = {}, idx, applySorting = false) => {
         if (typeof model == 'object' && !(model instanceof this.constructor.modelClass)) {
-          model = collection.$create(model);
+          model = collection.$build(model);
         }
 
         if (isNumber(idx)) {
