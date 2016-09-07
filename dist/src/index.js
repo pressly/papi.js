@@ -922,6 +922,10 @@ var ResourceSchema = function () {
     return new resourceClass(this, parentResource).includeParams(params);
   };
 
+  ResourceSchema.prototype.$ = function $() {
+    return this.$resource.apply(this, arguments);
+  };
+
   return ResourceSchema;
 }();
 

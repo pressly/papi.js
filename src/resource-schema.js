@@ -133,6 +133,10 @@ export default class ResourceSchema {
 
     return new resourceClass(this, parentResource).includeParams(params);
   }
+
+  $() {
+    return this.$resource(...arguments)
+  }
 };
 
 ResourceSchema.defineSchema = function() {
