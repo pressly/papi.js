@@ -122,9 +122,6 @@ class Papi extends ResourceSchema {
         credentials: 'include'
       }
 
-      // Default content type
-      req.headers['Content-Type'] = 'application/json';
-
       // if (options.timeout || this.options.timeout) {
       //   req.timeout(options.timeout || this.options.timeout);
       // }
@@ -148,11 +145,15 @@ class Papi extends ResourceSchema {
         } else {
           if (options.data.toString() === "[object FormData]") {
             req.body = options.data;
-            req.headers['Content-Type'] = 'multipart/form-data';
           } else {
             req.body = JSON.stringify(options.data);
           }
         }
+      }
+
+      if (req.body && req.body.toString() !== "[object FormData]") {
+        // Default content type
+        req.headers['Content-Type'] = 'application/json';
       }
 
       if (!isEmpty(req.query)) {
