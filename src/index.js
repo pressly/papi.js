@@ -145,7 +145,7 @@ class Papi extends ResourceSchema {
         if (method == 'get') {
           Object.assign(req.query, options.data);
         } else {
-          req.body = JSON.stringify(options.data);
+          req.body = options.data.toString() === "[object FormData]" ? options.data : JSON.stringify(options.data);
         }
       }
 
