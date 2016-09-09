@@ -122,6 +122,7 @@ class Papi extends ResourceSchema {
         credentials: 'include'
       }
 
+      // Default content type
       req.headers['Content-Type'] = 'application/json';
 
       // if (options.timeout || this.options.timeout) {
@@ -145,7 +146,12 @@ class Papi extends ResourceSchema {
         if (method == 'get') {
           Object.assign(req.query, options.data);
         } else {
-          req.body = options.data.toString() === "[object FormData]" ? options.data : JSON.stringify(options.data);
+          if (options.data.toString() === "[object FormData]") {
+            req.body = options.data;
+            req.headers['Content-Type'] = 'multipart/form-data';
+          } else {
+            req.body = JSON.stringify(options.data);
+          }
         }
       }
 
