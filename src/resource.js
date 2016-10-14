@@ -1,6 +1,6 @@
 'use strict'
 
-import {map, each, find, filter, clone, isEmpty, isArray, isObject, isNumber} from 'lodash';
+import { each, map, filter, find, isNumber, isObject, isArray, isEmpty, clone } from './helpers'
 
 function deepClone(obj) {
   return JSON.parse(JSON.stringify(obj));

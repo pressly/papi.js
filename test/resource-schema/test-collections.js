@@ -102,6 +102,13 @@ describe('Collections', function() {
     done();
   });
 
+  it('should filter models where params match', function(done) {
+    var models = collection.$where({name: 'Hello'});
+    models[0].name.should.equal('Hello');
+
+    done();
+  });
+
   it('should delete a model', function(done) {
     mockRequest.delete(`/hubs/${mock.hubs[0].id}`).reply(200, mock.hubs[0]);
 

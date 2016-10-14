@@ -1,6 +1,6 @@
 'use strict'
 
-import {map, each, filter, last, isObject, isArray, isEmpty} from 'lodash';
+import { map, each, last, isObject, isArray } from './helpers'
 
 import Resource from './resource';
 import * as models from './models/index';

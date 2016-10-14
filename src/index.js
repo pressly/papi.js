@@ -16,7 +16,7 @@ const memoize = require('../lib/memoize');
 // parsing so we need to handle it separately.
 import qs from 'querystring';
 
-import {isEmpty} from 'lodash';
+import { isEmpty } from './helpers';
 
 import ResourceSchema from './resource-schema';
 
