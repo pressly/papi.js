@@ -268,9 +268,9 @@ Papi.defineSchema()
     .delete('unfollow', { on: 'member', path: '/follow' })
     .get('reach',       { on: 'member' })
 
-    .resource('newsletters').open()
-      .resource('mailinglists', { modelName: 'MailingList' })
-    .close()
+    .resource('newsletters')
+
+    .resource('mailinglists', { routeSegment: '/newsletters/mailinglists/:id', modelName: 'MailingList' })
 
     .resource('widgets').open()
       .get('dimensions', { on: 'resource' })
