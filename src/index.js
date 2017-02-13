@@ -269,7 +269,7 @@ Papi.defineSchema()
     .get('reach',       { on: 'member' })
 
     .resource('newsletters').open()
-      .resource('mailinglists')
+      .resource('mailinglists', { modelName: 'MailingList' })
     .close()
 
     .resource('widgets').open()

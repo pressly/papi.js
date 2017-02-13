@@ -902,73 +902,97 @@ var Like = function (_Model13) {
   return Like;
 }(Model);
 
-var Post = function (_Model14) {
-  _inherits(Post, _Model14);
+var Newsletter = function (_Model14) {
+  _inherits(Newsletter, _Model14);
+
+  function Newsletter() {
+    _classCallCheck(this, Newsletter);
+
+    return _possibleConstructorReturn(this, _Model14.apply(this, arguments));
+  }
+
+  return Newsletter;
+}(Model);
+
+var MailingList = function (_Model15) {
+  _inherits(MailingList, _Model15);
+
+  function MailingList() {
+    _classCallCheck(this, MailingList);
+
+    return _possibleConstructorReturn(this, _Model15.apply(this, arguments));
+  }
+
+  return MailingList;
+}(Model);
+
+var Post = function (_Model16) {
+  _inherits(Post, _Model16);
 
   function Post() {
     _classCallCheck(this, Post);
 
-    return _possibleConstructorReturn(this, _Model14.apply(this, arguments));
+    return _possibleConstructorReturn(this, _Model16.apply(this, arguments));
   }
 
   return Post;
 }(Model);
 
-var Recommendation = function (_Model15) {
-  _inherits(Recommendation, _Model15);
+var Recommendation = function (_Model17) {
+  _inherits(Recommendation, _Model17);
 
   function Recommendation() {
     _classCallCheck(this, Recommendation);
 
-    return _possibleConstructorReturn(this, _Model15.apply(this, arguments));
+    return _possibleConstructorReturn(this, _Model17.apply(this, arguments));
   }
 
   return Recommendation;
 }(Model);
 
-var Style = function (_Model16) {
-  _inherits(Style, _Model16);
+var Style = function (_Model18) {
+  _inherits(Style, _Model18);
 
   function Style() {
     _classCallCheck(this, Style);
 
-    return _possibleConstructorReturn(this, _Model16.apply(this, arguments));
+    return _possibleConstructorReturn(this, _Model18.apply(this, arguments));
   }
 
   return Style;
 }(Model);
 
-var Tag = function (_Model17) {
-  _inherits(Tag, _Model17);
+var Tag = function (_Model19) {
+  _inherits(Tag, _Model19);
 
   function Tag() {
     _classCallCheck(this, Tag);
 
-    return _possibleConstructorReturn(this, _Model17.apply(this, arguments));
+    return _possibleConstructorReturn(this, _Model19.apply(this, arguments));
   }
 
   return Tag;
 }(Model);
 
-var User = function (_Model18) {
-  _inherits(User, _Model18);
+var User = function (_Model20) {
+  _inherits(User, _Model20);
 
   function User() {
     _classCallCheck(this, User);
 
-    return _possibleConstructorReturn(this, _Model18.apply(this, arguments));
+    return _possibleConstructorReturn(this, _Model20.apply(this, arguments));
   }
 
   return User;
 }(Model);
 
-var Widget = function (_Model19) {
-  _inherits(Widget, _Model19);
+var Widget = function (_Model21) {
+  _inherits(Widget, _Model21);
 
   function Widget() {
     _classCallCheck(this, Widget);
 
-    return _possibleConstructorReturn(this, _Model19.apply(this, arguments));
+    return _possibleConstructorReturn(this, _Model21.apply(this, arguments));
   }
 
   return Widget;
@@ -989,6 +1013,8 @@ var models = Object.freeze({
   Hub: Hub,
   Invite: Invite,
   Like: Like,
+  Newsletter: Newsletter,
+  MailingList: MailingList,
   Post: Post,
   Recommendation: Recommendation,
   Style: Style,
@@ -1213,15 +1239,15 @@ ResourceSchema.defineSchema = function () {
             //console.log(`- adding collection action to ${parentPointer.current.key}:`, method, name, options);
 
             resourceClass.prototype['$' + name] = function () {
-              var _this30 = this;
+              var _this32 = this;
 
               var data = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 
               return this.request(_extends({ method: method, action: action }, { data: data })).then(function (res) {
                 if (isArray(res)) {
-                  return _this30.hydrateCollection(res);
+                  return _this32.hydrateCollection(res);
                 } else {
-                  return _this30.hydrateModel(res);
+                  return _this32.hydrateModel(res);
                 }
               });
             };
@@ -1233,12 +1259,12 @@ ResourceSchema.defineSchema = function () {
             //console.log(`- adding member action to ${parentPointer.current.key}:`, method, name, options);
 
             resourceClass.prototype['$' + name] = function () {
-              var _this31 = this;
+              var _this33 = this;
 
               var data = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 
               return this.request(_extends({ method: method, action: action }, { data: data })).then(function (res) {
-                return _this31.hydrateModel(res);
+                return _this33.hydrateModel(res);
               });
             };
 
@@ -1374,26 +1400,26 @@ var Papi = function (_ResourceSchema) {
 
     _classCallCheck(this, Papi);
 
-    var _this32 = _possibleConstructorReturn(this, _ResourceSchema.apply(this, arguments));
+    var _this34 = _possibleConstructorReturn(this, _ResourceSchema.apply(this, arguments));
 
-    _this32.options = options;
-    _this32.options.host = options.host || 'https://api.pressly.com';
+    _this34.options = options;
+    _this34.options.host = options.host || 'https://api.pressly.com';
 
-    _this32.requestMiddlewares = [];
-    _this32.responseMiddlewares = [];
+    _this34.requestMiddlewares = [];
+    _this34.responseMiddlewares = [];
 
-    _this32.metrics = {
+    _this34.metrics = {
       sendEvent: function sendEvent(type, message) {
-        _this32.request('post', '/metrix/events/' + type, message);
+        _this34.request('post', '/metrix/events/' + type, message);
       }
     };
 
-    _this32.auth = {
+    _this34.auth = {
       session: null,
 
       get: function get() {
-        return _this32.request('get', '/session').then(function (res) {
-          return _this32.auth.set(res.data);
+        return _this34.request('get', '/session').then(function (res) {
+          return _this34.auth.set(res.data);
         });
       },
 
@@ -1402,13 +1428,13 @@ var Papi = function (_ResourceSchema) {
           throw new Error('Papi:Auth: Invalid session response - missing jwt');
         }
 
-        _this32.auth.session = session;
+        _this34.auth.session = session;
 
-        return _this32.auth.session;
+        return _this34.auth.session;
       },
 
       isLoggedIn: function isLoggedIn() {
-        return !!_this32.auth.session && !_this32.auth.isExpired();
+        return !!_this34.auth.session && !_this34.auth.isExpired();
       },
 
       isExpired: function isExpired() {
@@ -1418,18 +1444,18 @@ var Papi = function (_ResourceSchema) {
       },
 
       login: function login(email, password) {
-        return _this32.request('post', '/auth', { data: { email: email, password: password } }).then(function (res) {
-          return _this32.auth.set(res.data);
+        return _this34.request('post', '/auth', { data: { email: email, password: password } }).then(function (res) {
+          return _this34.auth.set(res.data);
         });
       },
 
       requestPasswordReset: function requestPasswordReset(email) {
-        return _this32.request('post', '/auth/password_reset', { data: { email: email } });
+        return _this34.request('post', '/auth/password_reset', { data: { email: email } });
       },
 
       requestNetworkCreds: function requestNetworkCreds(network) {
         return new Promise(function (resolve, reject) {
-          var url = _this32.options.host + ('/auth/' + network + '?close=true');
+          var url = _this34.options.host + ('/auth/' + network + '?close=true');
 
           window.open(url);
 
@@ -1449,27 +1475,27 @@ var Papi = function (_ResourceSchema) {
 
       logout: function logout() {
         // Clear session immediately even if server fails to respond
-        _this32.auth.session = null;
+        _this34.auth.session = null;
 
-        return _this32.request('delete', '/session').then(function (res) {
+        return _this34.request('delete', '/session').then(function (res) {
           return res;
         });
       }
     };
 
-    if (_this32.options.memoize == true) {
-      _this32.request = memoize(_this32.request, { maxAge: 1000, individualExpiry: true });
+    if (_this34.options.memoize == true) {
+      _this34.request = memoize(_this34.request, { maxAge: 1000, individualExpiry: true });
     }
-    return _this32;
+    return _this34;
   }
 
   Papi.prototype.request = function request(method, path) {
-    var _this33 = this;
+    var _this35 = this;
 
     var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 
     return new AbortablePromise(function (resolve, reject, onAbort) {
-      var url = /^(https?:)?\/\//.test(path) ? path : _this33.options.host + path;
+      var url = /^(https?:)?\/\//.test(path) ? path : _this35.options.host + path;
 
       var req = {
         url: url,
@@ -1484,8 +1510,8 @@ var Papi = function (_ResourceSchema) {
       // }
 
       // Send Authorization header when we have a JSON Web Token set in the session
-      if (_this33.auth.session && _this33.auth.session.jwt) {
-        req.headers['Authorization'] = 'Bearer ' + _this33.auth.session.jwt;
+      if (_this35.auth.session && _this35.auth.session.jwt) {
+        req.headers['Authorization'] = 'Bearer ' + _this35.auth.session.jwt;
       }
 
       req.headers['Accept'] = 'application/vnd.pressly.v2.0+json';
@@ -1520,14 +1546,14 @@ var Papi = function (_ResourceSchema) {
       var res = {};
 
       var beginRequest = function beginRequest() {
-        if (_this33.requestMiddlewares.length) {
+        if (_this35.requestMiddlewares.length) {
           var offset = 0;
           var next = function next() {
-            var layer = _this33.requestMiddlewares[++offset] || endRequest;
+            var layer = _this35.requestMiddlewares[++offset] || endRequest;
             return layer(req, res, next, resolve, reject);
           };
 
-          _this33.requestMiddlewares[0](req, res, next, resolve, reject);
+          _this35.requestMiddlewares[0](req, res, next, resolve, reject);
         } else {
           endRequest();
         }
@@ -1555,14 +1581,14 @@ var Papi = function (_ResourceSchema) {
       };
 
       var beginResponse = function beginResponse() {
-        if (_this33.responseMiddlewares.length) {
+        if (_this35.responseMiddlewares.length) {
           var offset = 0;
           var next = function next() {
-            var layer = _this33.responseMiddlewares[++offset] || endResponse;
+            var layer = _this35.responseMiddlewares[++offset] || endResponse;
             return layer(req, res, next, resolve, reject);
           };
 
-          _this33.responseMiddlewares[0](req, res, next, resolve, reject);
+          _this35.responseMiddlewares[0](req, res, next, resolve, reject);
         } else {
           endResponse();
         }
@@ -1596,7 +1622,7 @@ if (Papi.defineSchema == undefined) {
   Papi.defineSchema = ResourceSchema.defineSchema;
 }
 
-Papi.defineSchema().resource('accounts').open().get('available', { on: 'resource' }).post('become', { on: 'member' }).resource('users').resource('hubs', { link: 'hubs' }).close().resource('organizations').open().resource('users').resource('hubs').resource('invites').open().post('bulk_invite', { on: 'resource' }).post('resend', { on: 'member' }).put('accept', { on: 'member', routeSegment: '/invites/:hash' }).put('reject', { on: 'member', routeSegment: '/invites/:hash' }).close().close().resource('activity').resource('posts', { routeSegment: '/stream/posts/:id' }).resource('hubs').open().get('search', { on: 'resource' }).post('upgrade', { on: 'member' }).post('follow', { on: 'member' }).delete('unfollow', { on: 'member', path: '/follow' }).get('reach', { on: 'member' }).resource('newsletters').open().resource('mailinglists').close().resource('widgets').open().get('dimensions', { on: 'resource' }).close()
+Papi.defineSchema().resource('accounts').open().get('available', { on: 'resource' }).post('become', { on: 'member' }).resource('users').resource('hubs', { link: 'hubs' }).close().resource('organizations').open().resource('users').resource('hubs').resource('invites').open().post('bulk_invite', { on: 'resource' }).post('resend', { on: 'member' }).put('accept', { on: 'member', routeSegment: '/invites/:hash' }).put('reject', { on: 'member', routeSegment: '/invites/:hash' }).close().close().resource('activity').resource('posts', { routeSegment: '/stream/posts/:id' }).resource('hubs').open().get('search', { on: 'resource' }).post('upgrade', { on: 'member' }).post('follow', { on: 'member' }).delete('unfollow', { on: 'member', path: '/follow' }).get('reach', { on: 'member' }).resource('newsletters').open().resource('mailinglists', { modelName: 'MailingList' }).close().resource('widgets').open().get('dimensions', { on: 'resource' }).close()
 
 // Readonly styles endpoint
 .get('styles', { on: 'member', path: '/apps/current/styles' }).resource('apps').open().get('current', { on: 'resource' }).get('build', { on: 'member', path: '/build_app' }).get('status', { on: 'member' }).resource('styles').close().resource('addons').open().resource('configs').close().resource('analytics').open().get('summary', { on: 'resource' }).get('visitors', { on: 'resource' }).get('pageviews', { on: 'resource' }).get('duration', { on: 'resource' }).close().resource('feeds').open().resource('assets', { modelName: 'FeedAsset' }).close().resource('invites').open().get('users', { on: 'resource' }).post('bulk_invite', { on: 'resource' }).post('resend', { on: 'member' }).put('accept', { on: 'member', routeSegment: '/invites/:hash' }).put('reject', { on: 'member', routeSegment: '/invites/:hash' }).close().resource('recommendations').resource('users').open().post('grant_access', { on: 'resource' }).delete('revoke_access', { on: 'member' }).close().resource('collaborators', { modelName: 'User' }).resource('collections').open().put('reorder', { on: 'resource' }).close().resource('tags')
