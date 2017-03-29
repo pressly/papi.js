@@ -1424,10 +1424,6 @@ var Papi = function (_ResourceSchema) {
       },
 
       set: function set(session) {
-        if (!session.jwt) {
-          throw new Error('Papi:Auth: Invalid session response - missing jwt');
-        }
-
         _this34.auth.session = session;
 
         return _this34.auth.session;

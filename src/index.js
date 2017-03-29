@@ -46,10 +46,6 @@ class Papi extends ResourceSchema {
       },
 
       set: (session) => {
-        if (!session.jwt) {
-          throw new Error('Papi:Auth: Invalid session response - missing jwt');
-        }
-
         this.auth.session = session;
 
         return this.auth.session;
