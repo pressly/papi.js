@@ -348,8 +348,8 @@ Papi.defineSchema()
     .close()
 
     .resource('submissions', { routeSegment: '/posts/submissions/:id'}).open()
-      .put('publish', { on: 'member' })
-      .put('unpublish', { on: 'member' })
+      .put('approve', { on: 'member' })
+      .put('reject', { on: 'member' })
     .close()
 
     .resource('drafts', { routeSegment: '/posts/drafts/:id'}).open()
