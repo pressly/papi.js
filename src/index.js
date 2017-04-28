@@ -354,6 +354,7 @@ Papi.defineSchema()
 
     .resource('drafts', { routeSegment: '/posts/drafts/:id'}).open()
       .put('publish', { on: 'member' })
+      .put('submit', { on: 'member' })
     .close()
 
     .resource('deleted', { routeSegment: '/posts/deleted/:id'})
