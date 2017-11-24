@@ -403,4 +403,9 @@ Papi.defineSchema()
 
   .resource('stream').open()
   .close()
+
+
+  .resource('adminorganizations', { routeSegment: '/orgadmin/organizations' })
+  .resource('adminhubs', { routeSegment: '/orgadmin/hubs' })
+  .resource('adminusers', { routeSegment: '/orgadmin/users' })
 ;
