@@ -13,8 +13,6 @@ export * from './feed-asset';
 export * from './hub';
 export * from './invite';
 export * from './like';
-export * from './newsletter'
-export * from './mailing-list';
 export * from './post';
 export * from './recommendation';
 export * from './style';

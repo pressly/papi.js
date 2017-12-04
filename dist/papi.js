@@ -265,10 +265,9 @@ var parseHTTPLinks = function parseHTTPLinks(linksString) {
 
   if (linksString && !isEmpty(linksString)) {
     each(linksString.split(','), function (link) {
-      var _link$split = link.split(';');
-
-      var href = _link$split[0];
-      var rel = _link$split[1];
+      var _link$split = link.split(';'),
+          href = _link$split[0],
+          rel = _link$split[1];
 
       href = href.replace(/<(.*)>/, '$1').trim();
       rel = rel.replace(/rel="(.*)"/, '$1').trim();
@@ -902,97 +901,73 @@ var Like = function (_Model13) {
   return Like;
 }(Model);
 
-var Newsletter = function (_Model14) {
-  _inherits(Newsletter, _Model14);
-
-  function Newsletter() {
-    _classCallCheck(this, Newsletter);
-
-    return _possibleConstructorReturn(this, _Model14.apply(this, arguments));
-  }
-
-  return Newsletter;
-}(Model);
-
-var MailingList = function (_Model15) {
-  _inherits(MailingList, _Model15);
-
-  function MailingList() {
-    _classCallCheck(this, MailingList);
-
-    return _possibleConstructorReturn(this, _Model15.apply(this, arguments));
-  }
-
-  return MailingList;
-}(Model);
-
-var Post = function (_Model16) {
-  _inherits(Post, _Model16);
+var Post = function (_Model14) {
+  _inherits(Post, _Model14);
 
   function Post() {
     _classCallCheck(this, Post);
 
-    return _possibleConstructorReturn(this, _Model16.apply(this, arguments));
+    return _possibleConstructorReturn(this, _Model14.apply(this, arguments));
   }
 
   return Post;
 }(Model);
 
-var Recommendation = function (_Model17) {
-  _inherits(Recommendation, _Model17);
+var Recommendation = function (_Model15) {
+  _inherits(Recommendation, _Model15);
 
   function Recommendation() {
     _classCallCheck(this, Recommendation);
 
-    return _possibleConstructorReturn(this, _Model17.apply(this, arguments));
+    return _possibleConstructorReturn(this, _Model15.apply(this, arguments));
   }
 
   return Recommendation;
 }(Model);
 
-var Style = function (_Model18) {
-  _inherits(Style, _Model18);
+var Style = function (_Model16) {
+  _inherits(Style, _Model16);
 
   function Style() {
     _classCallCheck(this, Style);
 
-    return _possibleConstructorReturn(this, _Model18.apply(this, arguments));
+    return _possibleConstructorReturn(this, _Model16.apply(this, arguments));
   }
 
   return Style;
 }(Model);
 
-var Tag = function (_Model19) {
-  _inherits(Tag, _Model19);
+var Tag = function (_Model17) {
+  _inherits(Tag, _Model17);
 
   function Tag() {
     _classCallCheck(this, Tag);
 
-    return _possibleConstructorReturn(this, _Model19.apply(this, arguments));
+    return _possibleConstructorReturn(this, _Model17.apply(this, arguments));
   }
 
   return Tag;
 }(Model);
 
-var User = function (_Model20) {
-  _inherits(User, _Model20);
+var User = function (_Model18) {
+  _inherits(User, _Model18);
 
   function User() {
     _classCallCheck(this, User);
 
-    return _possibleConstructorReturn(this, _Model20.apply(this, arguments));
+    return _possibleConstructorReturn(this, _Model18.apply(this, arguments));
   }
 
   return User;
 }(Model);
 
-var Widget = function (_Model21) {
-  _inherits(Widget, _Model21);
+var Widget = function (_Model19) {
+  _inherits(Widget, _Model19);
 
   function Widget() {
     _classCallCheck(this, Widget);
 
-    return _possibleConstructorReturn(this, _Model21.apply(this, arguments));
+    return _possibleConstructorReturn(this, _Model19.apply(this, arguments));
   }
 
   return Widget;
@@ -1013,8 +988,6 @@ var models = Object.freeze({
   Hub: Hub,
   Invite: Invite,
   Like: Like,
-  Newsletter: Newsletter,
-  MailingList: MailingList,
   Post: Post,
   Recommendation: Recommendation,
   Style: Style,
@@ -1239,15 +1212,15 @@ ResourceSchema.defineSchema = function () {
             //console.log(`- adding collection action to ${parentPointer.current.key}:`, method, name, options);
 
             resourceClass.prototype['$' + name] = function () {
-              var _this32 = this;
+              var _this30 = this;
 
               var data = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 
               return this.request(_extends({ method: method, action: action }, { data: data })).then(function (res) {
                 if (isArray(res)) {
-                  return _this32.hydrateCollection(res);
+                  return _this30.hydrateCollection(res);
                 } else {
-                  return _this32.hydrateModel(res);
+                  return _this30.hydrateModel(res);
                 }
               });
             };
@@ -1259,12 +1232,12 @@ ResourceSchema.defineSchema = function () {
             //console.log(`- adding member action to ${parentPointer.current.key}:`, method, name, options);
 
             resourceClass.prototype['$' + name] = function () {
-              var _this33 = this;
+              var _this31 = this;
 
               var data = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 
               return this.request(_extends({ method: method, action: action }, { data: data })).then(function (res) {
-                return _this33.hydrateModel(res);
+                return _this31.hydrateModel(res);
               });
             };
 
@@ -1400,37 +1373,37 @@ var Papi = function (_ResourceSchema) {
 
     _classCallCheck(this, Papi);
 
-    var _this34 = _possibleConstructorReturn(this, _ResourceSchema.apply(this, arguments));
+    var _this32 = _possibleConstructorReturn(this, _ResourceSchema.apply(this, arguments));
 
-    _this34.options = options;
-    _this34.options.host = options.host || 'https://api.pressly.com';
+    _this32.options = options;
+    _this32.options.host = options.host || 'https://api.pressly.com';
 
-    _this34.requestMiddlewares = [];
-    _this34.responseMiddlewares = [];
+    _this32.requestMiddlewares = [];
+    _this32.responseMiddlewares = [];
 
-    _this34.metrics = {
+    _this32.metrics = {
       sendEvent: function sendEvent(type, message) {
-        _this34.request('post', '/metrix/events/' + type, message);
+        _this32.request('post', '/metrix/events/' + type, message);
       }
     };
 
-    _this34.auth = {
+    _this32.auth = {
       session: null,
 
       get: function get() {
-        return _this34.request('get', '/session').then(function (res) {
-          return _this34.auth.set(res.data);
+        return _this32.request('get', '/session').then(function (res) {
+          return _this32.auth.set(res.data);
         });
       },
 
       set: function set(session) {
-        _this34.auth.session = session;
+        _this32.auth.session = session;
 
-        return _this34.auth.session;
+        return _this32.auth.session;
       },
 
       isLoggedIn: function isLoggedIn() {
-        return !!_this34.auth.session && !_this34.auth.isExpired();
+        return !!_this32.auth.session && !_this32.auth.isExpired();
       },
 
       isExpired: function isExpired() {
@@ -1440,18 +1413,18 @@ var Papi = function (_ResourceSchema) {
       },
 
       login: function login(email, password) {
-        return _this34.request('post', '/auth', { data: { email: email, password: password } }).then(function (res) {
-          return _this34.auth.set(res.data);
+        return _this32.request('post', '/auth', { data: { email: email, password: password } }).then(function (res) {
+          return _this32.auth.set(res.data);
         });
       },
 
       requestPasswordReset: function requestPasswordReset(email) {
-        return _this34.request('post', '/auth/password_reset', { data: { email: email } });
+        return _this32.request('post', '/auth/password_reset', { data: { email: email } });
       },
 
       requestNetworkCreds: function requestNetworkCreds(network) {
         return new Promise(function (resolve, reject) {
-          var url = _this34.options.host + ('/auth/' + network + '?close=true');
+          var url = _this32.options.host + ('/auth/' + network + '?close=true');
 
           window.open(url);
 
@@ -1471,27 +1444,27 @@ var Papi = function (_ResourceSchema) {
 
       logout: function logout() {
         // Clear session immediately even if server fails to respond
-        _this34.auth.session = null;
+        _this32.auth.session = null;
 
-        return _this34.request('delete', '/session').then(function (res) {
+        return _this32.request('delete', '/session').then(function (res) {
           return res;
         });
       }
     };
 
-    if (_this34.options.memoize == true) {
-      _this34.request = memoize(_this34.request, { maxAge: 1000, individualExpiry: true });
+    if (_this32.options.memoize == true) {
+      _this32.request = memoize(_this32.request, { maxAge: 1000, individualExpiry: true });
     }
-    return _this34;
+    return _this32;
   }
 
   Papi.prototype.request = function request(method, path) {
-    var _this35 = this;
+    var _this33 = this;
 
     var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 
     return new AbortablePromise(function (resolve, reject, onAbort) {
-      var url = /^(https?:)?\/\//.test(path) ? path : _this35.options.host + path;
+      var url = /^(https?:)?\/\//.test(path) ? path : _this33.options.host + path;
 
       var req = {
         url: url,
@@ -1499,15 +1472,14 @@ var Papi = function (_ResourceSchema) {
         headers: {},
         query: {},
         credentials: 'include'
-      };
 
-      // if (options.timeout || this.options.timeout) {
-      //   req.timeout(options.timeout || this.options.timeout);
-      // }
+        // if (options.timeout || this.options.timeout) {
+        //   req.timeout(options.timeout || this.options.timeout);
+        // }
 
-      // Send Authorization header when we have a JSON Web Token set in the session
-      if (_this35.auth.session && _this35.auth.session.jwt) {
-        req.headers['Authorization'] = 'Bearer ' + _this35.auth.session.jwt;
+        // Send Authorization header when we have a JSON Web Token set in the session
+      };if (_this33.auth.session && _this33.auth.session.jwt) {
+        req.headers['Authorization'] = 'Bearer ' + _this33.auth.session.jwt;
       }
 
       req.headers['Accept'] = 'application/vnd.pressly.v2.0+json';
@@ -1542,14 +1514,14 @@ var Papi = function (_ResourceSchema) {
       var res = {};
 
       var beginRequest = function beginRequest() {
-        if (_this35.requestMiddlewares.length) {
+        if (_this33.requestMiddlewares.length) {
           var offset = 0;
           var next = function next() {
-            var layer = _this35.requestMiddlewares[++offset] || endRequest;
+            var layer = _this33.requestMiddlewares[++offset] || endRequest;
             return layer(req, res, next, resolve, reject);
           };
 
-          _this35.requestMiddlewares[0](req, res, next, resolve, reject);
+          _this33.requestMiddlewares[0](req, res, next, resolve, reject);
         } else {
           endRequest();
         }
@@ -1577,14 +1549,14 @@ var Papi = function (_ResourceSchema) {
       };
 
       var beginResponse = function beginResponse() {
-        if (_this35.responseMiddlewares.length) {
+        if (_this33.responseMiddlewares.length) {
           var offset = 0;
           var next = function next() {
-            var layer = _this35.responseMiddlewares[++offset] || endResponse;
+            var layer = _this33.responseMiddlewares[++offset] || endResponse;
             return layer(req, res, next, resolve, reject);
           };
 
-          _this35.responseMiddlewares[0](req, res, next, resolve, reject);
+          _this33.responseMiddlewares[0](req, res, next, resolve, reject);
         } else {
           endResponse();
         }
@@ -1627,7 +1599,7 @@ Papi.defineSchema().resource('accounts').open().get('available', { on: 'resource
 .resource('assets', { routeSegment: '/stream/:id' }).open().put('feature', { on: 'member' }).put('unfeature', { on: 'member' }).put('hide', { on: 'member' }).put('unhide', { on: 'member' }).put('lock', { on: 'member' }).put('unlock', { on: 'member' }).resource('likes').resource('comments').close().resource('posts', { routeSegment: '/posts/published/:id' }).open().put('hide', { on: 'member' }).put('unhide', { on: 'member' }).put('reorder', { on: 'member' }).resource('contributions').close().resource('scheduled', { routeSegment: '/posts/scheduled/:id' }).open().put('publish', { on: 'member' }).put('unpublish', { on: 'member' }).close().resource('submissions', { routeSegment: '/posts/submissions/:id' }).open().put('approve', { on: 'member' }).put('reject', { on: 'member' }).close().resource('drafts', { routeSegment: '/posts/drafts/:id' }).open().put('publish', { on: 'member' }).put('submit', { on: 'member' }).close().resource('deleted', { routeSegment: '/posts/deleted/:id' }).close().resource('invites').open().get('incoming', { on: 'resource' }).get('outgoing', { on: 'resource' }).post('bulk_invite', { on: 'resource' }).post('resend', { on: 'member' }).put('accept', { on: 'member', routeSegment: '/invites/:hash' }).put('reject', { on: 'member', routeSegment: '/invites/:hash' }).close().resource('code_revisions').open().get('fetch_repo', { on: 'member' })
 
 // This resource links to the root hubs resource
-.resource('hubs', { link: 'hubs' }).close().resource('signup').open().get('account_uid_available', { on: 'member' }).get('account_email_available', { on: 'member' }).close().resource('users').open().get('roles', { on: 'resource' }).resource('hubs').resource('organizations').close().resource('discover').open().resource('users', { link: 'users' }).resource('organizations', { link: 'organizations' }).resource('hubs', { link: 'hubs' }).open().get('popular', { on: 'resource' }).close().resource('posts').close().resource('creds').open().post('share', { on: 'member' }).close().resource('stream').open().close();
+.resource('hubs', { link: 'hubs' }).close().resource('signup').open().get('account_uid_available', { on: 'member' }).get('account_email_available', { on: 'member' }).close().resource('users').open().get('roles', { on: 'resource' }).resource('hubs').resource('organizations').close().resource('discover').open().resource('users', { link: 'users' }).resource('organizations', { link: 'organizations' }).resource('hubs', { link: 'hubs' }).open().get('popular', { on: 'resource' }).close().resource('posts').close().resource('creds').open().post('share', { on: 'member' }).close().resource('stream').open().close().resource('adminorganizations', { routeSegment: '/orgadmin/organizations' }).resource('adminhubs', { routeSegment: '/orgadmin/hubs' }).resource('adminusers', { routeSegment: '/orgadmin/users' });
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{"../lib/memoize":1,"dodgy":3,"isomorphic-fetch":4,"promiz":5,"querystring":8}],3:[function(require,module,exports){
 /*!
@@ -2225,6 +2197,28 @@ exports.encode = exports.stringify = require('./encode');
     arrayBuffer: 'ArrayBuffer' in self
   }
 
+  if (support.arrayBuffer) {
+    var viewClasses = [
+      '[object Int8Array]',
+      '[object Uint8Array]',
+      '[object Uint8ClampedArray]',
+      '[object Int16Array]',
+      '[object Uint16Array]',
+      '[object Int32Array]',
+      '[object Uint32Array]',
+      '[object Float32Array]',
+      '[object Float64Array]'
+    ]
+
+    var isDataView = function(obj) {
+      return obj && DataView.prototype.isPrototypeOf(obj)
+    }
+
+    var isArrayBufferView = ArrayBuffer.isView || function(obj) {
+      return obj && viewClasses.indexOf(Object.prototype.toString.call(obj)) > -1
+    }
+  }
+
   function normalizeName(name) {
     if (typeof name !== 'string') {
       name = String(name)
@@ -2267,7 +2261,10 @@ exports.encode = exports.stringify = require('./encode');
       headers.forEach(function(value, name) {
         this.append(name, value)
       }, this)
-
+    } else if (Array.isArray(headers)) {
+      headers.forEach(function(header) {
+        this.append(header[0], header[1])
+      }, this)
     } else if (headers) {
       Object.getOwnPropertyNames(headers).forEach(function(name) {
         this.append(name, headers[name])
@@ -2278,12 +2275,8 @@ exports.encode = exports.stringify = require('./encode');
   Headers.prototype.append = function(name, value) {
     name = normalizeName(name)
     value = normalizeValue(value)
-    var list = this.map[name]
-    if (!list) {
-      list = []
-      this.map[name] = list
-    }
-    list.push(value)
+    var oldValue = this.map[name]
+    this.map[name] = oldValue ? oldValue+','+value : value
   }
 
   Headers.prototype['delete'] = function(name) {
@@ -2291,12 +2284,8 @@ exports.encode = exports.stringify = require('./encode');
   }
 
   Headers.prototype.get = function(name) {
-    var values = this.map[normalizeName(name)]
-    return values ? values[0] : null
-  }
-
-  Headers.prototype.getAll = function(name) {
-    return this.map[normalizeName(name)] || []
+    name = normalizeName(name)
+    return this.has(name) ? this.map[name] : null
   }
 
   Headers.prototype.has = function(name) {
@@ -2304,15 +2293,15 @@ exports.encode = exports.stringify = require('./encode');
   }
 
   Headers.prototype.set = function(name, value) {
-    this.map[normalizeName(name)] = [normalizeValue(value)]
+    this.map[normalizeName(name)] = normalizeValue(value)
   }
 
   Headers.prototype.forEach = function(callback, thisArg) {
-    Object.getOwnPropertyNames(this.map).forEach(function(name) {
-      this.map[name].forEach(function(value) {
-        callback.call(thisArg, value, name, this)
-      }, this)
-    }, this)
+    for (var name in this.map) {
+      if (this.map.hasOwnProperty(name)) {
+        callback.call(thisArg, this.map[name], name, this)
+      }
+    }
   }
 
   Headers.prototype.keys = function() {
@@ -2357,14 +2346,36 @@ exports.encode = exports.stringify = require('./encode');
 
   function readBlobAsArrayBuffer(blob) {
     var reader = new FileReader()
+    var promise = fileReaderReady(reader)
     reader.readAsArrayBuffer(blob)
-    return fileReaderReady(reader)
+    return promise
   }
 
   function readBlobAsText(blob) {
     var reader = new FileReader()
+    var promise = fileReaderReady(reader)
     reader.readAsText(blob)
-    return fileReaderReady(reader)
+    return promise
+  }
+
+  function readArrayBufferAsText(buf) {
+    var view = new Uint8Array(buf)
+    var chars = new Array(view.length)
+
+    for (var i = 0; i < view.length; i++) {
+      chars[i] = String.fromCharCode(view[i])
+    }
+    return chars.join('')
+  }
+
+  function bufferClone(buf) {
+    if (buf.slice) {
+      return buf.slice(0)
+    } else {
+      var view = new Uint8Array(buf.byteLength)
+      view.set(new Uint8Array(buf))
+      return view.buffer
+    }
   }
 
   function Body() {
@@ -2372,7 +2383,9 @@ exports.encode = exports.stringify = require('./encode');
 
     this._initBody = function(body) {
       this._bodyInit = body
-      if (typeof body === 'string') {
+      if (!body) {
+        this._bodyText = ''
+      } else if (typeof body === 'string') {
         this._bodyText = body
       } else if (support.blob && Blob.prototype.isPrototypeOf(body)) {
         this._bodyBlob = body
@@ -2380,11 +2393,12 @@ exports.encode = exports.stringify = require('./encode');
         this._bodyFormData = body
       } else if (support.searchParams && URLSearchParams.prototype.isPrototypeOf(body)) {
         this._bodyText = body.toString()
-      } else if (!body) {
-        this._bodyText = ''
-      } else if (support.arrayBuffer && ArrayBuffer.prototype.isPrototypeOf(body)) {
-        // Only support ArrayBuffers for POST method.
-        // Receiving ArrayBuffers happens via Blobs, instead.
+      } else if (support.arrayBuffer && support.blob && isDataView(body)) {
+        this._bodyArrayBuffer = bufferClone(body.buffer)
+        // IE 10-11 can't handle a DataView body.
+        this._bodyInit = new Blob([this._bodyArrayBuffer])
+      } else if (support.arrayBuffer && (ArrayBuffer.prototype.isPrototypeOf(body) || isArrayBufferView(body))) {
+        this._bodyArrayBuffer = bufferClone(body)
       } else {
         throw new Error('unsupported BodyInit type')
       }
@@ -2409,6 +2423,8 @@ exports.encode = exports.stringify = require('./encode');
 
         if (this._bodyBlob) {
           return Promise.resolve(this._bodyBlob)
+        } else if (this._bodyArrayBuffer) {
+          return Promise.resolve(new Blob([this._bodyArrayBuffer]))
         } else if (this._bodyFormData) {
           throw new Error('could not read FormData body as blob')
         } else {
@@ -2417,27 +2433,28 @@ exports.encode = exports.stringify = require('./encode');
       }
 
       this.arrayBuffer = function() {
-        return this.blob().then(readBlobAsArrayBuffer)
-      }
-
-      this.text = function() {
-        var rejected = consumed(this)
-        if (rejected) {
-          return rejected
-        }
-
-        if (this._bodyBlob) {
-          return readBlobAsText(this._bodyBlob)
-        } else if (this._bodyFormData) {
-          throw new Error('could not read FormData body as text')
+        if (this._bodyArrayBuffer) {
+          return consumed(this) || Promise.resolve(this._bodyArrayBuffer)
         } else {
-          return Promise.resolve(this._bodyText)
+          return this.blob().then(readBlobAsArrayBuffer)
         }
       }
-    } else {
-      this.text = function() {
-        var rejected = consumed(this)
-        return rejected ? rejected : Promise.resolve(this._bodyText)
+    }
+
+    this.text = function() {
+      var rejected = consumed(this)
+      if (rejected) {
+        return rejected
+      }
+
+      if (this._bodyBlob) {
+        return readBlobAsText(this._bodyBlob)
+      } else if (this._bodyArrayBuffer) {
+        return Promise.resolve(readArrayBufferAsText(this._bodyArrayBuffer))
+      } else if (this._bodyFormData) {
+        throw new Error('could not read FormData body as text')
+      } else {
+        return Promise.resolve(this._bodyText)
       }
     }
 
@@ -2465,7 +2482,8 @@ exports.encode = exports.stringify = require('./encode');
   function Request(input, options) {
     options = options || {}
     var body = options.body
-    if (Request.prototype.isPrototypeOf(input)) {
+
+    if (input instanceof Request) {
       if (input.bodyUsed) {
         throw new TypeError('Already read')
       }
@@ -2476,12 +2494,12 @@ exports.encode = exports.stringify = require('./encode');
       }
       this.method = input.method
       this.mode = input.mode
-      if (!body) {
+      if (!body && input._bodyInit != null) {
         body = input._bodyInit
         input.bodyUsed = true
       }
     } else {
-      this.url = input
+      this.url = String(input)
     }
 
     this.credentials = options.credentials || this.credentials || 'omit'
@@ -2499,7 +2517,7 @@ exports.encode = exports.stringify = require('./encode');
   }
 
   Request.prototype.clone = function() {
-    return new Request(this)
+    return new Request(this, { body: this._bodyInit })
   }
 
   function decode(body) {
@@ -2515,16 +2533,17 @@ exports.encode = exports.stringify = require('./encode');
     return form
   }
 
-  function headers(xhr) {
-    var head = new Headers()
-    var pairs = (xhr.getAllResponseHeaders() || '').trim().split('\n')
-    pairs.forEach(function(header) {
-      var split = header.trim().split(':')
-      var key = split.shift().trim()
-      var value = split.join(':').trim()
-      head.append(key, value)
+  function parseHeaders(rawHeaders) {
+    var headers = new Headers()
+    rawHeaders.split(/\r?\n/).forEach(function(line) {
+      var parts = line.split(':')
+      var key = parts.shift().trim()
+      if (key) {
+        var value = parts.join(':').trim()
+        headers.append(key, value)
+      }
     })
-    return head
+    return headers
   }
 
   Body.call(Request.prototype)
@@ -2535,10 +2554,10 @@ exports.encode = exports.stringify = require('./encode');
     }
 
     this.type = 'default'
-    this.status = options.status
+    this.status = 'status' in options ? options.status : 200
     this.ok = this.status >= 200 && this.status < 300
-    this.statusText = options.statusText
-    this.headers = options.headers instanceof Headers ? options.headers : new Headers(options.headers)
+    this.statusText = 'statusText' in options ? options.statusText : 'OK'
+    this.headers = new Headers(options.headers)
     this.url = options.url || ''
     this._initBody(bodyInit)
   }
@@ -2576,35 +2595,16 @@ exports.encode = exports.stringify = require('./encode');
 
   self.fetch = function(input, init) {
     return new Promise(function(resolve, reject) {
-      var request
-      if (Request.prototype.isPrototypeOf(input) && !init) {
-        request = input
-      } else {
-        request = new Request(input, init)
-      }
-
+      var request = new Request(input, init)
       var xhr = new XMLHttpRequest()
-
-      function responseURL() {
-        if ('responseURL' in xhr) {
-          return xhr.responseURL
-        }
-
-        // Avoid security warnings on getResponseHeader when not allowed by CORS
-        if (/^X-Request-URL:/m.test(xhr.getAllResponseHeaders())) {
-          return xhr.getResponseHeader('X-Request-URL')
-        }
-
-        return
-      }
 
       xhr.onload = function() {
         var options = {
           status: xhr.status,
           statusText: xhr.statusText,
-          headers: headers(xhr),
-          url: responseURL()
+          headers: parseHeaders(xhr.getAllResponseHeaders() || '')
         }
+        options.url = 'responseURL' in xhr ? xhr.responseURL : options.headers.get('X-Request-URL')
         var body = 'response' in xhr ? xhr.response : xhr.responseText
         resolve(new Response(body, options))
       }
