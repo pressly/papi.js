@@ -1,12 +1,13 @@
 {
   "name": "papi",
-  "version": "2.2.7",
+  "version": "2.2.8",
   "description": "Javascript HTTP/REST client for the Pressly API",
   "author": "Peter Kieltyka <peter@pressly.com>",
   "jsnext:main": "./src/index.js",
   "main": "./dist/src/index.js",
   "scripts": {
     "build": "gulp build",
+    "dist": "gulp dist",
     "test": "nyc --reporter=html --require babel-core/register mocha",
     "test-watch": "mocha -w"
   },
