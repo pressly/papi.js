@@ -10,21 +10,6 @@ function singularize(string) {
   return string.replace(/s$/, '');
 }
 
-var parseHTTPLinks = function(linksString) {
-  var links = {};
-
-  if (linksString && !isEmpty(linksString)) {
-    each(linksString.split(','), function(link) {
-      var [href, rel] = link.split(';');
-      href = href.replace(/<(.*)>/, '$1').trim();
-      rel = rel.replace(/rel="(.*)"/, '$1').trim();
-      links[rel] = href;
-    });
-  }
-
-  return links;
-};
-
 var toUnderscoreCase = function(str) {
 	return str.replace(/([A-Z])/g, function($1){return "_" + $1.toLowerCase(); });
 };
@@ -194,11 +179,7 @@ export default class Resource {
   setResponse(res) {
     this.status = res.status;
     this.headers = res.headers;
-    this.links = {};
-
-    if (res.headers && res.headers.has('Link')) {
-      this.links = parseHTTPLinks(res.headers.get('Link'));
-    }
+    this.links = res.links;
   }
 
   sync(data) {

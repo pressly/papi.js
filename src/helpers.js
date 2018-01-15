@@ -144,3 +144,18 @@ export const clone = (obj) => {
 
   return result
 }
+
+export const parseHTTPLinks = (linksString) => {
+  var links = {}
+
+  if (linksString && !isEmpty(linksString)) {
+    each(linksString.split(','), function (link) {
+      var [href, rel] = link.split(';')
+      href = href.replace(/<(.*)>/, '$1').trim()
+      rel = rel.replace(/rel="(.*)"/, '$1').trim()
+      links[rel] = href
+    })
+  }
+
+  return links
+}

@@ -16,7 +16,7 @@ const memoize = require('../lib/memoize');
 // parsing so we need to handle it separately.
 import qs from 'querystring';
 
-import { isEmpty } from './helpers';
+import { isEmpty, parseHTTPLinks } from './helpers';
 
 import ResourceSchema from './resource-schema';
 
@@ -177,6 +177,12 @@ class Papi extends ResourceSchema {
         fetch(req.url, req).then((response) => {
           if (response.status >= 200 && response.status < 300) {
             res = response;
+
+            // parse http links into a usable format
+            res.links = {};
+            if (res.headers && res.headers.has('Link')) {
+              res.links = parseHTTPLinks(res.headers.get('Link'));
+            }
 
             response.json().then((data) => {
               res.data = data || {};
