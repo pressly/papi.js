@@ -177,14 +177,6 @@ var clone = function clone(obj) {
   return result;
 };
 
-function deepClone(obj) {
-  return JSON.parse(JSON.stringify(obj));
-}
-
-function singularize$1(string) {
-  return string.replace(/s$/, '');
-}
-
 var parseHTTPLinks = function parseHTTPLinks(linksString) {
   var links = {};
 
@@ -202,6 +194,14 @@ var parseHTTPLinks = function parseHTTPLinks(linksString) {
 
   return links;
 };
+
+function deepClone(obj) {
+  return JSON.parse(JSON.stringify(obj));
+}
+
+function singularize$1(string) {
+  return string.replace(/s$/, '');
+}
 
 var toUnderscoreCase = function toUnderscoreCase(str) {
   return str.replace(/([A-Z])/g, function ($1) {
@@ -396,11 +396,7 @@ var Resource = function () {
   Resource.prototype.setResponse = function setResponse(res) {
     this.status = res.status;
     this.headers = res.headers;
-    this.links = {};
-
-    if (res.headers && res.headers.has('Link')) {
-      this.links = parseHTTPLinks(res.headers.get('Link'));
-    }
+    this.links = res.links;
   };
 
   Resource.prototype.sync = function sync(data) {
@@ -1483,6 +1479,12 @@ var Papi = function (_ResourceSchema) {
         fetch(req.url, req).then(function (response) {
           if (response.status >= 200 && response.status < 300) {
             res = response;
+
+            // parse http links into a usable format
+            res.links = {};
+            if (res.headers && res.headers.has('Link')) {
+              res.links = parseHTTPLinks(res.headers.get('Link'));
+            }
 
             response.json().then(function (data) {
               res.data = data || {};
